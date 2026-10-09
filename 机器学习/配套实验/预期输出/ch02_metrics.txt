@@ -1,0 +1,10 @@
+model: A
+errors: [-1.0, 1.0, 0.0, 2.0]
+MAE=1.000000 MSE=1.500000 RMSE=1.224745
+worst index: 3
+model: B
+errors: [0.0, 0.0, 0.0, 4.0]
+MAE=1.000000 MSE=4.000000 RMSE=2.000000
+worst index: 3
+invalid input rejected: [] []
+invalid input rejected: [1.0] [1.0, 2.0]

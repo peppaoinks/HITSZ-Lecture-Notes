@@ -1,0 +1,12 @@
+split sizes: 12 4 4
+baseline validation MAE: 3.050000
+k=1 validation MAE: 0.100000
+k=3 validation MAE: 0.241667
+k=5 validation MAE: 0.540000
+selected k: 1
+baseline test MAE: 2.950000
+selected model test MAE: 0.700000
+x=1.2 y=6.5 prediction=5.600 error=0.900
+x=2.8 y=9.5 prediction=10.200 error=0.700
+x=4.2 y=12.3 prediction=11.700 error=0.600
+x=5.8 y=15.5 prediction=16.100 error=0.600

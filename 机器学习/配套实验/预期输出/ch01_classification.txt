@@ -1,0 +1,6 @@
+threshold: 0.5
+TP FP TN FN: 2 2 3 1
+accuracy=0.625000 precision=0.500000 recall=0.666667
+threshold: 0.7
+TP FP TN FN: 1 1 4 2
+accuracy=0.625000 precision=0.500000 recall=0.333333

@@ -1,0 +1,14 @@
+raw: [' 82 ', '91', '', ' 76', 'absent', '88', '0', '105', '-3']
+clean: [82, 91, 76, 88, 0]
+rejected:
+(2, '', 'not an unsigned ASCII integer')
+(4, 'absent', 'not an unsigned ASCII integer')
+(7, '105', 'out of range')
+(8, '-3', 'not an unsigned ASCII integer')
+summary:
+count = 5
+mean = 67.4
+minimum = 0
+maximum = 91
+pass_rate = 0.8
+empty input: None
