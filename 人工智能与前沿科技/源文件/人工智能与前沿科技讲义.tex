@@ -1,0 +1,644 @@
+\documentclass[UTF8,fontset=none,zihao=-4,a4paper]{ctexart}
+% 统一版式：后续更新仅在本文件继续编写。
+\usepackage[left=26mm,right=26mm,top=25mm,bottom=25mm,headheight=15pt]{geometry}
+\setCJKmainfont{Songti SC}[BoldFont={Songti SC Bold}]
+\setCJKsansfont{Songti SC}[BoldFont={Songti SC Bold}]
+\setCJKmonofont{Songti SC}[BoldFont={Songti SC Bold}]
+\setCJKfamilyfont{kai}{Kaiti SC}
+\setmainfont{Times New Roman}
+\setmonofont{Times New Roman}
+\usepackage{amsmath,amssymb,booktabs,tabularx,array,enumitem,fancyhdr,needspace,longtable,tikz,listings}
+\usepackage[most]{tcolorbox}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\hypersetup{pdftitle={人工智能与前沿科技},pdfsubject={课程课件中文总结讲义}}
+\definecolor{Theme}{HTML}{35566E}
+\definecolor{BoxBack}{HTML}{F2F6F8}
+\definecolor{BoxFrame}{HTML}{B8C8D3}
+\tcbset{lecturebox/.style={enhanced,breakable,colback=BoxBack,colframe=BoxFrame,colbacktitle=BoxBack,coltitle=Theme,fonttitle=\bfseries,boxrule=0.5pt,arc=0pt,left=8pt,right=8pt,top=5pt,bottom=5pt,toptitle=5pt,bottomtitle=3pt,before skip=6pt,after skip=6pt}}
+\newtcolorbox{infobox}[1]{lecturebox,title={#1}}
+\ctexset{section={format=\large\bfseries,beforeskip=0pt,afterskip=14pt},subsection={format=\normalsize\bfseries,beforeskip=10pt,afterskip=5pt}}
+\setcounter{tocdepth}{1}
+\linespread{1.22}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{1pt}
+\AtBeginDocument{\setlength{\abovedisplayskip}{8pt}\setlength{\belowdisplayskip}{8pt}\setlength{\abovedisplayshortskip}{5pt}\setlength{\belowdisplayshortskip}{5pt}}
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.2}
+\setlist{itemsep=3pt,topsep=5pt,parsep=0pt,leftmargin=2em}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small 人工智能与前沿科技}
+\fancyhead[R]{\small\nouppercase{\leftmark}}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\renewcommand{\sectionmark}[1]{\markboth{#1}{}}
+\newcommand{\chapterpage}[1]{\clearpage\section{#1}}
+\newcommand{\term}[1]{\textbf{#1}}
+\newcommand{\source}[1]{\par\noindent{\small\color{Theme}课件依据：#1。}\par}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\DeclareMathOperator{\softmax}{softmax}
+\DeclareMathOperator{\argmin}{arg\,min}
+\DeclareMathOperator{\KL}{KL}
+\lstset{basicstyle=\small\ttfamily,columns=fullflexible,keepspaces=true,breaklines=true,frame=single,rulecolor=\color{BoxFrame},backgroundcolor=\color{BoxBack},showstringspaces=false,aboveskip=9pt,belowskip=9pt}
+\allowdisplaybreaks[2]\raggedbottom
+\begin{document}
+\begin{titlepage}\thispagestyle{empty}\vspace*{0.28\textheight}
+\begin{center}{\fontsize{30}{40}\selectfont\bfseries 人工智能与前沿科技}\end{center}
+\end{titlepage}
+\pagenumbering{Roman}\thispagestyle{empty}\tableofcontents
+\clearpage\pagenumbering{arabic}
+
+\section{人工智能的基本框架}
+\source{Lecture 1，第13--21、33--55页}
+本讲义依据课程平台发布的六讲课件、写作案例与职业规划材料整理。大语言模型以9月2日版本为主，生成模型以9月28日版本为主；较早版本保留为对照。为说明课件中的概念，补充必要的数学表达、计算步骤和例题，不将课程提及的每一项技术扩写为专门课程。
+
+\subsection{人工智能、机器学习与深度学习}
+\term{人工智能}（Artificial Intelligence，AI）研究使系统执行感知、推理、决策、生成和控制等任务的方法。\term{机器学习}（Machine Learning，ML）通过数据改善模型在指定任务上的表现；\term{深度学习}（Deep Learning，DL）通常以多层神经网络学习数据表示。三者并非同义词：机器学习是人工智能的重要方法，深度学习是机器学习中的一类方法。
+
+\begin{infobox}{定义：数据驱动模型}
+设输入为 $x$，目标为 $y$，可学习参数为 $\theta$。模型 $f_\theta$ 给出预测 $\hat y=f_\theta(x)$；训练根据样本调整 $\theta$，使规定的损失降低。模型表现取决于任务定义、数据、结构、训练方法与评价标准。
+\end{infobox}
+\term{分类}预测离散类别，例如猫或狗；\term{回归}预测数值，例如浓度；\term{生成}学习数据规律并产生新的样本；\term{控制}根据状态选择动作。图像重建常同时涉及回归与生成式先验，不能仅凭输出是一张图像就把它视为任意内容生成。
+
+\subsection{算法、数据与计算硬件}
+课程将现代深度学习的发展归纳为三个相互关联的条件：可训练的模型与优化方法、大规模数据、支持并行计算的硬件。算法决定如何表示和学习；数据提供任务中的统计信息；硬件影响可处理的模型规模与训练时间。
+
+\term{图形处理器}（GPU）擅长并行执行大量相似运算，矩阵乘法和卷积适合这种结构。GPU并不改变学习问题的统计条件，也不会消除数据偏差。更多数据只有在质量、覆盖范围和标签可靠性合适时才可能提高泛化能力。
+
+课件中的“某类模型至少需要多少张图像”是说明量级的经验描述，不构成通用阈值。所需样本量随模型、预训练、任务难度与目标精度而变。技术突破也不遵循统一的固定年限。
+
+\subsection{从数字任务到物理交互}
+\term{具身智能}强调智能系统通过传感器与执行机构同物理环境交互。课件把数字域AI、感知物理世界的系统和持续交互的具身系统作为理解路径；这些类别并非互斥的统一历史阶段。
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lYY}
+\toprule 对象 & 主要输入与输出 & 核心约束\\\midrule
+数字域任务 & 文本、图像、数据与生成结果 & 内容正确性、计算成本\\
+物理感知 & 相机或传感器信号与环境估计 & 噪声、标定、分布变化\\
+具身交互 & 状态观测与机器人动作 & 延迟、闭环稳定性、执行安全\\\bottomrule
+\end{tabularx}
+\end{center}
+从图像分类到机器人控制，评价标准逐渐涉及真实执行。仿真中成功的策略还需面对传感器误差、摩擦与动力学变化；外观逼真的人形机器人也不等于具备完整的自主学习能力。
+
+\subsection{能力、证据与适用范围}
+同一模型在一个基准上得分较高，不代表所有任务都更好。比较至少需要相同的数据划分、指标、计算预算与输入条件。\term{基准测试}提供可重复的比较条件，真实部署则还需要考察新场景、异常输入、延迟、成本与误差后果。
+
+\begin{infobox}{注意：预测结果与事实依据}
+语言流畅、图像清晰或分类置信度高，均不能单独证明内容真实。可靠使用AI应当明确输入条件，保留可核对的依据，并针对任务误差设计验证方法。
+\end{infobox}
+
+\subsection{通用逼近的含义与边界}
+\begin{infobox}{结论：通用逼近的条件}
+例如，对连续Sigmoid激活函数，单隐藏层网络能够在单位超立方体上一致逼近任意连续函数；对每个给定误差容限，可选取足够多的隐藏单元。这是表达能力的存在性结论，不保证有限数据、有限计算下的训练能找到该网络，也不保证域外预测准确。
+\end{infobox}
+“网络可以学习任何函数”的表述省略了函数类型、定义域和误差意义。实际学习还受噪声、可识别性、优化与样本数量限制。网络不是把所有知识自动转换成可靠结论的工具。
+
+
+\chapterpage{大语言模型与信息处理}
+\source{Lecture 2，9月2日版本第21--42、59--109、147--172页}
+\subsection{机器翻译的三条技术路径}
+\term{自然语言处理}（NLP）研究文本和语言信息的计算处理。机器翻译是课程用来说明技术演进的主要例子。
+
+\begin{center}\begin{tabularx}{\linewidth}{lYY}
+\toprule 方法 & 主要机制 & 典型困难\\\midrule
+规则翻译 & 人工词典、语法分析与转换规则 & 多义词、长句、规则维护\\
+统计翻译 & 从双语语料学习对应关系与目标语言概率 & 长距离依赖、全句连贯性\\
+神经翻译 & 学习上下文表示与条件生成模型 & 稀有词、领域迁移、事实忠实性\\\bottomrule
+\end{tabularx}\end{center}
+课件中的年代用于概括发展趋势，各方法实际存在重叠。神经机器翻译早于Transformer；Transformer于2017年提出，并非所有神经翻译或语言模型都采用同一种结构。
+
+设源语言句子为 $s$，目标语言句子为 $t$。统计翻译的一种基本表达为
+\[
+\hat t=\arg\max_t P(t\mid s)=\arg\max_t P(s\mid t)P(t),
+\]
+其中 $P(t)$ 是目标语言模型，$P(s\mid t)$ 描述翻译对应关系；等式利用贝叶斯公式，并省略与 $t$ 无关的 $P(s)$。实际系统还可使用更一般的加权特征评分。
+
+\begin{infobox}{例题：多义词与上下文}
+句子“The bank was steep, so I couldn't climb it.”中的bank指河岸。只按词典首项翻译会误作“银行”；上下文中的steep与climb提供词义判别信息。
+\end{infobox}
+上下文模型能利用这些线索，但仍可能在生僻术语、否定关系和数字上出错。翻译质量应同时检查语义、术语、语气与原文事实，不能把“翻译问题已完全解决”作为无条件结论。
+
+\subsection{词元、嵌入与自回归生成}
+\term{词元}（token）是分词后模型处理的基本单元，可以是一个词、子词、汉字或其他片段。词元序列转化为向量，称为\term{嵌入}（embedding）。嵌入表示供后续计算使用，不是可直接查验的事实目录。
+
+\term{大语言模型}（LLM）通常在大量文本上训练。自回归语言模型按链式法则分解序列概率：
+\[
+P(w_1,\ldots,w_n)=\prod_{i=1}^{n}P(w_i\mid w_1,\ldots,w_{i-1}),
+\]
+其中 $w_i$ 是第 $i$ 个词元，$n$ 是序列长度。生成时根据已有上下文预测下一个词元，重复直到结束条件满足。
+
+预测高概率文本与证明某个命题是不同任务。模型可能生成不存在的文献、错误的单位或不适用的程序，这类具有可信表面形式的错误称为\term{幻觉}。接入检索可以提供新资料，但检索结果仍可能过时或不支持结论。
+
+\subsection{注意力与Transformer}
+\term{注意力机制}根据当前查询与各位置的匹配程度，汇集有关信息。令输入表示矩阵为 $X$，学习得到的投影矩阵为 $W_Q,W_K,W_V$，则
+\[
+Q=XW_Q,\qquad K=XW_K,\qquad V=XW_V.
+\]
+$Q$、$K$、$V$分别称为查询、键和值。缩放点积注意力为
+\begin{infobox}{核心公式：缩放点积注意力}
+\[
+\operatorname{Attention}(Q,K,V)=\softmax\!\left(\frac{QK^{\mathsf T}}{\sqrt{d_k}}\right)V.
+\]
+$d_k$为键向量维数；softmax逐行作用，把每行评分转换为和为1的权重，再对值向量加权求和。
+\end{infobox}
+若一个查询对两个位置的评分均为0，softmax权重为 $(1/2,1/2)$，输出为两值向量的平均。若一个评分明显较大，相应位置贡献更大。注意力权重可帮助观察关联，但不能直接作为因果解释。
+
+\term{自注意力}的查询、键和值来自同一序列；\term{交叉注意力}的查询来自一个序列，键和值来自另一序列。多头注意力在不同投影子空间中并行计算，再组合结果。Transformer还包括逐位置前馈网络、残差连接、归一化以及位置表示。
+
+对长度为 $n$ 的序列，标准全连接自注意力需要构造 $n\times n$ 评分矩阵，相关计算和存储随 $n^2$ 增长。自回归生成使用因果遮罩，使当前位置无法访问未来词元。位置表示补充序列次序，因为纯注意力汇集本身不唯一确定词序。
+
+\subsection{语音翻译与工程需求}
+实时翻译依次包括声音采集、\term{自动语音识别}（ASR）、翻译与\term{语音合成}（TTS）。各环节误差会累积，应分别评价识别、翻译与延迟。
+
+课件以microOLED、微孔阵列与CMOS的对准为检索案例：描述尺寸、表面形状、精度和预算，才能获得较相关的术语与候选设备；产品规格与可行性仍需核查。
+
+\subsection{提示、验证与反馈}
+任务描述应包含目标、材料、约束和验收方式。压缩成像代码需交代采样率，并展示感知矩阵、系数和重建结果。验证时核对原始来源或中间计算，记录错误与修订依据；另一模型的意见不能代替独立验证。
+
+\chapterpage{神经网络的学习原理}
+\source{Lecture 3，第4--29、48--51、104--118页；Lecture 1，第43--48页}
+\subsection{输入、参数与非线性映射}
+\term{多层感知机}（MLP）把向量输入依次映射到隐藏层与输出层。令 $a^{(0)}=x$，第 $\ell$ 层的计算为
+\[
+z^{(\ell)}=W^{(\ell)}a^{(\ell-1)}+b^{(\ell)},\qquad
+ a^{(\ell)}=\phi\!\left(z^{(\ell)}\right).
+\]
+$W^{(\ell)}$ 为权重矩阵，$b^{(\ell)}$ 为偏置，$z^{(\ell)}$ 为激活前数值，$\phi$ 是逐元素作用的激活函数。若前层有 $m$ 个单元、本层有 $r$ 个单元，则 $W^{(\ell)}\in\mathbb R^{r\times m}$，偏置有 $r$ 个参数。
+
+\term{修正线性单元}（ReLU）定义为 $\phi(z)=\max\{0,z\}$。正值保留，负值置零。仅堆叠线性或仿射变换，所得仍是仿射映射；非线性激活使网络能够表示更复杂的关系。
+
+\begin{infobox}{例题：一个神经元的前向计算}
+设 $x=(1,2)^{\mathsf T}$，$w=(2,-1)^{\mathsf T}$，$b=1$。则 $z=w^{\mathsf T}x+b=2-2+1=1$，ReLU输出为1。若偏置改为 $-1$，则 $z=-1$，输出变为0。
+\end{infobox}
+将 $28\times28$ 灰度图展平后得到784维向量，连接到128个隐藏单元，需要 $784\times128+128=100480$ 个参数。展平会削弱显式空间结构，促使视觉模型采用局部连接与权重共享。
+
+\subsection{损失函数与训练目标}
+设训练集为 $\{(x_i,y_i)\}_{i=1}^N$，单样本损失为 $\ell$，经验风险为
+\[
+L(\theta)=\frac1N\sum_{i=1}^{N}\ell(f_\theta(x_i),y_i).
+\]
+\term{均方误差}（MSE）常用于回归。对 $d$ 维预测，$\ell=\frac1d\sum_{j=1}^d(\hat y_j-y_j)^2$。分类中常用\term{交叉熵}；若真实类别为 $k$，预测概率为 $p_k$，损失为 $-\log p_k$。
+
+类别评分 $s_j$ 经softmax转换为概率：$p_j=e^{s_j}/\sum_c e^{s_c}$。真实类别概率由0.2升至0.8时，交叉熵从约1.609降至0.223。概率较高表示模型更偏向该类别，不能保证分类正确或概率已校准。
+
+\subsection{反向传播与参数更新}
+\term{反向传播}利用链式法则计算损失对参数的导数。\term{优化器}根据梯度和更新规则改变参数。两者关联紧密，但并非同一个操作。
+
+以标量线性模型 $\hat y=wx+b$ 和损失 $\ell=\frac12(\hat y-y)^2$ 为例：
+\begin{align*}
+\frac{\partial\ell}{\partial\hat y}&=\hat y-y,\\
+\frac{\partial\ell}{\partial w}&=(\hat y-y)x,\qquad
+\frac{\partial\ell}{\partial b}=\hat y-y,\\
+w_{\mathrm{new}}&=w-\eta(\hat y-y)x,\qquad
+b_{\mathrm{new}}=b-\eta(\hat y-y).
+\end{align*}
+$\eta>0$ 为\term{学习率}，控制更新步长。若 $x=2,y=3,w=1,b=0,\eta=0.1$，则预测为2，梯度分别为 $-2,-1$，更新后 $w=1.2,b=0.1$，新预测为2.5，损失由0.5降至0.125。
+
+对多层网络，导数沿计算图逐层传播。例如ReLU在 $z>0$ 处导数为1，在 $z<0$ 处为0；$z=0$ 处需采用实现约定。Adam是一种利用梯度矩估计的优化算法，并非反向传播的别称。
+
+\begin{infobox}{方法：PyTorch中的一次训练更新}
+梯度清零、前向计算、计算损失、反向求导、优化器更新必须依次执行。默认梯度会累加，因此通常每次更新前需要清零。
+\end{infobox}
+\begin{lstlisting}[language=Python]
+optimizer.zero_grad()
+logits = model(inputs)
+loss = criterion(logits, targets)
+loss.backward()
+optimizer.step()
+\end{lstlisting}
+上述代码是训练步骤示意，变量由完整训练程序提供。PyTorch的常用交叉熵接口接受未归一化的logits；不应在未检查接口约定时额外重复softmax。验证时使用评估模式，并关闭不必要的梯度记录。
+
+\subsection{数据划分与泛化}
+\term{训练集}用于更新参数；\term{验证集}用于选择模型、超参数和停止时机；\term{测试集}用于最终评价。反复根据测试结果调参会使测试集间接参与选择，削弱独立评价的意义。
+
+\term{过拟合}表现为模型过度适应训练数据，而在未见数据上表现较差；\term{欠拟合}表示模型或训练不足以捕捉任务规律。训练损失下降而验证损失上升，是过拟合的常见信号之一，也需排除划分偏差。
+
+\term{数据泄漏}包括同一对象的高度相似样本分散到训练和测试中、使用全数据估计预处理参数等。医学图像应常按患者划分；视频应避免相邻帧跨集合造成虚高表现。正则化、数据增强、早停和合理预训练可能改善泛化，但均不能保证所有场景有效。
+
+\chapterpage{视觉模型与任务结构}
+\source{Lecture 3，第30--103页}
+\subsection{卷积、特征图与感受野}
+\term{卷积神经网络}（CNN）利用局部连接与共享参数提取空间特征。深度学习中常称为“卷积”的操作通常实际采用互相关，即不翻转核。对单通道图像 $X$、核 $K$ 和偏置 $b$，步长为1、忽略边界时，
+\[
+Y_{i,j}=b+\sum_{u=0}^{k_h-1}\sum_{v=0}^{k_w-1}K_{u,v}X_{i+u,j+v}.
+\]
+$Y$为输出\term{特征图}，$k_h,k_w$为核的高与宽。多通道输入还需对输入通道求和。核在不同位置共享参数，可检测相似的局部模式。
+
+一维输出尺寸为
+\[
+H_{\mathrm{out}}=\left\lfloor\frac{H+2p-d(k-1)-1}{s}+1\right\rfloor,
+\]
+其中输入尺寸为 $H$，填充为 $p$，核尺寸为 $k$，步长为 $s$，膨胀系数为 $d$；宽度同理。普通卷积取 $d=1$。
+
+\begin{infobox}{例题：卷积尺寸与参数量}
+$32\times32\times3$ 输入使用16个 $3\times3$ 卷积核，步长1、填充1，输出为 $32\times32\times16$。含偏置时参数量为 $16(3\times3\times3+1)=448$。
+\end{infobox}
+输入三通道对应三个二维核片，相加后形成一个输出通道。参数量不随图像面积线性增加，但计算量仍随输出位置数增加。\term{感受野}表示某个输出位置可能受影响的输入区域；多个局部层堆叠可以扩大感受野。
+
+\subsection{激活、池化与网络层次}
+ReLU提供非线性；\term{池化}对局部区域取最大值或平均值，降低空间尺寸。池化可减少后续计算并增强一定的平移容忍性，也会损失位置细节。需要精确分割时，常结合上采样和高分辨率特征。
+
+典型CNN由特征提取部分和任务输出部分组成。前层常学习局部边缘或纹理，后层可组合为复杂表示；这种解释是经验上的概括，不意味着每个通道都有唯一可读的语义。
+
+\subsection{代表模型与残差连接}
+\begin{center}\begin{tabularx}{\linewidth}{lY}
+\toprule 模型 & 课程强调的结构思想\\\midrule
+LeNet & 用卷积识别手写字符\\
+AlexNet & 更深的卷积网络与GPU训练推动大规模视觉识别\\
+VGG & 反复堆叠小尺寸卷积核\\
+GoogLeNet & 多分支组合不同尺度特征\\
+ResNet & 用残差连接改善深层网络训练\\\bottomrule
+\end{tabularx}\end{center}
+\term{残差块}学习 $F(x)$，输出 $y=x+F(x)$。当输入输出维数不同，跳接可使用投影 $P$，写为 $y=Px+F(x)$。对恒等跳接，
+\[
+\frac{\partial y}{\partial x}=I+\frac{\partial F}{\partial x},
+\]
+其中 $I$ 为单位矩阵。这为梯度提供直接通路，并使学习接近恒等映射更方便。
+
+深层网络问题不仅是\term{梯度消失}，还包括优化困难与性能退化。残差连接能改善训练，但不能无条件消除所有梯度问题。课件将1958年的工作概括为MLP发明时点；较准确的历史对应是Rosenblatt的感知机工作，不宜将现代多层网络训练归于单一时点。
+
+\subsection{分类、检测与分割}
+\begin{center}\begin{tabularx}{\linewidth}{lYY}
+\toprule 任务 & 输出 & 典型问题\\\midrule
+分类 & 整幅图像的类别 & 图中主要是什么\\
+目标检测 & 类别与边界框 & 目标在哪里\\
+语义分割 & 每个像素的类别 & 哪些像素属于道路\\
+实例分割 & 每个对象独立的像素区域 & 两辆车分别有哪些像素\\\bottomrule
+\end{tabularx}\end{center}
+Faster R-CNN使用候选区域网络提出框，再进行分类与定位；Mask R-CNN增加像素掩码分支。YOLO系列把检测组织为高效预测流程，具体结构随版本变化，不能将一个版本的机制视为整个系列的固定定义。
+
+\term{U-Net}采用编码器逐步提取低分辨率语义信息，解码器恢复空间分辨率，并以跳接融合高分辨率特征。其典型跳接是拼接特征；ResNet典型跳接是相加，二者不可混同。分割损失可使用像素交叉熵或重叠度相关损失。
+
+\subsection{视觉Transformer}
+\term{视觉Transformer}（ViT）把图像划分为图像块（patch），将各块展平并投影成嵌入向量，加上位置表示后通过Transformer处理。若图像大小为 $H\times W$，块大小为 $P\times P$，且 $H,W$ 可被 $P$ 整除，则块数为
+\[
+n=\frac{H W}{P^2}.
+\]
+例如 $224\times224$ 图像使用 $16\times16$ 块，得到196个图像块；某些分类实现另加入一个分类词元。注意力可以跨块建立联系，但块数增加也提高计算开销。
+
+CNN的局部连接和参数共享是较强的结构先验；标准ViT在初始结构中具有较少的局部约束，因此通常更依赖训练数据与预训练。二者也可以组合，并无单一结构在所有场景必然占优。
+
+\subsection{迁移学习与自监督预训练}
+\term{迁移学习}利用已有任务获得的表示或参数帮助新任务。\term{预训练}通常先在较大数据上学习通用表示，\term{微调}再用目标任务数据调整参数。源任务与目标任务差异过大时，迁移可能无益，甚至产生负迁移。
+
+\term{自监督学习}从数据本身构造训练目标。课件的\term{掩码自编码器}（MAE）随机遮盖部分图像块，利用未遮盖部分重建缺失部分，从而学习视觉表示。无需人工语义标签不等于没有训练目标，也不等于不需要数据。
+
+
+\subsection{数据集与指标}
+课程采用MNIST、Fashion-MNIST、CIFAR-10和ImageNet说明由简单到复杂的视觉基准。MNIST与Fashion-MNIST均为 $28\times28$ 灰度图；CIFAR-10为 $32\times32$ 三通道彩色图，包含3072个标量通道值，不能把1024个空间位置误称为全部输入特征。
+
+分类常用准确率；不均衡任务还应查看精确率、召回率等。分割常用交并比 $\mathrm{IoU}=|A\cap B|/|A\cup B|$，其中 $A$ 为预测区域，$B$ 为真实区域。检测需同时考虑类别与定位，并写明评价规则。不同任务的指标不能直接比较。
+
+\chapterpage{生成模型与多模态表示}
+\source{Lecture 4，9月28日版本第12--120页；9月1日版本为对照}
+\subsection{判别建模与生成建模}
+\term{判别模型}主要学习由输入到类别或目标的关系，例如 $P(y\mid x)$。\term{生成模型}学习数据分布或采样机制，可生成类似训练分布的新样本。生成不等于简单复制训练样本，但模型也可能记忆或复现训练内容。
+
+\term{潜在变量} $z$ 表示生成过程中的隐藏表示，\term{潜在空间}由这种表示的可能取值组成。图中的二维潜在空间只是示意，实际维数通常更高。相邻潜在点是否产生语义相近的结果，取决于训练目标和已学到的结构。
+
+\subsection{自编码器与变分自编码器}
+\term{自编码器}（AE）由编码器 $E$ 与解码器 $D$ 组成：
+\[
+z=E(x),\qquad \hat x=D(z),\qquad L_{\mathrm{rec}}=\|x-\hat x\|_2^2.
+\]
+$x$ 为原始样本，$\hat x$ 为重建结果。重建好不等于在潜在空间任意取点都能产生合理图像，因为训练约束主要作用于已编码的样本附近。
+
+\term{变分自编码器}（VAE）学习近似后验 $q_\phi(z\mid x)$，并使用先验 $p(z)$ 约束潜在空间。常用高斯编码分布的采样可写为
+\[
+z=\mu_\phi(x)+\sigma_\phi(x)\odot\epsilon,\qquad \epsilon\sim\mathcal N(0,I),
+\]
+其中 $\mu_\phi,\sigma_\phi$ 为编码器输出，$\odot$ 表示逐元素乘法。这种\term{重参数化}把随机性放入 $\epsilon$，便于对网络参数求导。
+
+训练可最小化负的证据下界：
+\[
+L_{\mathrm{VAE}}=-\mathbb E_{q_\phi(z\mid x)}\log p_\theta(x\mid z)
++\KL\!\left(q_\phi(z\mid x)\,\|\,p(z)\right).
+\]
+第一项要求解释或重建数据；第二项衡量编码分布与先验的差异。若高斯观测模型具有固定方差，第一项可对应缩放后的平方误差。VAE并非一律使用MSE；重建细节和潜在空间约束之间存在权衡。
+
+\subsection{生成对抗网络}
+\term{生成对抗网络}（GAN）包含生成器 $G$ 与判别器 $D$。生成器把随机变量 $z$ 映射为样本 $G(z)$；判别器区分真实样本和生成样本。原始目标为
+\begin{align*}
+\min_G\max_D\quad
+&\mathbb E_{x\sim p_{\mathrm{data}}}\log D(x)\\
+&+\mathbb E_{z\sim p_z}\log\bigl(1-D(G(z))\bigr).
+\end{align*}
+$p_{\mathrm{data}}$为数据分布，$p_z$为随机输入分布。生成器和判别器交替更新。实际训练常使用改进损失，不能把原式当作所有GAN实现的唯一形式。
+
+GAN可产生清晰样本，但存在训练不稳定和\term{模式崩塌}：生成样本只覆盖少数类型，缺少多样性。GAN通常不直接给出样本的可计算密度；这不表示生成机制没有概率分布。图像锐利也不能证明样本分布覆盖完整。
+
+\subsection{扩散模型的加噪与去噪}
+\term{扩散模型}（diffusion model）先定义逐步加噪过程，再学习反向生成。为避免课件图示中的时间方向混淆，本讲义统一令 $x_0$ 为干净数据，$x_T$ 为近似纯噪声。
+
+令 $\beta_t\in(0,1)$ 为第 $t$ 步的噪声方差，$\alpha_t=1-\beta_t$，$\bar\alpha_t=\prod_{s=1}^t\alpha_s$。标准DDPM前向过程满足
+\begin{infobox}{核心公式：扩散前向采样}
+\[
+x_t=\sqrt{\bar\alpha_t}\,x_0+\sqrt{1-\bar\alpha_t}\,\epsilon,
+\qquad\epsilon\sim\mathcal N(0,I).
+\]
+$t$从0增加到 $T$ 时，信号逐渐削弱、噪声逐渐增强。系数取决于噪声日程，通常不是把图像和噪声按时间直接做线性平均。
+\end{infobox}
+设 $\bar\alpha_t=0.64$，则 $x_t=0.8x_0+0.6\epsilon$。平方根系数使两部分的尺度符合定义的前向分布。线性变化的 $\beta_t$ 也不意味着 $x_0$ 的混合系数随时间线性变化。
+
+噪声预测网络 $\epsilon_\theta(x_t,t)$ 常以
+\[
+L_{\mathrm{noise}}=\mathbb E_{x_0,t,\epsilon}
+\left\|\epsilon-\epsilon_\theta(x_t,t)\right\|_2^2
+\]
+训练。训练中可直接采样时间步与相应的 $x_t$，不必为每次更新实际生成整条加噪链。
+
+反向采样从 $x_T\sim\mathcal N(0,I)$ 出发，按 $t=T,T-1,\ldots,1$ 逐步更新。一种DDPM形式为
+\[
+x_{t-1}=\frac1{\sqrt{\alpha_t}}
+\left(x_t-\frac{\beta_t}{\sqrt{1-\bar\alpha_t}}
+\epsilon_\theta(x_t,t)\right)+\sigma_t\xi,
+\]
+其中 $\sigma_t$ 为采样噪声尺度，$\xi\sim\mathcal N(0,I)$，最后一步通常不再添加随机噪声。不同采样器有不同更新规则，不能简单理解为每步减去同一个固定比例的“全部噪声”。
+
+\subsection{条件生成、CLIP与潜在扩散}
+\term{条件生成}在采样时使用标签、文字、输入图像或其他条件 $c$，目标是产生符合条件的样本。噪声网络可写为 $\epsilon_\theta(x_t,t,c)$；无条件生成则不使用这种外部语义约束。
+
+\term{CLIP}通过图像与文本的对比训练，把对应内容的表示拉近，把不对应的表示区分开。CLIP提供图像或文本表示，本身不是扩散采样器。条件向量可通过交叉注意力等结构影响去噪网络。
+
+\term{潜在扩散}先把图像编码为较小的潜在表示，在该表示上训练和运行扩散过程，最后解码为图像。其效率来自降低去噪阶段的表示规模，仍需考虑编码解码开销与细节损失。课件 $512\times512$ 到 $64\times64$ 的空间尺寸变化是具体结构示例，不是所有模型固定的压缩比例。
+
+\term{扩散Transformer}（DiT）用Transformer结构处理潜在图像块等表示，替代某些扩散模型中的U-Net主干。DiT描述网络架构，扩散描述生成过程；二者位于不同层次。
+
+\subsection{流匹配与动作生成}
+\term{流匹配}（flow matching）学习随时间变化的速度场 $v_\theta(x,t)$，用常微分方程把简单分布变换为数据分布：
+\[
+\frac{dx}{dt}=v_\theta(x,t),\qquad t\in[0,1].
+\]
+一种直线路径构造令 $x_0$ 为噪声、$x_1$ 为数据，定义 $x_t=(1-t)x_0+tx_1$，相应条件速度为 $x_1-x_0$。训练拟合该路径的速度；生成时从噪声起点数值积分。这一节的 $x_0,x_1$ 是流路径端点，与前节扩散时间索引分别使用。
+
+较平直的路径和合适训练方法可能减少采样步骤；步数与质量仍取决于模型及求解器。课件比较“1000步、100步、1步”的例子是不同方法的示意，不能作为普遍速度定律。
+
+机器人动作可存在多个合理候选，生成策略可在观测条件下产生动作轨迹。流匹配用于动作生成时，还需考虑实时性、轨迹连续性和物理约束；少量采样步骤不自动保证闭环控制稳定。
+
+\begin{center}\begin{tabularx}{\linewidth}{lYY}
+\toprule 方法 & 核心学习对象 & 主要限制\\\midrule
+AE/VAE & 编码、重建与潜在分布 & 重建与生成质量权衡\\
+GAN & 生成器与判别器的对抗 & 稳定性、多样性\\
+扩散 & 噪声或相关去噪量 & 多步推理开销\\
+流匹配 & 连续变换的速度场 & 积分误差与路径质量\\\bottomrule
+\end{tabularx}\end{center}
+
+\chapterpage{计算成像与物理先验}
+\source{Lecture 5，第9--65、67--182、184--238页}
+\subsection{前向模型与逆问题}
+\term{计算成像}结合光学测量和算法恢复目标信息。\term{前向问题}根据场景与成像系统预测测量；\term{逆问题}根据测量估计原始场景。在线性近似下可写为
+\[
+I=Hx+n,
+\]
+其中 $x\in\mathbb R^N$ 为待恢复对象，$I\in\mathbb R^M$ 为传感器测量，$H\in\mathbb R^{M\times N}$ 为前向算子，$n$ 为噪声。$H$可描述模糊、编码、采样等操作；相干衍射强度测量一般不适合直接用这个线性式完整描述。
+
+\term{适定问题}通常要求解存在、唯一且对数据扰动稳定。缺失测量、相位丢失和模糊可能破坏这些条件。若 $Hv=0$，则 $x$与 $x+v$ 产生相同无噪声测量，说明仅凭测量无法区分它们。
+
+\begin{infobox}{核心公式：带正则化的重建}
+\[
+\hat x=\argmin_x\left\{\frac12\|Hx-I\|_2^2+\lambda R(x)\right\},\qquad\lambda\ge0.
+\]
+$\hat x$为估计，第一项要求预测测量接近实际测量；$R(x)$为正则化项，编码稀疏性、平滑性或其他先验；$\lambda$控制两者的权衡。平方误差的数据项常对应加性高斯噪声假设。
+\end{infobox}
+\term{先验}不是对结果任意添加“合理细节”，而是明确约束解的集合或概率规律。过强的先验可能把真实异常结构抹除；过弱的先验可能放大噪声。应同时评估测量一致性与对象真实性。
+
+\subsection{点扩散函数与去模糊}
+\term{点扩散函数}（PSF）描述点源经系统后的响应。在空间不变、线性成像近似下，$I=h*x+n$，其中 $h$ 为PSF，$*$为卷积。去卷积尝试从模糊测量恢复 $x$。
+
+傅里叶域中，卷积转化为乘法：$\widetilde I=\widetilde h\,\widetilde x+\widetilde n$。直接使用 $\widetilde I/\widetilde h$，会在 $\widetilde h$ 很小的位置放大噪声；若频率响应为零，相应信息并未被可靠记录。正则化和噪声模型因此不可省略。
+
+已知模糊核时可求非盲去卷积；\term{盲去卷积}还需估计模糊核。真实手持场景可能存在空间变化、运动、饱和与压缩误差。神经网络可学习复杂退化与先验，但训练分布不匹配时也会产生伪影。
+
+\subsection{去噪、变换域与结构信息}
+去噪问题可近似为 $I=x+n$。均值滤波平滑局部变化；中值滤波对孤立异常值较有效；变换域方法利用图像系数的结构，BM3D等方法还利用不同位置的相似图像块。
+
+\term{离散余弦变换}（DCT）把图像表示为余弦基的线性组合；小波变换提供多尺度表示。自然图像在适当变换中常可近似稀疏，但并非所有高频系数都是噪声。边缘、细纹理和噪声都可能包含高频成分，简单删除高频会损失真实细节。
+
+深度模型可利用卷积的局部性、非线性表示和注意力的非局部联系。把经典算法展开为网络，或把可学习去噪器嵌入迭代重建，有助于结合物理约束与数据先验。网络越复杂并不自动意味着需要的数据越少或结果越可信。
+
+\begin{infobox}{例题：平滑后的低误差为何未必更好}
+若细胞图像中的微弱小结构被平滑掉，背景噪声可能显著下降，平均像素误差也可能改善；但用于测量结构数量的结果反而失真。评价需检查任务相关细节，而非只比较图像是否“干净”。
+\end{infobox}
+
+\subsection{无透镜成像与编码测量}
+\term{无透镜成像}去掉传统成像透镜，通过衍射、扩散片或编码孔径记录场景的编码信息，再进行重建。小体积、低重量和特定大视场设计是其潜在优势；算法开销、光收集效率、标定和重建延迟是重要代价。
+
+扩散片成像可用测得的PSF描述编码。PSF随空间位置或深度变化时，简单的空间不变模型不再充分。系统设计需要说明目标与传感器距离、光源相干性、编码器位置和标定范围。
+
+空间相干性描述不同空间点之间的相位关联；时间相干性与频谱宽度有关。方向性或“单一颜色”只是相关现象，不应直接当作相干性的完整定义。非相干强度成像常可采用PSF模型；相干成像需追踪复振幅及干涉。
+
+\subsection{压缩感知与采样率}
+\term{压缩感知}在特定稀疏性和测量条件下，以少于未知维数的测量恢复信号。设 $x=\Psi a$，$\Psi$ 为表示基，$a$ 为稀疏或近似稀疏系数，则
+\[
+y=\Phi x+n=\Phi\Psi a+n.
+\]
+$\Phi\in\mathbb R^{M\times N}$为测量矩阵，$y\in\mathbb R^M$为测量向量，采样率为 $r=M/N$。一种噪声条件下的恢复方式为
+\[
+\hat a=\argmin_a\|a\|_1\quad\text{满足}\quad
+\|\Phi\Psi a-y\|_2\le\delta,
+\qquad \hat x=\Psi\hat a,
+\]
+其中 $\delta$是测量误差容限。恢复需要合适的测量设计及稀疏条件，不能仅由 $M<N$ 推出可恢复。
+
+\begin{infobox}{例题：课件中的25\%采样}
+一个 $8\times8$ 图像块展平为 $x\in\mathbb R^{64}$，测量矩阵 $\Phi\in\mathbb R^{16\times64}$ 输出16个数，故采样率为 $16/64=25\%$。这16个数通常是多像素加权组合，并非必然保留其中16个像素。
+\end{infobox}
+若希望从测量恢复64个任意数，仅16个方程通常不足。引入DCT等表示中的稀疏性，才可能选择符合先验的解。测量矩阵的归一化、变换方向和真实采样过程均应在代码中核对。
+
+\term{正交匹配追踪}（OMP）是稀疏恢复的一种贪心方法。每轮选择同残差相关性较大的字典列，把它加入支持集合，在已选列上进行最小二乘拟合，再更新残差，直到达到稀疏度或误差停止条件。逐块恢复计算较方便，但可能出现块边界伪影。
+
+课件进一步介绍视频和高光谱\term{快照压缩成像}（SCI），将时间或波长等额外维度编码到较少测量中。\term{深度展开}把迭代算法的若干步骤组织为可训练网络，例如测量一致性更新与去噪交替执行；它保留算法结构，但仍依赖数据与模型准确性。
+
+\subsection{相位恢复与叠层成像}
+相干光的对象可写为复场 $u=Ae^{i\varphi}$，其中 $A$ 为振幅，$\varphi$ 为相位。相机通常记录强度 $|u|^2$，无法直接获得完整相位。\term{叠层成像}（ptychography）利用有重叠信息的多个测量，共同恢复对象的振幅和相位。
+
+一种简化前向式为
+\[
+I_j=\left|\mathcal F\{P_j u\}\right|^2+n_j,
+\]
+$P_j$为第 $j$ 次照明或探针，$\mathcal F$为傅里叶变换，$I_j$为衍射强度；实际算子随光学几何而定。不同测量之间的重叠提供约束，减少相位恢复歧义。
+
+傅里叶叠层显微利用不同照明角度获得频域中的不同区域，再合成较大有效孔径。标定、探针与对象共同估计、计算开销及动态场景变化均影响重建。分辨率评价仍须说明测量几何。
+
+\subsection{超分辨显微与非视线成像}
+\term{超分辨显微}通过改变光学测量或利用额外统计信息，获得超出常规成像分辨能力的结构。\term{受激发射损耗显微}（STED）用环形损耗光抑制外围荧光，减小有效发光区域，再扫描成像。\term{随机光学重建显微}（STORM）等定位方法让稀疏发光体在不同时刻出现，逐次定位后组合图像。
+
+这些技术常在光子数、时间分辨率、空间分辨率、光漂白和光毒性之间权衡。深度学习可加速定位、重建或去噪；若改变样本类型、PSF或噪声分布，模型可能失效。插值放大像素数量不等于提高物理分辨率。
+
+\term{非视线成像}（NLOS）利用间接反射、时间飞行或其他编码信号推断被遮挡对象。其能力取决于光路、背景、多次散射、检测信噪比与模型，不能泛化为任意遮挡物后的无条件透视。
+
+\subsection{重建结果的评价}
+有真实参考图像时，可比较像素误差与结构指标；没有真值时，可检查重投影残差 $\|H\hat x-I\|$，并进行重复测量或物理一致性验证。较小残差也不是唯一充分条件，因为不同对象可能产生同一测量。
+
+感知上逼真的细节可能来自先验，应区分测量支持的恢复与模型推测的补全，并报告不确定性。
+
+\chapterpage{生物医学中的人工智能}
+\source{Lecture 6，第3--30、31--68、69--95页}
+\subsection{需求与评价层次}
+课程强调医疗系统的成本、可及性、速度和有效性。AI可帮助读出传感器信号、重建图像、分析行为与辅助控制，但模型性能应联系样本来源、使用场景和误差后果。实验室识别率、临床筛查价值与获准常规使用属于不同层次。
+
+\term{筛查}旨在发现需要进一步评估的人群；\term{诊断}综合更多证据判断疾病状态；\term{监测}跟踪状态随时间的变化。三个目标的样本、阈值和评价要求并不相同。讲义中的案例为课程技术说明，不据此提供个体诊疗结论。
+
+\subsection{即时检测与试纸读出}
+\term{即时检测}（Point-of-Care Testing，POCT）在患者附近或资源受限环境中完成检测。\term{侧向层析检测}（LFA）通过毛细流动和标记反应形成检测线；\term{垂直流检测}（VFA）可在二维膜上布置多个反应点，支持多指标读出。
+
+从试纸图像预测目标浓度时，模型可能利用检测区、背景和参考区的信息。时间序列模型还可学习反应信号随时间的变化。可及性和速度的改善依赖相机、照明、试剂批次与反应条件一致，不能只看网络结构。
+
+\begin{infobox}{方法：传感器模型的验证}
+区分检测对象、参考方法、样本量与浓度范围；记录设备和试剂条件；按独立样本划分数据；考察低浓度、干扰物和新批次；报告误差及阈值，而非只展示几个成功样本。
+\end{infobox}
+
+\subsection{可穿戴传感与时序分析}
+可穿戴装置记录脉搏、呼吸、温度、压力或运动等信号。模型可提取时序特征，进行活动识别、异常提示或状态估计。运动伪影、佩戴位置变化、个体差异和传感器漂移均会影响预测。
+
+训练数据应覆盖目标人群和使用条件。同一受试者相邻时段的数据高度相关，随机按片段划分可能夸大跨人群能力。长期监测还需处理缺失数据、误报与模型校准。
+
+\subsection{虚拟染色与组织图像}
+\term{虚拟染色}把未染色图像或某种染色图像转换为类似目标染色的表示。模型学习输入与目标之间的映射，可减少某些流程中的化学染色步骤。训练可能采用配对图像或适当的非配对方法。
+
+常规组织染色可改变样本并影响后续处理，但“所有染色均不可逆且破坏细胞”过于绝对，需要按具体制备与染色方法讨论。虚拟染色结果应验证是否保留病理相关结构，颜色相似或视觉逼真不等于诊断等价。
+
+课件从自然图像生成过渡到虚拟染色，二者虽可使用类似模型，目的不同：艺术生成允许多种合理细节，病理转换需要保证组织信息忠实性。
+
+\subsection{行为表型与医学影像}
+\term{数字行为表型}从视频或交互任务中提取视线、表情、反应与运动等特征。课件的自闭症相关研究属于辅助筛查与行为研究案例；行为模型输出应结合专业评估，不能把某次视频分类直接等同于确诊。
+
+医学图像中的分割、分类和严重程度评分，分别对应不同任务。例如分割心脏结构并不自动完成疾病诊断；一项模型在某种超声或磁共振资料上有效，也不证明能跨设备、跨医院直接应用。
+
+定义真阳性、假阳性、真阴性、假阴性数为 $TP,FP,TN,FN$，则
+\[
+\text{灵敏度}=\frac{TP}{TP+FN},\qquad
+\text{特异度}=\frac{TN}{TN+FP},\qquad
+\text{阳性预测值}=\frac{TP}{TP+FP}.
+\]
+\term{灵敏度}关注真正阳性中被发现的比例；\term{特异度}关注真正阴性中被正确排除的比例；\term{阳性预测值}关注预测阳性中实际阳性的比例。各分母必须非零。
+
+\begin{infobox}{例题：低患病率与假阳性}
+在假设的10000人样本中，100人为真阳性对象，模型灵敏度90\%、特异度95\%。则 $TP=90$，$FN=10$，$FP=9900\times5\%=495$，阳性预测值为 $90/(90+495)\approx15.4\%$。
+\end{infobox}
+该计算说明，较高灵敏度和特异度不保证较高阳性预测值；它不是任何实际疾病或设备的性能数据。病例比例、阈值与验证人群必须共同解释。
+
+\subsection{蛋白结构预测与药物发现}
+\term{AlphaFold}系列展示了神经网络用于分子结构研究的可能性。课件重点介绍AlphaFold 2：利用序列及相关序列信息，更新序列表示与残基对表示，再构建、迭代细化三维结构，并输出置信信息。
+
+局部结构置信度与残基间相对位置不确定性有不同含义。可靠的结构预测可支持研究假设与后续实验，但不能单独证明结合强度、药物有效性或安全性。结构预测、候选分子设计和药物临床验证是不同环节。
+
+\subsection{强化学习与微机器人}
+\term{强化学习}（RL）通过与环境交互学习动作策略。设状态为 $s_t$，动作为 $a_t$，即时奖励为 $r_t$，策略为 $\pi$，折扣因子为 $\gamma\in[0,1)$，常见目标为
+\[
+J(\pi)=\mathbb E_\pi\!\left[\sum_{t=0}^{\infty}\gamma^t r_t\right].
+\]
+对磁驱动微机器人，动作可为线圈电流，状态可包含位置及观测，奖励可鼓励接近目标并惩罚偏离。超声驱动装置的动力学和动作变量不同，不能直接套用相同控制模型。
+
+策略需评价目标到达率、轨迹精度、延迟与碰撞风险。仿真、动物模型或实验装置中的成功不能直接推广到人体应用。
+
+\chapterpage{AI辅助研究与课程项目}
+\source{Lecture 2，第93--172页；写作智能体案例第2--24页；职业规划案例第1--17页；通知0907、0909}
+\subsection{信息收集与证据链}
+研究首先要把宽泛主题转化为可以讨论的问题，写明对象、约束、已有方法及仍未解决的困难。AI可帮助扩展关键词、概括材料和识别候选问题；原始论文、实验或公开数据才是判断核心事实的依据。
+
+每个主要结论可组织为\term{证据链}：主张、来源、材料中的实际结果、适用条件、可能反例。文献真实存在不等于支持主张；摘要提到相关技术，也不等于已经证明目标场景可行。
+
+\begin{infobox}{例题：增长趋势不能单独证明瓶颈}
+若计算吞吐量增长快于存储带宽，只能提示在持续趋势下可能出现相对压力。若缺少当前带宽需求、实际利用率和端到端测量，不能直接据此断言系统已受存储瓶颈支配。
+\end{infobox}
+这是写作案例中的关键辨析：技术叙述要从趋势进一步落到可检验量，避免用宏观增长率替代直接证据。
+
+\subsection{集成光子计算的系统边界}
+写作案例讨论片上光子神经网络综述。光学器件可执行某些线性运算，完整系统还涉及光源、调制、数据转换、探测、存储、标定和控制。某些方案也能实现非线性，不能把所有集成光子系统归约为仅含线性计算。
+
+若比较能耗，必须说明是否包含外围开销。系统能量可分解为
+\[
+E_{\mathrm{total}}=E_{\mathrm{core}}+E_{\mathrm{conversion}}+
+E_{\mathrm{memory}}+E_{\mathrm{control}},
+\]
+各项分别代表计算核心、数据转换、存储传输与控制等能量；具体分类应避免重复计数。核心操作很快或节能，不保证端到端系统在同等精度和负载下优于其他硬件。
+
+这一案例的重点是写作与验证方法，而非给出各类光子器件的完整设计。几何、器件数量和尺寸的推算，应先说明架构、并行度、复用方式及损耗预算，再计算规模。
+
+\subsection{编程、图表与学术写作}
+AI生成程序后，应先检查输入、输出和单位，再检查中间量及边界情况。重建任务可核对采样矩阵维数、采样率、损失变化和同文献的定性差异。执行成功不等于算法正确。
+
+图表应明确传达一个可陈述的结论。坐标轴、单位、图例、比例关系和箭头含义必须清楚。AI绘制的示意图可能遗漏结构、连接方向或尺度，修改时应依据正文和原始资料逐项检查。
+
+学术写作应先形成论证，再组织文字。引言需交代背景、已有研究、具体缺口与本文目标；润色应保留事实含义、限定语和引用对应关系。写作案例中的资料分类与长期工作记录，是为了确保修订连续和来源可追溯。
+
+\subsection{职业规划的分析框架}
+课程项目围绕三个问题组织：选择哪个领域及其依据；自身与该方向的匹配情况；当前及未来进入该方向的条件。技术分析至少应联系岗位任务、能力要求、行业约束和可验证的变化趋势。
+
+\begin{center}\begin{tabularx}{\linewidth}{lYY}
+\toprule 分析部分 & 应说明的内容 & 可采用的证据\\\midrule
+领域与问题 & 解决什么任务，谁需要解决 & 文献、产品、岗位要求\\
+技术变化 & 哪个环节可能被改进或替代 & 公开性能、成本、部署条件\\
+个人准备 & 已有能力、能力缺口与行动 & 项目、课程、实习经历\\
+情景与反例 & 预测成立条件、失败时如何调整 & 替代技术、市场与制度约束\\\bottomrule
+\end{tabularx}\end{center}
+5--10年预测应表述为带条件的情景，区分已发生事实、推断与个人选择。一个技术演示的成功不能直接推出相关岗位一定增加；岗位需求还受成本、组织流程和社会因素影响。
+
+\subsection{评阅与持续修订}
+有效评阅要求具体标准，例如证据是否支持结论、计划是否可执行、是否讨论替代方案。笼统称赞或只改写语言不能检验方案。
+
+\begin{infobox}{方法：一次有依据的修订}
+列出原主张；定位不充分或错误之处；补充证据或缩小适用范围；解释采取的修改；检查相关图表与其他段落是否同步；保留尚未解决的问题。每次新增内容先去重，再并入相应章节。
+\end{infobox}
+课程材料所示成绩结构为展示30\%、上机40\%、书面报告三个检查点各10\%。书面报告页面同时出现“30\% score”，宜按书面报告总计30\%理解；各检查点的具体要求以教师后续通知为准。通知中的招聘介绍和历史活动安排不作为当前岗位或待遇的通用事实。
+
+\chapterpage{主要结论与术语}
+\subsection{知识之间的联系}
+神经网络通过前向映射表示任务，通过损失和梯度学习参数。CNN与Transformer提供不同的表示结构；AE、GAN、扩散与流匹配组织不同的生成机制。计算成像利用测量模型限制可能结果，生物医学应用进一步要求将算法性能联系实际评价。AI协作则需要把任务描述、证据核对和修订组织为连续流程。
+
+\begin{infobox}{要点：五个必须区分的层次}
+表达能力与训练成功；训练表现与新数据泛化；图像逼真与测量真实；研究演示与实际部署；AI建议与可核实证据。这些区别共同决定模型结论的使用边界。
+\end{infobox}
+
+\subsection{常用符号}
+\begin{longtable}{p{0.21\linewidth}p{0.72\linewidth}}
+\toprule 符号 & 含义与约定\\\midrule\endhead
+$x,\hat x$ & 输入或真实对象，以及对象估计；含义随具体任务说明\\
+$y,\hat y$ & 目标与预测；压缩感知一节的 $y$ 专指测量向量\\
+$\theta,\phi$ & 可学习参数；在激活函数一节 $\phi(\cdot)$ 为函数记号\\
+$W,b$ & 线性层权重矩阵与偏置\\
+$L,\ell,\eta$ & 总损失、单样本损失与学习率\\
+$Q,K,V,d_k$ & 注意力中的查询、键、值及键向量维数\\
+$z,\epsilon$ & 潜在变量与随机噪声；具体分布在相应章节给出\\
+$\beta_t,\alpha_t,\bar\alpha_t$ & 扩散噪声方差、信号保留系数及累乘系数\\
+$H,I,n,R,\lambda$ & 成像算子、测量、噪声、正则项与权衡系数\\
+$\Phi,\Psi,a,M,N$ & 感知矩阵、表示基、系数、测量数与未知数维度\\
+$u,A,\varphi$ & 复光场、振幅与相位\\
+$s_t,a_t,r_t,\pi,\gamma$ & 强化学习状态、动作、奖励、策略与折扣因子\\\bottomrule
+\end{longtable}
+
+\subsection{常用英文缩写}
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.24\linewidth}>{\raggedright\arraybackslash}p{0.69\linewidth}}
+\toprule 缩写 & 中文含义\\\midrule\endhead
+AI / ML / DL & 人工智能／机器学习／深度学习\\
+LLM / NLP & 大语言模型／自然语言处理\\
+MLP / CNN / ViT & 多层感知机／卷积神经网络／视觉Transformer\\
+AE / VAE / MAE & 自编码器／变分自编码器／掩码自编码器\\
+GAN / DDPM / DiT & 生成对抗网络／去噪扩散概率模型／扩散Transformer\\
+PSF / DCT / SCI & 点扩散函数／离散余弦变换／快照压缩成像\\
+STED / STORM & 受激发射损耗显微／随机光学重建显微\\
+POCT / LFA / VFA & 即时检测／侧向层析检测／垂直流检测\\
+RL & 强化学习\\\bottomrule
+\end{longtable}
+
+\subsection{资料范围与修正依据}
+\noindent\textbf{课程原始资料。}胡竞天《人工智能与前沿科技》，2026年秋季课程平台资料。已保存12份PDF：导论59页；大语言模型172页与168页两个版本；写作案例24页；神经网络118页；生成模型120页与99页两个版本；计算成像238页；生物医学95页；职业规划案例17页；通知0907共20页；通知0909共24页。页码为PDF物理页码。通知与案例中重复内容合并为第八章的方法说明。
+
+\noindent\textbf{必要修正。}通用逼近补全条件；反向传播与优化器分开；CIFAR-10区分空间像素数与通道值数；残差训练困难不只归因于梯度消失；扩散加噪与时间方向按标准DDPM整理；高频不全部等于噪声；实验性能不直接等同临床诊断或部署结果。
+
+课件生物医学部分存在同一链接用于自闭症、帕金森与蛋白结构等不同主题的情况。本讲义不把这些重复链接当作对应主题的证据；未确认的具体表现数字不纳入核心结论。主要相关原文列于下方，供概念及修正核对。
+
+\begingroup\small\raggedright
+\begin{enumerate}[label={[\arabic*]},leftmargin=2.5em,itemsep=4pt]
+\item Vaswani 等，\textit{Attention Is All You Need}，2017。\url{https://arxiv.org/abs/1706.03762}。
+\item He 等，\textit{Deep Residual Learning for Image Recognition}，2015。\url{https://arxiv.org/abs/1512.03385}。
+\item Ho、Jain、Abbeel，\textit{Denoising Diffusion Probabilistic Models}，2020。\url{https://arxiv.org/abs/2006.11239}。
+\item PyTorch官方教程，\textit{Automatic Differentiation with torch.autograd}。\url{https://docs.pytorch.org/tutorials/beginner/basics/autogradqs_tutorial.html}。
+\item Kingma、Welling，\textit{Auto-Encoding Variational Bayes}，2013。\url{https://arxiv.org/abs/1312.6114}。
+\item Lipman 等，\textit{Flow Matching for Generative Modeling}，2022年预印本／2023年会议论文。\url{https://arxiv.org/abs/2210.02747}。
+\item Cybenko，\textit{Approximation by superpositions of a sigmoidal function}，1989。\url{https://doi.org/10.1007/BF02551274}。
+\item Jumper 等，\textit{Highly accurate protein structure prediction with AlphaFold}，Nature，2021。\url{https://www.nature.com/articles/s41586-021-03819-2}。
+\end{enumerate}
+\endgroup
+\end{document}
