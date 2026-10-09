@@ -1,0 +1,896 @@
+% 大学物理讲义：可持续更新的单文件源文档。
+% 首版范围：所提供六份第9、10章课件，气体动理论与热力学基础。
+% 后续新增章节放在“要点与符号”前，同时更新该章及资料说明。
+\documentclass[UTF8,fontset=none,zihao=-4,a4paper]{ctexart}
+\usepackage[left=26mm,right=26mm,top=25mm,bottom=25mm,headheight=15pt]{geometry}
+% ---------- 字体：集中设置 ----------
+\IfFontExistsTF{Songti SC}{
+  \setCJKmainfont{Songti SC}[BoldFont={Songti SC Bold}]
+  \setCJKsansfont{Songti SC}[BoldFont={Songti SC Bold}]
+  \setCJKmonofont{Songti SC}[BoldFont={Songti SC Bold}]
+}{
+  \setCJKmainfont{FandolSong-Regular.otf}[BoldFont={FandolSong-Bold.otf}]
+  \setCJKsansfont{FandolSong-Regular.otf}[BoldFont={FandolSong-Bold.otf}]
+  \setCJKmonofont{FandolSong-Regular.otf}[BoldFont={FandolSong-Bold.otf}]
+}
+\IfFontExistsTF{Times New Roman}{
+ \setmainfont{Times New Roman}
+ \setsansfont{Times New Roman}
+ \setmonofont{Times New Roman}
+}{
+ \setmainfont{texgyretermes-regular.otf}[BoldFont={texgyretermes-bold.otf},ItalicFont={texgyretermes-italic.otf},BoldItalicFont={texgyretermes-bolditalic.otf}]
+ \setsansfont{texgyretermes-regular.otf}[BoldFont={texgyretermes-bold.otf},ItalicFont={texgyretermes-italic.otf}]
+ \setmonofont{texgyretermes-regular.otf}[BoldFont={texgyretermes-bold.otf},ItalicFont={texgyretermes-italic.otf}]
+}
+\usepackage{amsmath,amssymb,booktabs,tabularx,array,longtable,enumitem,fancyhdr,needspace}
+\usepackage{unicode-math}
+\setmathfont{texgyretermes-math.otf}
+\usepackage{xcolor}
+\usepackage[breakable,skins]{tcolorbox}
+\usepackage{tikz,pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{arrows.meta}
+\usepackage[hidelinks]{hyperref}
+\hypersetup{pdftitle={大学物理},pdfsubject={六份课件全部公式的符号、条件与使用场景详解},pdftitle={大学物理公式详解}}
+% ---------- 主题色与信息框：集中设置 ----------
+\definecolor{ThemeMain}{HTML}{35566E}
+\definecolor{ThemeBack}{HTML}{F2F6F8}
+\definecolor{ThemeBorder}{HTML}{B8C8D3}
+\newtcolorbox{infobox}[2][]{enhanced,breakable,
+ colback=ThemeBack,colframe=ThemeBorder,colbacktitle=ThemeBack,
+ coltitle=ThemeMain,fonttitle=\normalsize\bfseries,
+ title={#2},attach title to upper={\par\smallskip},
+ boxrule=0.45pt,arc=0.8mm,left=3mm,right=3mm,top=2mm,bottom=2mm,
+ before skip=8pt,after skip=8pt,pad at break*=1.5mm,#1}
+% ---------- 正文、标题、表格与页码 ----------
+\ctexset{section={format=\large\bfseries,beforeskip=0pt,afterskip=14pt},
+ subsection={format=\normalsize\bfseries,beforeskip=12pt,afterskip=6pt},
+ subsubsection={format=\normalsize\bfseries,beforeskip=8pt,afterskip=4pt}}
+\setcounter{tocdepth}{1}
+\setcounter{secnumdepth}{2}
+\linespread{1.22}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{3pt}
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.3}
+\setlist{itemsep=3pt,topsep=4pt,parsep=0pt,leftmargin=2em}
+\setlist[enumerate]{label=\arabic*.}
+\setlength{\emergencystretch}{1.5em}
+\allowdisplaybreaks[2]
+\raggedbottom
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small 大学物理}
+\fancyhead[R]{\small\nouppercase{\leftmark}}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\renewcommand{\sectionmark}[1]{\markboth{#1}{}}
+\newcommand{\chapterpage}[1]{\clearpage\section{#1}}
+\newcommand{\term}[1]{\textbf{#1}}
+\newcommand{\dd}{\mathop{}\!\mathrm{d}}
+\newcommand{\ee}{\mathrm{e}}
+\newcommand{\unit}[1]{\,\mathrm{#1}}
+\newcommand{\sol}{\par\noindent\textbf{解}\quad}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcommand{\explain}[3]{\par\noindent\textbf{物理量与单位}\quad #1\par
+\noindent\textbf{适用条件}\quad #2\par
+\noindent\textbf{使用场景与方法}\quad #3\par}
+
+\begin{document}
+\begin{titlepage}\thispagestyle{empty}\vspace*{0.28\textheight}
+\begin{center}{\fontsize{36}{45}\selectfont\bfseries 大学物理}\end{center}\end{titlepage}
+\pagenumbering{gobble}\tableofcontents\clearpage\pagenumbering{arabic}
+\chapterpage{符号与计算约定}
+\begin{infobox}{记号约定}
+状态方程主要保留 $m/M$，不把它统一改写成 $\nu$ 或 $n$。课件例题使用 $\nu$、$n$ 时分别解释。数密度 $n$ 与多方指数 $n$、动能 $\varepsilon$ 与制冷系数 $\varepsilon$、压强公式中的面积 $S$ 与熵 $S$、不同语境的 $W$、$\mu$ 和 $k$ 均按该处意义阅读。横线表示统计平均，$\sqrt{\overline{v^2}}$ 不写成另起名字的速率符号。
+\end{infobox}
+课件将过程热量与功写成 $\mathrm dQ,\mathrm dW$，本册保留这一写法，但它们表示微小过程交换量，\textbf{不表示热量和功是状态函数}。热力学温度 $T$ 用 K；各对数的比值必须无量纲。基本计算采用课件常用近似 $R=8.31\unit{J\,mol^{-1}K^{-1}}$、$k=1.38\times10^{-23}\unit{J\,K^{-1}}$，不因常数精度差异改变例题原结果。
+
+\chapterpage{状态参量与理想气体状态方程}
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{压强、温度与单位换算}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}p=\frac FS,\qquad T=273.15+t\\1\unit{atm}=1.01325\times10^5\unit{Pa},\quad1\unit{Pa}=1\unit{N\,m^{-2}}\\1\unit{Torr}\approx\frac1{760}\unit{atm}\approx1\unit{mmHg}\approx133\unit{Pa}\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$F$ 为垂直于器壁的压力（N），$S$ 为受力面积（$\mathrm m^2$），$p$ 为压强（Pa）。$T$ 为热力学温度（K），$t$ 为摄氏温度的数值（$^\circ\mathrm C$）。atm、Torr、mmHg 都是压强单位，不是物理量。}{$p=F/S$ 用于均匀压强或求给定面积上的平均压强；不均匀时应逐小面元处理。气体状态方程采用绝对压强。温度换算中的 273.15 是两种温标零点的差。}{已知活塞面积求气体推力时用 $F=pS$；若两侧均有压强，净压力取压强差乘面积。摄氏温度必须先转为 K 再代入状态方程、速率或效率公式。}
+课件另列工程大气压 $1\,\text{工程大气压}=9.80665\times10^4\unit{Pa}$，不能与标准大气压混用。课件热功当量为 $1\,\text{卡}=4.186\unit J$，用于按课件约定将热量换为焦耳。
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{固定质量气体的状态关系}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\frac{p_1V_1}{T_1}=\frac{p_2V_2}{T_2}=\cdots=\text{恒量}\\p_0=1.01325\times10^5\unit{Pa},\quad T_0=273.15\unit K\\V_{\mathrm{mol}}=22.4\times10^{-3}\unit{m^3},\qquad V_0=\frac mM V_{\mathrm{mol}}\\\frac{pV}{T}=\frac{p_0V_0}{T_0}=\frac mM\frac{p_0V_{\mathrm{mol}}}{T_0}\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$p_j,V_j,T_j$ 为第 $j$ 个平衡状态的压强、体积、温度。下标 0 表示课件标准状态；$V_{\mathrm{mol}}$ 表示该状态下 1 mol 气体的体积。$m$ 为气体总质量（kg），$M$ 为摩尔质量（$\mathrm{kg\,mol^{-1}}$），$m/M$ 为物质的量（mol）。}{同一种或组成不变、质量固定的理想气体。$22.4\times10^{-3}\mathrm{m^3}$ 是标准状态下 1 mol 的近似值；严格作为摩尔体积使用时其单位为 $\mathrm{m^3\,mol^{-1}}$。}{初末态已知三个量中的两个、需要求另一个时，直接用两态比值；无需先求物质的量。气体有泄漏或反应改变组成时，不能默认 $pV/T$ 不变。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{状态方程与宏微观联系}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}R=\frac{p_0V_{\mathrm{mol}}}{T_0}=8.31\unit{J\,mol^{-1}K^{-1}}\\pV=\frac mM RT,\qquad pV=NkT,\qquad p=nkT\\k=\frac R{N_A}=1.38\times10^{-23}\unit{J\,K^{-1}}\\N=\frac mM N_A=\frac mM\frac Rk\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$N$ 为总分子数（无量纲计数），$n=N/V$ 为分子数密度（$\mathrm m^{-3}$），$N_A$ 为阿伏伽德罗常数（$\mathrm{mol^{-1}}$）；$R$ 为摩尔气体常量，$k$ 为玻耳兹曼常数。$\mu$ 为单分子质量（kg），满足解释关系 $M=\mu N_A$。}{平衡态经典理想气体；实际气体低密度、远离凝结时可近似。$m$ 与 $M$ 必须使用配套的质量单位。}{给出质量和摩尔质量时用 $m/M$ 形式；给出分子数时用 $NkT$；求单位体积分子数时用 $n=p/(kT)$。不能把这里的 $n$ 当成物质的量。}
+
+
+\chapterpage{速率分布与三个统计速率}
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{概率密度与区间分子数}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}f(v)=\lim_{\Delta v\to0}\frac{\Delta N}{N\Delta v}=\frac1N\frac{\mathrm dN}{\mathrm dv}\\f(v)\mathrm dv=\frac{\mathrm dN}{N},\qquad Nf(v)\mathrm dv=\mathrm dN\\\int_{v_1}^{v_2}f(v)\mathrm dv=\frac{\Delta N}{N},\qquad\int_0^\infty f(v)\mathrm dv=1\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$v$ 为分子速率（$\mathrm{m\,s^{-1}}$），$\mathrm dv$ 或 $\Delta v$ 为速率区间宽度。$\mathrm dN$、$\Delta N$ 为区间内分子数；$N$ 为全部分子数，课件 20、24 页也写作 $N_0$。$f(v)$ 为概率密度（$\mathrm{s\,m^{-1}}$），$f(v)\mathrm dv$ 和积分为无量纲概率。}{只讨论速率的非负区间；公式本身适用于任意已归一化的速率分布，不限于麦克斯韦分布。用窄矩形近似时要求 $f$ 在区间内变化不大。}{求某速率范围的分子百分比时积分；求实际分子数再乘 $N$。$f(v)$ 的数值不能直接说成概率，单个精确速率值在连续分布中的概率为零。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{麦克斯韦速率分布}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}f(v)=4\pi\left(\frac\mu{2\pi kT}\right)^{3/2}e^{-\frac{\mu v^2}{2kT}}v^2\\\frac{\mathrm dN}{N_0}=4\pi\left(\frac\mu{2\pi kT}\right)^{3/2}e^{-\frac{\varepsilon_k}{kT}}v^2\mathrm dv\\\varepsilon_k=\frac12\mu v^2=\frac12\mu(v_x^2+v_y^2+v_z^2)\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$\mu$ 为一个分子的质量（kg）；$\varepsilon_k$ 为该分子的平动动能（J）。$v_x,v_y,v_z$ 是速度在三坐标方向的分量，可正可负；$v$ 是速率。$T,k,N_0$ 同前；$e$ 为自然指数的底数。}{经典、非相对论、热平衡理想气体；课件基本公式假设无外力场。有保守力场的等温平衡中，在给定位置仍可采用相同局部分布。金属简并电子不能直接套此式。}{由温度和分子质量求速率区间概率，或比较分布曲线：同气体升温时峰右移且变低；同温时较轻分子的峰更靠右。$v^2$ 与指数衰减共同决定峰值，不能仅由指数项判断整段区间的分子数。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{平均速率的定义}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}N=\Delta N_1+\Delta N_2+\cdots+\Delta N_n\\\bar v=\frac{\sum_i\Delta N_i v_i}{\sum_i\Delta N_i}=\frac{\Delta N_1v_1+\cdots+\Delta N_nv_n}{N}\\\bar v=\frac{\int v\mathrm dN}{N}=\int_0^\infty vf(v)\mathrm dv\\\bar v=\sqrt{\frac{8kT}{\pi\mu}}=\sqrt{\frac{8RT}{\pi M}}\approx1.60\sqrt{\frac{RT}{M}}\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$v_i$ 为第 $i$ 组分子的速率，$\Delta N_i$ 为该组分子数，$i$ 为求和编号，$n$ 在离散求和上限中为组数。$\bar v$ 为平均速率（$\mathrm{m\,s^{-1}}$）；横线表示总体统计平均。}{前两行适用于一般离散或连续分布；最后一行只适用于麦克斯韦分布。对分组数据，每组的代表速率须足以描述该组。}{求碰撞频率、平均飞行距离时常用 $\bar v$。平均速率是速率的算术平均；各向同性气体的平均速度矢量为零，平均速率仍大于零。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{方均根速率与最概然速率}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\overline{v^2}=\int_0^\infty v^2f(v)\mathrm dv\\\sqrt{\overline{v^2}}=\sqrt{\frac{3kT}{\mu}}=\sqrt{\frac{3RT}{M}}\approx1.73\sqrt{\frac{RT}{M}}\\\frac{\mathrm d}{\mathrm dv}f(v)=0,\qquad v_p=\sqrt{\frac{2kT}{\mu}}=\sqrt{\frac{2RT}{M}}\approx1.41\sqrt{\frac{RT}{M}}\\v_p<\bar v<\sqrt{\overline{v^2}}\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$\overline{v^2}$ 是速率平方的平均值（$\mathrm{m^2\,s^{-2}}$），开方后才是方均根速率。$v_p$ 是分布峰处的最概然速率（$\mathrm{m\,s^{-1}}$）；课件有时将下标排成大写 $P$，意义相同。}{均方定义适用于任意分布；根式与大小排序适用于麦克斯韦分布。求极值还需比较端点并确认极大值，不能把所有驻点均当成 $v_p$。}{平均平动动能、压强问题用 $\overline{v^2}$；分布图峰值用 $v_p$；一般平均速率用 $\bar v$。三者均正比于 $\sqrt{T/M}$，但数值不同。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{限定速率区间的平均}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\bar v_{v_1\to v_2}=\frac{\int_{v_1}^{v_2}v\mathrm dN}{\int_{v_1}^{v_2}\mathrm dN}=\frac{\int_{v_1}^{v_2}vf(v)\mathrm dv}{\int_{v_1}^{v_2}f(v)\mathrm dv}\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$v_1,v_2$ 为选定区间的上下界；$\bar v_{v_1\to v_2}$ 是仅对该区间分子求得的平均速率。分母是区间概率，不是全体分子数。}{区间概率必须大于零，且积分存在。若 $f$ 只是未归一化的相对分布，分子分母的共同系数仍可约去。}{筛选高速分子、求一段分布曲线下的平均速率时使用。课件划去的 $\int_{v_1}^{v_2}vf(v)\mathrm dv$ 只有加权总量，漏除区间概率会低估条件平均。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{三角形分布例题}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\frac1N\int_0^\infty Nf(v)\mathrm dv=\frac1N\frac12(3v_0)a=1,\qquad a=\frac{2N}{3v_0}\\v_P=v_0\\\bar v=\frac1N\left[\int_0^{v_0}v\frac a{v_0}v\mathrm dv+\int_{v_0}^{3v_0}v\frac a{3v_0-v_0}(3v_0-v)\mathrm dv\right]\\\bar v=\frac{2av_0^2}{N}=\frac43v_0\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{横轴为速率 $v$，纵轴为 $Nf(v)$；$v_0$ 为峰处速率，$3v_0$ 为截断速率；$a$ 为纵轴峰高，单位为分子数每速率单位。$N$ 为总粒子数。}{本例人为给定的三角形分布，不是麦克斯韦分布。第一段从零线性上升，第二段线性下降到 $3v_0$ 处零值。}{先用三角形总面积等于 $N$ 求 $a$，再找峰求 $v_P$，最后按两段积分求平均。不能把纵轴当成 $f(v)$ 而直接令面积为 1。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{电子气的截断分布例题}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\frac{\mathrm dN}{N_0}=\begin{cases}Av^2\mathrm dv,&0<v<v_F,\\0,&v>v_F,\end{cases}\qquad f(v)=\begin{cases}Av^2,&0<v<v_F,\\0,&v>v_F,\end{cases}\\\int_0^{v_F}Av^2\mathrm dv=\frac A3v_F^3=1,\qquad A=\frac3{v_F^3}\\v_p=v_F,\qquad\bar v=\int_0^{v_F}v\frac3{v_F^3}v^2\mathrm dv=0.75v_F\\\overline{v^2}=\int_0^{v_F}v^2\frac3{v_F^3}v^2\mathrm dv=0.6v_F^2,\quad\sqrt{\overline{v^2}}=\sqrt{0.6}v_F\approx0.77v_F\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$N_0$ 为自由电子总数，$v_F$ 为题设费米速率，$A$ 为归一化常数，单位为速率的负三次方；这里的 $A$ 不是功。}{使用题设的截断 $v^2$ 分布。峰值在截断边缘，$v_p=v_F$ 是边缘极限的记法；该分布不要求在边缘满足导数为零。}{展示同一套归一化、求矩和找峰方法如何处理非麦克斯韦分布。三种速率必须从该 $f(v)$ 求得，不能套 $\sqrt{RT/M}$ 的气体公式。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{旋转狭缝测速}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\frac lv=\frac\theta\omega,\qquad v=\frac\omega\theta l,\qquad\theta\approx2^\circ\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$l$ 为两狭缝间的飞行距离（m），$\omega$ 为狭缝转动角速度（$\mathrm{rad\,s^{-1}}$），$\theta$ 为飞行期间转过的角度（rad），$v$ 为通过狭缝的粒子速率。}{粒子近似直线匀速飞行，装置已抽真空，角速度稳定。$2^\circ$ 代入须换为 $2\pi/180$ rad；否则会产生约 57.3 倍误差。}{飞行时间 $l/v$ 等于狭缝转过 $\theta$ 所需的时间 $\theta/\omega$，由不同转速筛选不同速率。测到的是被装置选择后的粒子，需要考虑狭缝接受条件才能解释分布。}
+
+
+\chapterpage{玻耳兹曼分布与等温气压}
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{保守力场中的相空间分布}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\varepsilon=\varepsilon_k+\varepsilon_p\\\mathrm dN=n_0\left(\frac\mu{2\pi kT}\right)^{3/2}e^{-\frac{\varepsilon_k+\varepsilon_p}{kT}}\mathrm dv_x\mathrm dv_y\mathrm dv_z\mathrm dx\mathrm dy\mathrm dz\\\int_{-\infty}^{\infty}\left(\frac\mu{2\pi kT}\right)^{3/2}e^{-\frac{\varepsilon_k}{kT}}\mathrm dv_x\mathrm dv_y\mathrm dv_z=1\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$\varepsilon_p$ 为单分子势能（J），$\varepsilon_k$ 为平动动能（J），$\varepsilon$ 为其总机械能。$x,y,z$ 为位置（m），$v_x,v_y,v_z$ 为速度分量；$n_0$ 为势能零点处的数密度。$\mathrm dN$ 同时限定位置与速度。}{等温经典平衡气体处于保守外力场；势能仅依赖位置。课件三速度积分的简写实际表示对每个速度分量均积分至正负无穷。}{同时求某小空间区域和某小速度范围内的分子数时用完整式。先对全部速度积分可求空间分布；给定位置后归一化的速度分布仍取麦克斯韦形状。指数因子说明单个微观状态的权重，不应忽略能级简并或区间包含的状态数。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{按势能的空间分布}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\mathrm dN^{\prime}=n_0e^{-\frac{\varepsilon_p}{kT}}\mathrm dx\mathrm dy\mathrm dz,\qquad n=n_0e^{-\frac{\varepsilon_p}{kT}}\\n=n_0e^{-\frac{\mu gz}{kT}},\qquad p=nkT=n_0kTe^{-\frac{\mu gz}{kT}}\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$\mathrm dN^{\prime}$ 为体积元内包含全部速度的分子数；$n$ 为该处数密度（$\mathrm m^{-3}$）。重力场中 $g$ 为重力加速度（$\mathrm{m\,s^{-2}}$），$z$ 为相对参考面的高度（m），$\mu gz$ 为势能。}{等温平衡，粒子间相互作用可忽略；地面附近可取 $g$ 为常量。势能零点与 $n_0$ 所在参考位置必须一致。}{求不同高度或势能位置的相对浓度时，用指数比值，未知 $n_0$ 可约去。高度越大数密度越小，不能据此推断高处同温分子的平均速率更小。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{等温气压和高度计}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}p=nkT=p_0e^{-\frac{\mu gz}{kT}}=p_0e^{-\frac{Mgz}{RT}}\\z=\frac{RT}{Mg}\ln\frac{p_0}{p}\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$p_0$ 为 $z=0$ 的绝对压强；$p$ 为高度 $z$ 的绝对压强；$M$ 为摩尔质量（$\mathrm{kg\,mol^{-1}}$），$R,T,g$ 同前。此处 $z$ 是高度，不是碰撞频率。}{整层气体等温、组成均匀、$g$ 近似不变且处于静力平衡。实际大气温度随高度变化，不能在大范围高度上无条件用等温公式。}{已知基准压强和当地压强估计高度，或由高度求压强。课件“每升高 10 m 压强约降 133 Pa”是近地面特定条件下的数量级估计，不是高度无关的精确线性定律。}
+
+
+\chapterpage{压强、温度与分子能量}
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{各向同性统计平均}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\bar v_x=\bar v_y=\bar v_z,\qquad\overline{v_x^2}=\overline{v_y^2}=\overline{v_z^2}\\\overline{v^2}=\overline{v_x^2}+\overline{v_y^2}+\overline{v_z^2}\\\overline{v_x^2}=\overline{v_y^2}=\overline{v_z^2}=\frac13\overline{v^2}\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$\bar v_x$ 为带正负号的速度分量平均值，$\overline{v_x^2}$ 为该分量平方的平均。$x,y,z$ 指互相垂直的坐标轴；平方平均单位为 $\mathrm{m^2\,s^{-2}}$。}{无宏观定向流动且分布各向同性。此时第一行相等的三个平均实际均为零，但均方平均并不为零。}{把某一方向的器壁碰撞计算转成三维速率统计，是推导压强公式的关键。不能把 $\overline{v_x^2}$ 换成 $(\bar v_x)^2$，后者在该条件下为零。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{单次碰撞到器壁平均压强}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}n=\sum_i n_i,\qquad-\mu v_{ix}-\mu v_{ix}=-2\mu v_{ix}\\\text{分子对器壁的冲量}=2\mu v_{ix},\quad\text{碰撞分子数}=n_iv_{ix}\mathrm dt\mathrm dS\\\mathrm dI=\sum_i n_i\mu v_{ix}^2\mathrm dt\mathrm dS,\quad\mathrm dF=\frac{\mathrm dI}{\mathrm dt}=\sum_i n_i\mu v_{ix}^2\mathrm dS\\p=\frac{\mathrm dF}{\mathrm dS}=\frac{\mathrm dI}{\mathrm dS\mathrm dt}=\mu\sum_i n_iv_{ix}^2=\mu n\overline{v_x^2}\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$n_i$ 为第 $i$ 速度组的数密度，$v_{ix}$ 为其速度在 $x$ 方向的分量，$I$ 为器壁所得冲量（$\mathrm{N\,s}$），$F$ 为压力（N），$\mathrm dS$ 为小面元（$\mathrm m^2$），$\mathrm dt$ 为时间段（s）。这里 $S$ 不是熵。}{分子与平面器壁发生完全弹性反射，气体均匀。只有朝向器壁的半空间速度分子参与撞击；把求和扩展到正负对称全部速度组时出现 $1/2$，与单次冲量中的 2 抵消。}{用动量定理解释为何压强与 $n$、$\mu$ 和速度平方有关。课件从单组冲量的因子 2 到总和中不含 2，原因是只取朝向器壁的分子，不能再次额外乘 2。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{理想气体压强的微观公式}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}p=\frac13n\mu\overline{v^2}=\frac23n\left(\frac12\mu\overline{v^2}\right)\\\bar\varepsilon_k=\frac12\mu\overline{v^2},\qquad p=\frac23n\bar\varepsilon_k\\p=p_1+p_2+p_3+\cdots\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$\bar\varepsilon_k$ 在这些压强页中表示单分子平均平动动能（J），后续能量均分页的 $\bar\varepsilon_k$ 可能包含转动，须按上下文区分。$p_j$ 为混合气体第 $j$ 组分的分压（Pa）。}{经典均匀各向同性理想气体；分压相加要求各组分可以近似独立处理。压强公式中的动能只取平动动能，不能把转动和振动能量一起代入。}{由数密度与动能求压强，或把宏观测量反推微观统计量。少数分子的瞬时撞击力会涨落，公式对应宏观平均。混合气体总压强由各分压求和，不能平均各分压。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{温度的微观公式}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\bar\varepsilon_{kt}=\frac32kT,\qquad\frac12\mu\overline{v^2}=\frac32kT\\\sqrt{\overline{v^2}}=\sqrt{\frac{3kT}{\mu}},\qquad\bar\varepsilon_{kt}=\bar\varepsilon_{kt}(T)\\pV=\frac23nV\bar\varepsilon_{kt}=\frac23N\bar\varepsilon_{kt}=NkT\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{下标 $kt$ 表示平动动能，$\bar\varepsilon_{kt}$ 为单分子统计平均（J）。$N=nV$，$T$ 为 K。$\bar\varepsilon_{kt}(T)$ 表示它是温度的函数。}{三维经典热平衡气体。接近绝对零度时不能由经典公式推出所有微观运动完全停止。}{同温不同气体的平均平动动能相同，方均根速率通常不同；同样动能说明同温，压强还取决于 $n$。课件氮气例题用 $M=28\times10^{-3}\mathrm{kg\,mol^{-1}}$，将 $1000,0,-150^\circ\mathrm C$ 近似转为 $1273,273,123$ K，再分别代入得到 $1194,493,320\mathrm{m\,s^{-1}}$；动能分别约 $2.63\times10^{-20},5.65\times10^{-21},2.55\times10^{-21}$ J。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{密度、摩尔质量与能量密度}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\rho=\frac mV=\frac{pM}{RT},\qquad M=\frac mV\frac{RT}p=\rho\frac{RT}p\\\sqrt{\overline{v^2}}=\sqrt{\frac{3p}{\rho}},\qquad n=\frac p{kT}\\E_k=n\frac32kT=\frac32p\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$\rho$ 为质量密度（$\mathrm{kg\,m^{-3}}$），不能与数密度 $n$ 混淆。$E_k$ 在本课件例题中指单位体积的平动能量，实际单位是 $\mathrm{J\,m^{-3}}$，不是总能量的 J。}{理想气体平衡态。$E_k$ 式是能量密度式，因为 $n$ 是每单位体积的分子数；若求总体平动能须再乘 $V$。}{空气例题直接由 $p=1.013\times10^5$ Pa、$\rho=1.29\mathrm{kg\,m^{-3}}$ 得速率约 $4.85\times10^2\mathrm{m\,s^{-1}}$。09-2 第 40--43 页由密度推得 $M\approx28\times10^{-3}\mathrm{kg\,mol^{-1}}$，仅能判断氮气或 CO 等候选，不能只凭摩尔质量唯一鉴别气体；能量密度约 $1.5\times10^3\mathrm{J\,m^{-3}}$，原页漏写了每立方米。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{自由度、能量均分与内能}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\cos^2\alpha+\cos^2\beta+\cos^2\gamma=1\\\frac12\mu\overline{v_x^2}=\frac12\mu\overline{v_y^2}=\frac12\mu\overline{v_z^2}=\frac12kT\\\bar\varepsilon_k=\frac i2kT,\qquad\bar\varepsilon_{kr}=\frac r2kT\\E_{\mathrm{mol}}=N_A\frac i2kT=\frac i2RT\\E=\frac mM\frac i2RT,\qquad\Delta E=\frac mM\frac i2R\Delta T\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$\alpha,\beta,\gamma$ 在第一行是方向角，这里的 $\gamma$ 不是热容比。$i$ 为有效能量自由度数，$r$ 为转动自由度数，均无量纲；$\bar\varepsilon_k$ 在此指平均总动能。$E_{\mathrm{mol}}$ 为 1 mol 内能，$E$ 为气体内能（J），$\Delta T=T_2-T_1$。}{经典均分对每个有效独立二次能量项给出 $kT/2$。刚性分子忽略振动；单原子 $i=3$，线性刚性双原子 $i=5$，非线性刚性多原子通常 $i=6$。整个温区内 $i$ 不变才可直接用常数 $i$ 计算内能变化。}{由质量和温度求内能或比较不同气体储能。$\frac12kT$ 是每个二次项，$\frac32kT$ 是单分子平动动能，$\frac i2kT$ 是单分子总能量，$\frac i2RT$ 才是 1 mol 的能量。课件第 38 页选择题把 CO$_2$ 一概取多原子 $i=6$，不适用于忽略振动的线性 CO$_2$；此模型下 CO$_2$ 和 O$_2$ 均取 $i=5$，不能沿用原页单选 C 的解释。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{非刚性双原子分子的三类能量}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\bar\varepsilon_{kt}=\frac12m\overline{v_{C_x}^2}+\frac12m\overline{v_{C_y}^2}+\frac12m\overline{v_{C_z}^2}\\\bar\varepsilon_{kr}=\frac12J\overline{\omega_y^2}+\frac12J\overline{\omega_z^2}\\\bar\varepsilon_v=\frac12\mu\overline{v_{C_x}^2}+\frac12k\overline{x^2},\qquad i=7,\quad\bar\varepsilon=\frac72kT\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{第一行的 $m$ 为该分子的总质量，$C$ 为质心，$v_{C_x}$ 等为质心速度分量。$J$ 为转动惯量（$\mathrm{kg\,m^2}$），$\omega_y,\omega_z$ 为角速度（$\mathrm{rad\,s^{-1}}$）。振动行的 $\mu$ 为约化质量，$x$ 为相对平衡位置的振动位移，系数 $k$ 为力常量（$\mathrm{N\,m^{-1}}$）；最后 $kT$ 中的 $k$ 恢复为玻耳兹曼常数。}{线性双原子分子的经典小振动模型；一个振动模式包括一个动能项和一个势能项，充分激发后共贡献 $kT$。振动行中原课件沿用了 $v_{C_x}$，其物理意义应是相对振动速度，不应与第一行质心平动速度理解为同一量。}{解释为什么非刚性双原子由 $i=5$ 增至有效 $i=7$。这是课件同页符号复用的例子，不能用单分子质量代替约化质量，也不能用玻耳兹曼常数代替弹簧力常量；低温振动未充分激发时不能直接取 $i=7$。}
+
+
+\chapterpage{真实气体、碰撞与平均自由程}
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{范德瓦耳斯体积和压强修正}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}p\left(V-\frac mM b\right)=\frac mM RT,\qquad p=\frac{\frac mM RT}{V-\frac mM b}\\p_i\propto n^2,\qquad p_i=\left(\frac mM\right)^2\frac a{V^2}\\p=\frac{\frac mM RT}{V-\frac mM b}-p_i=\frac{\frac mM RT}{V-\frac mM b}-\left(\frac mM\right)^2\frac a{V^2}\\\left(p+\frac{m^2}{M^2}\frac a{V^2}\right)\left(V-\frac mM b\right)=\frac mM RT\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$a$ 为吸引作用的物质常数（$\mathrm{Pa\,m^6\,mol^{-2}}$），$b$ 为每摩尔排除体积参数（$\mathrm{m^3\,mol^{-1}}$），$p_i$ 为吸引作用引起的压强修正。$p,V,T,m,M$ 与状态方程相同，$n$ 在正比关系中为分子数密度。}{对真实气体的近似模型，要求 $V>(m/M)b$。首行只考虑有限体积，完整式同时计入吸引。$b$ 不是简单的一摩尔分子自身几何体积之和；课件的描述应理解为有效排除体积。}{给定真实气体状态估计压强、比较理想模型偏差。$p+p_i$ 是修正后的有效压强，不是仪器测到的外部压强。低温汽液共存时，范德瓦耳斯曲线的回折段不能直接当成稳定平衡过程；本课件用等温线图说明这种局限。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{平均碰撞频率与相对运动}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\bar z=\pi d^2\bar u n,\qquad\bar z=\sqrt2\pi d^2\bar v n\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$\bar z$ 为单个分子每秒与其他分子碰撞的平均次数（$\mathrm{s^{-1}}$）；$d$ 为分子有效直径（m），$\pi d^2$ 为两相同硬球的有效碰撞截面；$\bar u$ 为相对速率平均，$\bar v$ 为单分子平均速率；$n$ 为数密度。}{稀薄同种气体、硬球碰撞、热平衡麦克斯韦速度分布，$\bar u=\sqrt2\bar v$。异种分子相对运动不能无条件使用该 $\sqrt2$ 因子。}{估计碰撞时间间隔、平衡建立速率或比较不同密度。课件柱体 $\pi d^2\bar u$ 是单位时间扫过的体积（$\mathrm{m^3\,s^{-1}}$），乘 $n$ 才变成频率。数值数量级约 $10^9$ 至 $10^{10}\mathrm{s^{-1}}$。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{平均自由程与无碰撞比例}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\bar\lambda=\frac{\bar v}{\bar z}=\frac1{\sqrt2\pi d^2n},\qquad p=nkT\\\bar\lambda=\frac{kT}{\sqrt2\pi d^2p},\qquad P(L>l)=e^{-l/\lambda}\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$\bar\lambda$ 为连续分子间碰撞之间路程的平均（m）；$l$ 为观察的路程，$L$ 为一次实际自由路程。概率式中的 $\lambda$ 是课件同页未加横线的写法，此处与 $\bar\lambda$ 表示同一尺度；$P$ 是概率，不是压强。}{均匀稀薄硬球气体，直径近似不随温度改变；指数路程分布采用沿路径碰撞率近似恒定的模型。容器壁碰撞与分子间碰撞必须区分。}{给定 $T,p,d$ 求平均自由程；当 $l=\lambda$ 时，$P=e^{-1}\approx37\%$，即走过一个平均自由程并不意味着所有分子都已碰撞。课件把超过容器线度的分子间自由程“取为容器线度”，只能作为器壁限制实际飞行路程的粗略说法，不能改写分子间碰撞公式。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{改变条件时的比例关系与氢气例题}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\bar\lambda\propto\frac Tp,\qquad\bar z=\frac{\bar v}{\bar\lambda},\quad\bar v\propto\sqrt T\\\bar v\approx1.70\times10^3\unit{m\,s^{-1}},\quad n=\frac p{kT}\approx2.69\times10^{25}\unit{m^{-3}}\\\bar\lambda\approx2.14\times10^{-7}\unit m,\qquad\bar z\approx7.95\times10^9\unit{s^{-1}}\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$\propto$ 表示在其余相关因素固定时成比例。数值行是标准状态下氢气 $M=2\times10^{-3}\mathrm{kg\,mol^{-1}}$、$d=2\times10^{-10}$ m 的课件结果；舍入后数值与高精度计算略有差别。}{固定气体种类、固定硬球直径。定温改变压强时，温度不参与变化；定容升温还要求粒子数固定，因而 $n$ 固定。}{定温增压：$\bar\lambda\propto1/p$、$\bar z\propto p$；定容升温：$\bar\lambda$ 不变、$\bar z\propto\sqrt T$；增大 $d$：自由程按 $1/d^2$ 减小，频率按 $d^2$ 增大。\textbf{课件定压升温行的频率趋势写反}：由其自身公式可得 $\bar z\propto\sqrt T/T=T^{-1/2}$，应随温度升高而减小。}
+
+
+\chapterpage{第一定律、功与热容}
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{内能函数与第一定律}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}Q=(E_2-E_1)+W,\qquad\mathrm dQ=\mathrm dE+\mathrm dW\\E=E(V,T),\qquad E=E(T)\quad\text{（理想气体）}\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$Q$ 为系统吸收的热量（J），吸热正、放热负；$W$ 为系统对外做功（J），膨胀做功正、外界对系统做功负。$E_1,E_2$ 为初末内能，$\Delta E=E_2-E_1$。$E(V,T)$ 表示一定量固定组成物质的内能可能依赖温度和体积。}{封闭系统、整体机械能不另发生需要计入的变化；课件基础计算只考虑体积功。理想气体忽略分子间作用势能，固定组成的内能仅依赖温度。}{已知 $Q,W,\Delta E$ 中两个即可求第三个；先判断正负再代入。任意过程均须守恒，能量守恒却不能单独判断过程能否自发发生。课件插图另写 $U=\frac i2nRT$，该图中的 $U$ 是内能、$n$ 是物质的量，不能把这个 $n$ 解释成数密度。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{体积功的微元和积分}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\mathrm dW=pS\mathrm dl=p\mathrm dV,\qquad W=\int_{V_1}^{V_2}p\mathrm dV\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$S$ 为活塞面积，$\mathrm dl$ 为向外微小位移，$\mathrm dV=S\mathrm dl$；$p$ 为沿过程的气体压强，$V_1,V_2$ 为初末体积，功的单位为 J。}{系统压强可以描述的机械准静态过程，且只考虑体积功。一般不可逆过程应使用外压求边界功；不能直接用一个不存在的系统全过程压强曲线。}{从 $p$--$V$ 图或过程方程求功。膨胀 $\mathrm dV>0$，压缩 $\mathrm dV<0$；曲线下几何面积仅给绝对大小，积分符号才给功的正负。相同端点、不同路径所得功可不同。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{热容量、比热与摩尔热容}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}C=\frac{\mathrm dQ}{\mathrm dT},\qquad c=\frac1m\frac{\mathrm dQ}{\mathrm dT},\qquad C_i=\frac{\mathrm dQ}{\mathrm dT}\\C_{V,\mathrm m}=\left(\frac{\mathrm dQ}{\mathrm dT}\right)_{V,\mathrm{mol}},\qquad C_{p,\mathrm m}=\left(\frac{\mathrm dQ}{\mathrm dT}\right)_{p,\mathrm{mol}}\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$C$ 是整个物体沿给定过程的热容量（$\mathrm{J\,K^{-1}}$）；$c$ 是单位质量热容（$\mathrm{J\,kg^{-1}K^{-1}}$）；$C_i$ 是课件对 1 mol 在过程 $i$ 中热容的记法（$\mathrm{J\,mol^{-1}K^{-1}}$）。$C_{V,\mathrm m},C_{p,\mathrm m}$ 为定体、定压摩尔热容。}{定义依赖过程，$\mathrm dQ/\mathrm dT$ 不能视为仅由初末态决定。$i$ 在此为过程标签，不是能量自由度。摩尔定义的导数作用于 1 mol，推广到物质的量 $m/M$ 时必须乘 $m/M$。}{已知升温和指定过程求热量。课件的 $C_i$ 未在式中显式写每摩尔因子，由“1 mol”条件补足；同一气体的定压热容大于定体热容，因为定压升温同时对外做功。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{定体热容、迈耶公式与热容比}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}C_{V,\mathrm m}=\frac i2R,\qquad C_{p,\mathrm m}=C_{V,\mathrm m}+R\\\gamma=\frac{C_{p,\mathrm m}}{C_{V,\mathrm m}}=\frac{i+2}{i}\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$i$ 为有效能量自由度数；$\gamma$ 为摩尔热容比（无量纲）。$R$ 单位为 $\mathrm{J\,mol^{-1}K^{-1}}$，两种热容使用相同单位。}{理想气体；首式和 $(i+2)/i$ 要求经典有效自由度数在温区中不变。迈耶公式对固定组成理想气体可逐温度使用。课件将 CO$_2$ 与所有多原子一律列为 $i=6$，须按线性结构与振动激发情况判断。}{得到内能变化的系数、定压吸热的系数以及绝热方程的指数。单原子 $\gamma=5/3$，刚性双原子 $\gamma=7/5$，非线性刚性多原子 $\gamma=4/3$。}
+
+
+\chapterpage{等体、等压、等温与复合过程}
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{等体过程}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}V=\text{恒量},\quad\mathrm dV=0,\quad\frac pT=C,\quad\mathrm dQ_V=\mathrm dE\\W=0,\quad Q_V=\frac mM C_{V,\mathrm m}(T_2-T_1)\\\Delta E=\frac mM\frac i2R(T_2-T_1)\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$Q_V$ 为定体过程吸热，$C$ 在 $p/T=C$ 中是沿过程常数，不是热容量。$T_1,T_2$ 为初末温度，$p$ 为瞬时压强。}{固定量理想气体、刚性容器、无其他形式功；热容取常数才能将积分写成温差乘积。}{刚性容器加热或冷却。先由 $p_2/p_1=T_2/T_1$ 求末温，再求内能与热量；升温时二者均正。体积不变不代表温度、压强或内能不变。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{等压过程}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}p=\text{恒量},\quad\mathrm dp=0,\quad\frac VT=C\\\mathrm dQ_p=\mathrm dE+p\mathrm dV,\quad Q_p=\Delta E+p(V_2-V_1)\\Q_p=\frac mM C_{p,\mathrm m}(T_2-T_1),\quad\Delta E=\frac mM C_{V,\mathrm m}(T_2-T_1)\\W=p(V_2-V_1)=\frac mM R(T_2-T_1)\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$Q_p$ 为等压吸热；$V_2-V_1$ 为体积变化（$\mathrm m^3$），$p\Delta V$ 为功（J）；其余记号同前。$C$ 为 $V/T$ 的常量。}{固定量理想气体机械准静态等压过程、只计体积功；积分热量采用温区内常数热容。}{恒载活塞下缓慢加热。由 $V_2/V_1=T_2/T_1$ 连接体积和温度，再分别求 $W,\Delta E,Q_p$。等压膨胀时气体升温且吸热；等压压缩通常降温并放热。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{等温过程}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}T=\text{恒量},\quad\mathrm dE=0,\quad pV=C,\quad\mathrm dQ_T=\mathrm dW\\W=\int_{V_1}^{V_2}\frac mM RT\frac{\mathrm dV}V=\frac mM RT\ln\frac{V_2}{V_1}=\frac mM RT\ln\frac{p_1}{p_2}\\Q=W,\qquad\Delta E=0\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$Q_T$ 为等温微小吸热；$\ln$ 为自然对数，$V_2/V_1$ 与 $p_1/p_2$ 均无量纲。$T$ 是整个过程的共同温度。}{理想气体、组成和量不变；对数功公式要求机械准静态路径。任意理想气体等温过程都有 $\Delta E=0$，但自由膨胀不能用此对数求实际功。}{与恒温热源接触的缓慢膨胀或压缩。膨胀时对数正，需吸热补偿做功；压缩时对数负，向外放热。温度不变不等于没有能量传递。课件 31 页把该行标题误写为“等压”，本式按内容为等温。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{500 J 加热氢气：三条路径}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\Delta E=Q_V=\nu\frac52R(T-T_0),\quad T=\frac{2Q_V}{5\nu R}+T_0=285\unit K\\Q=W=\frac mM RT\ln\frac{p_0}p,\quad\frac Q{\nu RT}=\ln\frac{p_0}p\\p=p_0e^{-\frac Q{nRT}}=9.07\times10^4\unit{Pa},\quad V=\frac{p_0V_0}p=5.00\times10^{-2}\unit{m^3}\\Q_p=\frac mM C_{p,\mathrm m}(T-T_0)=2\times\frac72R(T-T_0)\\T=\frac{Q_p}{7R}+T_0=281.6\unit K,\qquad V=\frac{V_0T}{T_0}\approx0.046\unit{m^3}\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$T_0,p_0,V_0$ 为标准初态；$\nu$ 在第 35 页表示物质的量，$n$ 在第 36 页的指数中也表示物质的量，本题均为 2 mol。这里 $n$ \textbf{不是数密度}。$Q_V,Q_p$ 是同样 500 J 在两种路径中的吸热。}{刚性双原子氢气 $i=5$，课件温度用 $T_0\approx273$ K；各路径的机械条件分别为等体、准静态等温、等压。}{比较同样热量的去向：等体全部增加内能；等温全部成为对外功；等压分成内能和功。保留课件 $\nu$、$n$ 的实际位置并明确其同义，不再把所有地方替换成统一新符号。课件末态数值取其有效精度。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{复合过程的状态衔接与能量相加}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}V_a=\frac{mRT_a}{Mp_a},\quad V_b=V_a,\quad T_b=\frac{p_b}{p_a}T_a\\T_c=T_b,\quad V_c=\frac{p_bV_b}{p_c},\quad V_d=\frac{V_c}2,\quad T_d=\frac{V_d}{V_c}T_c\\Q_1=\Delta E_1=\frac mM\frac52R(T_b-T_a),\quad W_1=0\\Q_2=W_2=\frac mM RT_b\ln\frac{V_c}{V_b},\quad\Delta E_2=0\\W_3=p_c(V_d-V_c),\quad\Delta E_3=\frac mM\frac52R(T_d-T_c),\quad Q_3=W_3+\Delta E_3\\W=W_1+W_2+W_3,\quad Q=Q_1+Q_2+Q_3,\quad\Delta E=Q-W\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$a,b,c,d$ 为依次到达的四个状态，数字 1、2、3 标三段过程，不是循环编号。气体氮气质量 $m=2.8\times10^{-3}$ kg，$M=28\times10^{-3}\mathrm{kg\,mol^{-1}}$，$T_a\approx300$ K。}{三段依次为等体升压、等温膨胀、等压压缩，量固定、采用刚性双原子热容。第 38 页 $p_2$ 是 $p_b$ 的另一排版记法。}{每一段的末态就是下一段的初态。课件给出 $T_b=T_c=900$ K、$T_d=450$ K；$W_1=0,W_2\approx823$ J、$W_3\approx-374$ J；总 $W\approx449$ J、$Q\approx761$ J、$\Delta E\approx312$ J。差异来自各步提前取整，精细计算应到最后统一舍入。全过程没有返回 $a$，不能令总内能变化为零。}
+
+
+\chapterpage{绝热过程、多方过程及公式推导}
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{绝热能量关系与三种过程方程}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\mathrm dQ=0,\qquad0=\mathrm dW+\mathrm dE\\\Delta E=\frac mM C_{V,\mathrm m}(T_2-T_1),\quad W=-\frac mM C_{V,\mathrm m}(T_2-T_1)\\pV^\gamma=C_1,\qquad TV^{\gamma-1}=C_2,\qquad p^{\gamma-1}T^{-\gamma}=C_3\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$\gamma=C_{p,\mathrm m}/C_{V,\mathrm m}$ 为热容比；$C_1,C_2,C_3$ 为不同维度的过程常数，不是热容。$Q=0$ 表示没有热交换，不表示温度不变。}{能量关系适用于绝热封闭系统、只计功；内能温差式取常数热容。三种幂律另外要求理想气体、常数热容及机械准静态可逆绝热过程，不能用于突发自由膨胀。}{给出两态 $p,V$ 时用第一式；给出 $T,V$ 时用第二式；给出 $p,T$ 时用第三式。膨胀做功使内能减少而降温，压缩输入功则升温。课件第三式保留 $p^{\gamma-1}T^{-\gamma}$，不换成另一指数写法。}
+
+
+\subsubsection{推导：第一定律与状态方程消去温度}
+绝热过程有 $\mathrm dW=-\mathrm dE$，且 $\mathrm dW=p\mathrm dV$、$\mathrm dE=(m/M)C_{V,\mathrm m}\mathrm dT$，因而
+\begin{align*}
+p\mathrm dV&=-\frac mM C_{V,\mathrm m}\mathrm dT,\\
+-\frac{p\mathrm dV}{C_{V,\mathrm m}}&=\frac mM\mathrm dT.
+\end{align*}
+固定 $m/M$ 下对状态方程微分，
+\begin{align*}
+p\mathrm dV+V\mathrm dp&=\frac mM R\mathrm dT=-\frac{Rp\mathrm dV}{C_{V,\mathrm m}},\\
+C_{V,\mathrm m}V\mathrm dp+(C_{V,\mathrm m}+R)p\mathrm dV&=0,\\
+C_{V,\mathrm m}V\mathrm dp+C_{p,\mathrm m}p\mathrm dV&=0,\\
+\frac{\mathrm dp}p+\gamma\frac{\mathrm dV}V&=0.
+\end{align*}
+最后一步除以 $C_{V,\mathrm m}pV$。常数 $\gamma$ 时积分得到 $\ln p+\gamma\ln V=C$；严格说对数应相对于参考单位取无量纲比值，课件将其吸收到积分常数。因此 $pV^\gamma=C_1$。再由 $p=(m/M)RT/V$ 消去 $p$，得 $TV^{\gamma-1}=C_2$；由 $V=(m/M)RT/p$ 消去 $V$，得 $p^{1-\gamma}T^\gamma=$ 常量，取倒数即课件的 $p^{\gamma-1}T^{-\gamma}=C_3$。
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{绝热线与等温线的斜率}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}V^\gamma\mathrm dp+\gamma pV^{\gamma-1}\mathrm dV=0,\quad V\mathrm dp+\gamma p\mathrm dV=0\\\left.\frac{\mathrm dp}{\mathrm dV}\right|_A=-\gamma\frac{p_A}{V_A}\quad\text{（绝热）}\\V\mathrm dp+p\mathrm dV=0,\quad\left.\frac{\mathrm dp}{\mathrm dV}\right|_A=-\frac{p_A}{V_A}\quad\text{（等温）}\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$A$ 为同一个比较状态，$p_A,V_A$ 为该点压强和体积；斜率的单位是 $\mathrm{Pa\,m^{-3}}$。}{比较同一理想气体同一点处的可逆绝热线与等温线，$\gamma>1$。上述关系由两个过程方程直接微分并解出 $\mathrm dp/\mathrm dV$。}{识别 $p$--$V$ 曲线：绝热线下降更陡。两斜率均为负，因此绝热斜率的代数值更小、绝对值更大；课件说“斜率大于”应理解为斜率绝对值更大。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{非静态绝热自由膨胀}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\Delta Q=0,\quad W=0,\quad\Delta E=0,\quad\Delta T=0,\quad V\uparrow,\ p\downarrow\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{课件 $\Delta Q$ 表示该过程无热交换，沿用原式；$\Delta T$ 为初末平衡温度差。箭头表体积增大与压强减小。}{隔热刚性容器中理想气体向真空自由膨胀，初末均可描述为平衡态；没有外压阻力、没有其他功。真实气体的初末温度不一定相同。}{由 $Q=W=0$ 代入第一定律得 $\Delta E=0$，再由理想气体 $E(T)$ 得 $\Delta T=0$。这是从守恒而非绝热幂律得出的结论；中间态非平衡，不能把过程画成实际等温曲线计算功。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{多方过程与特殊过程的联系}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}pV^n=C,\qquad p^{1/n}V=C^{\prime}\\n=0\ \text{等压},\quad n=1\ \text{等温},\quad n=\gamma\ \text{准静态绝热},\quad n\to\infty\ \text{等体}\\p=p_1\frac{V_1^n}{V^n}\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$n$ 在本节是多方指数（无量纲），与数密度同字母但不是同一物理量。$C,C^{\prime}$ 为沿程常数；$p_1,V_1$ 为初态。}{固定量理想气体的机械准静态过程，用常数指数拟合。$p^{1/n}V$ 写法仅直接适用于 $n\ne0$；$n\to\infty$ 是等体极限的形式说明，不是对无穷大进行普通代数运算。}{已知过程曲线或拟合指数时求状态和功；一般多方不一定介于等温与绝热之间，$n$ 可取其他值。由状态方程还可得到解释关系 $TV^{n-1}=$ 常量，将温度变化与体积变化联系起来。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{多方功、吸热与过程热容}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}W=\int_{V_1}^{V_2}p\mathrm dV=\frac{p_1V_1-p_2V_2}{n-1}\\\Delta E=\frac mM C_{V,\mathrm m}(T_2-T_1)=\frac mM\frac i2R(T_2-T_1)\\Q=\Delta E+W=\frac mM C_{V,\mathrm m}\Delta T+\frac{p_2V_2-p_1V_1}{1-n}\\Q=\frac mM\left(C_{V,\mathrm m}+\frac R{1-n}\right)\Delta T\\Q_n=\frac mM C_{n,\mathrm m}\Delta T,\quad C_{n,\mathrm m}=C_{V,\mathrm m}+\frac R{1-n}=\frac{\gamma-n}{1-n}C_{V,\mathrm m}\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$C_{n,\mathrm m}$ 为该多方路径的摩尔热容，单位为 $\mathrm{J\,mol^{-1}K^{-1}}$；$Q_n$ 为该路径吸热，其符号可以为负。$\Delta T=T_2-T_1$；其余符号延续上节。}{$n\ne1$，理想气体量固定、热容常数、机械准静态路径。$n=1$ 时必须回到等温对数功式，不能直接代入含 $n-1$ 的分母。}{由端点直接计算多方功，再用第一定律求热。$n=0$ 恢复定压热容，$n=\gamma$ 得 $C_{n,\mathrm m}=0$，$n\to\infty$ 恢复定体热容。当 $1<n<\gamma$ 时 $C_{n,\mathrm m}<0$，表示路径上吸热与升温可异号，不是物质本身储能系数为负。}
+
+
+\subsubsection{推导：积分功与过程热容}
+沿程 $p=p_1V_1^nV^{-n}$。$n\ne1$ 时
+\begin{align*}
+W&=p_1V_1^n\int_{V_1}^{V_2}V^{-n}\mathrm dV
+=\frac{p_1V_1^n}{1-n}(V_2^{1-n}-V_1^{1-n})\\
+&=\frac{p_2V_2-p_1V_1}{1-n}
+=\frac{m}{M}\frac{R(T_2-T_1)}{1-n}.
+\end{align*}
+第二行使用 $p_2V_2^n=p_1V_1^n$，最后使用初末状态方程。将此功与 $\Delta E=(m/M)C_{V,\mathrm m}\Delta T$ 相加，提取 $\Delta T$，得到 $Q=(m/M)[C_{V,\mathrm m}+R/(1-n)]\Delta T$。按定义比较系数即得 $C_{n,\mathrm m}$。再用 $R=(\gamma-1)C_{V,\mathrm m}$ 化简：
+\[
+C_{n,\mathrm m}=\left[1+\frac{\gamma-1}{1-n}\right]C_{V,\mathrm m}=\frac{\gamma-n}{1-n}C_{V,\mathrm m}.
+\]
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{氧气绝热与等温膨胀比较}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}T_1V_1^{\gamma-1}=T_2V_2^{\gamma-1},\quad T_2=T_1\left(\frac{V_1}{V_2}\right)^{\gamma-1}=119\unit K\\W_Q=\frac mM\frac52R(T_1-T_2)=941\unit J\\W_T=\frac mM RT_1\ln\frac{V_2}{V_1}=1435\unit J\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$W_Q$ 是课件给绝热功的下标记法，$W_T$ 是等温功；此处 $Q$ 下标不意味着绝热吸热。$m=8\times10^{-3}$ kg，$M=32\times10^{-3}\mathrm{kg\,mol^{-1}}$，$V_2/V_1=10$，$T_1\approx300$ K，$\gamma=1.4$。}{两条路径均由同一初态缓慢膨胀至同一末体积，按课件忽略转动自由度随低温改变的常热容模型。它们的末温与末压不同，不是完全相同的初末状态。}{绝热路径先求 $T_2$ 再由内能减少求功；等温路径由对数式直接求功。温度降得很低时常数热容模型可能失效，课件数值是该近似模型下的结果。}
+
+
+\chapterpage{循环过程、热机与制冷机}
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{循环净功与热量}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\Delta E=0,\qquad W=W_{a\mathrm I b}-W_{b\mathrm{II}a}>0\\Q_1-Q_2=W,\qquad Q_{\text{吸}}-|Q_{\text{放}}|=W\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$W_{a\mathrm I b}$ 是膨胀路径功，$W_{b\mathrm{II}a}$ 在课件面积比较式中为压缩功绝对大小。$Q_1$、$Q_2$ 在这里分别为正的吸热大小、放热大小；$Q_{\text{放}}$ 若作为带符号放热则为负，故另写绝对值。}{系统完成一个循环回到同一状态；净功对应闭合 $p$--$V$ 曲线的有向面积，要求各路径可用系统压强描述。}{循环后内能变化为零，因此净功等于净吸热。顺时针通常为对外输出功，逆时针为外界输入功。式中的减号已包含压缩功的负贡献，不能再把面积量 $W_{b\mathrm{II}a}$ 代入负数。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{热机效率}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\eta=\frac W{Q_{\text{吸}}}=1-\frac{|Q_{\text{放}}|}{Q_{\text{吸}}}\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$\eta$ 为热效率（无量纲），$W$ 为一个循环的净输出功，$Q_{\text{吸}}$ 为该循环全部从外部吸收的热量。}{工作于稳态循环的热机，分母须大于零；用同一循环或同一时间区间的能量。一般热机效率不能仅由两温度计算。}{逐段判断吸热和放热，将所有正热量相加得分母。分子是循环净功而非膨胀段功。净功单位为 J，功率单位为 W；课件中物理量字母 $W$ 指功，不能因字母相同就当成瓦特功率。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{制冷系数及其功符号}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}|W|=|Q_{\text{放}}|-Q_{\text{吸}},\qquad\varepsilon=\frac{Q_{\text{吸}}}{|W|}=\frac{Q_{\text{吸}}}{|Q_{\text{放}}|-Q_{\text{吸}}}\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$\varepsilon$ 为制冷系数（无量纲），不是分子能量；$Q_{\text{吸}}$ 为从低温被冷却物体吸取的热量，$|Q_{\text{放}}|$ 为向高温环境放出的热量。$|W|$ 为外界输入功大小，课件箭头旁也用 $A$ 表示该输入功。}{完整制冷循环，符号仍采用气体对外功正的约定，所以实际 $W<0$。}{评价单位输入功能搬走多少低温热量，$\varepsilon$ 可以大于 1；这不意味着热机效率大于 1。制冷的有用量是低温吸热，不能把高温放热放进分子。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{两等温、两等体的循环例题}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}Q_{AB}=W_{AB}=\frac mM RT_1\ln\frac{V_2}{V_1}\\Q_{BC}=\Delta E_{BC}=\frac mM\frac52R(T_2-T_1)\\Q_{CD}=W_{CD}=\frac mM RT_2\ln\frac{V_1}{V_2}\\Q_{DA}=\Delta E_{DA}=\frac mM\frac52R(T_1-T_2)\\\eta=\frac{W_{AB}+W_{CD}}{Q_{AB}+Q_{DA}}=\frac{(T_1-T_2)\ln(V_2/V_1)}{T_1\ln(V_2/V_1)+\frac52(T_1-T_2)}\approx15\%\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$A,B,C,D$ 为循环四角状态；$T_1=300$ K、$T_2=200$ K，$V_2=2V_1$。氧气质量 $m=3.2\times10^{-2}$ kg，对应 $m/M=1$ mol。$Q_{BC},Q_{CD}$ 带负号。}{AB、CD 为等温，BC、DA 为等体；刚性双原子氧气，未设置回热装置。}{等体段功为零但仍交换热量。净功为两等温功之和；分母除 AB 吸热外还包括 DA 升温吸热，因此不能用 $1-T_2/T_1$。将共同比例因子 $(m/M)R$ 约去即得课件效率式。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{卡诺循环四段与效率推导}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}Q_1=\frac mM RT_1\ln\frac{V_B}{V_A},\qquad Q_2=\frac mM RT_2\ln\frac{V_C}{V_D}\\Q_{BC}=Q_{DA}=0,\qquad\eta=\frac W{Q_1}=1-\frac{Q_2}{Q_1}\\\eta=1-\frac{T_2\ln(V_3/V_4)}{T_1\ln(V_2/V_1)}\\T_1V_2^{\gamma-1}=T_2V_3^{\gamma-1},\qquad T_1V_1^{\gamma-1}=T_2V_4^{\gamma-1}\\\frac{V_2}{V_1}=\frac{V_3}{V_4},\qquad\eta=1-\frac{T_2}{T_1}\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$T_1>T_2$ 为高、低温热源温度（K），$Q_1,Q_2$ 均取正的热量大小。$V_1,V_2,V_3,V_4$ 对应 $V_A,V_B,V_C,V_D$；BC 和 DA 为绝热。CD 实际放热为负，但式中 $Q_2$ 用压缩比 $V_C/V_D>1$ 表示其正大小。}{仅在两个恒温热源间交换热量，全部过程可逆；理想气体推导取常数热容。卡诺效率本身依据卡诺定理并不限于理想气体工作物质。}{对两条绝热式相除，$T_1,T_2$ 消去，得 $(V_2/V_1)^{\gamma-1}=(V_3/V_4)^{\gamma-1}$；$\gamma>1$ 时开幂得到相等体积比。代入效率式后两对数约去。\textbf{热量与绝热关系共同使效率只依赖热源温度}，不能只因为某循环有两种温度就套结论。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{卡诺制冷系数与热机上限}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\varepsilon=\frac{Q_{\text{吸}}}{|Q_{\text{放}}|-Q_{\text{吸}}}=\frac{T_{\text{低}}}{T_{\text{高}}-T_{\text{低}}}\\\eta=1-\frac{T_2}{T_1}\quad\text{（可逆机）},\qquad\eta\le1-\frac{T_2}{T_1}\quad\text{（一般热机）}\\\eta_C=1-\frac{273+30}{273+580}=64.5\%\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$T_{\text{高}},T_{\text{低}}$ 为制冷机放热端和吸热端的热源温度；$\eta_C$ 是课件热电厂例题的卡诺上限，实际效率约 36\%。}{冷热源温度恒定且 $T_{\text{高}}>T_{\text{低}}>0$。制冷等号仅可逆时达到；热机不等号在相同两热源条件下比较。}{反向卡诺循环满足 $|Q_{\text{放}}|/Q_{\text{吸}}=T_{\text{高}}/T_{\text{低}}$，代入一般制冷系数并约去 $Q_{\text{吸}}$ 得温度式。提高高温热源温度或降低低温热源温度可改变理论效率；热源温差相同不意味着温度比相同。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{卡诺净功加倍例题}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\eta_1=\frac{W_1}{Q_{1\text{吸}}}=\frac{W_1}{W_1+|Q_{1\text{放}}|}=1-\frac{T_0}{T_1}\\1+\frac{|Q_{1\text{放}}|}{W_1}=\frac{T_1}{T_1-T_0},\quad |Q_{1\text{放}}|=\frac{T_0}{T_1-T_0}W_1\\|Q_{2\text{放}}|=\frac{T_0}{T_2-T_0}W_2,\quad |Q_{1\text{放}}|=|Q_{2\text{放}}|,\quad W_2=2W_1\\T_2=2T_1-T_0=473\unit K,\quad\eta_2=1-\frac{T_0}{T_2}=42.3\%\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$T_0=273$ K 为共同冷却器温度；$T_1=373$ K 为原高温热源；$T_2$ 为提高后的高温热源。数字 1、2 在此标两种循环，不标两个热源；$W_1,W_2$ 为各循环净功。}{两循环工作于相同两条绝热线之间、冷源温度固定，因此低温等温段体积比相同，放热大小相同。题干称“净功率”，要使用 $W_2=2W_1$ 还须循环频率相同。}{用能量守恒把吸热写成净功加放热，再与卡诺效率联立。由共同放热得到 $T_0W_1/(T_1-T_0)=T_0(2W_1)/(T_2-T_0)$，消去共同因子可解末温。若只知功率而不知循环频率，不能唯一推出净功加倍。课件第 8 页分母中出现 $A_2$，按其能量关系为该循环净功的同义记法。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{两等压、两绝热循环}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}Q_1=\frac mM C_{p,\mathrm m}(T_B-T_A),\quad Q_2=\frac mM C_{p,\mathrm m}(T_C-T_D)\\\eta=1-\frac{Q_2}{Q_1}=1-\frac{T_C-T_D}{T_B-T_A}\\\frac{V_A}{T_A}=\frac{V_B}{T_B},\quad\frac{V_D}{T_D}=\frac{V_C}{T_C}\\T_AV_A^{\gamma-1}=T_DV_D^{\gamma-1},\quad T_BV_B^{\gamma-1}=T_CV_C^{\gamma-1}\\T_D=\frac{T_A}{T_B}T_C,\qquad\eta=1-\frac{T_C}{T_B}\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$p_1$ 是 AB 高压、$p_2$ 是 CD 低压，$A,B,C,D$ 为四状态。$Q_2$ 是 CD 放热的正大小，故写 $T_C-T_D>0$。}{AB、CD 等压，BC、DA 为可逆绝热；固定量理想气体、常热容。这是该特定循环的效率，不是一般卡诺温度公式。}{由两个等压关系及两个绝热关系消去体积，得 $T_D/T_A=T_C/T_B$；代入热量比，$T_C-T_D=(T_C/T_B)(T_B-T_A)$，因而得到 $1-T_C/T_B$。$T_B,T_C$ 是同一绝热段的端点温度，不是固定两热源温度。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{奥托循环及压缩比}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}Q_1=\frac mM C_{V,\mathrm m}(T_d-T_c),\quad Q_2=\frac mM C_{V,\mathrm m}(T_e-T_b)\\\eta=1-\frac{Q_2}{Q_1}=1-\frac{T_e-T_b}{T_d-T_c}\\T_eV^{\gamma-1}=T_dV_0^{\gamma-1},\quad T_bV^{\gamma-1}=T_cV_0^{\gamma-1}\\\frac{T_e-T_b}{T_d-T_c}=\left(\frac{V_0}{V}\right)^{\gamma-1},\quad\eta=1-\frac1{(V/V_0)^{\gamma-1}}=1-\frac1{r^{\gamma-1}}\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$b,c,d,e$ 为循环状态，$V$ 为最大体积、$V_0$ 为最小体积；$r=V/V_0>1$ 为无量纲压缩比，不是其倒数。$Q_2$ 是 e 至 b 放热的正大小。}{理想奥托模型：c 至 d、e 至 b 等体换热，b 至 c、d 至 e 可逆绝热，理想气体热容常数。实际发动机存在燃烧、排气和耗散，效率不严格满足本式。}{两个绝热方程相减：$(T_e-T_b)V^{\gamma-1}=(T_d-T_c)V_0^{\gamma-1}$；相除得温差比，再代入效率。增大压缩比提高模型效率，实际效率仍受上述非理想因素限制。}
+
+
+\chapterpage{第二定律、统计熵与熵变}
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{第二定律两种表述的等效图式}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}Q=W,\qquad Q_1=Q,\qquad Q+Q_2,\qquad Q-Q_2=W\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$Q$ 是假设能从单一热源全变为功的热量；$Q_2$ 是配套制冷机从低温端搬走的热量；$Q_1$ 是图中另一台机吸热。A、B 表示配套的两台装置，不是气体状态点。}{这些关系用于反证假设下的组合装置，不代表现实中允许 $Q=W$ 的单热源循环热机。}{若单热源热机可把 $Q$ 全变功，驱动 B 制冷机后可零外功把 $Q_2$ 从低温搬到高温；反之若可零功搬热，则与热机组合抵消冷源放热，剩余 $Q-Q_2$ 全变成功。两种违反情形相互推出，故两种第二定律表述等效。}
+
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{微观态数与集中概率}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\text{三分子宏观态微观态数：}\ 1,3,3,1\\\text{对应概率：}\ \frac18,\frac38,\frac38,\frac18,\qquad W_N=\frac1{2^N}\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$N$ 为独立分子总数，$W_N$ 为全部分子落在指定 A 半室的普通概率。A、B 是等体积两半室，不是热机状态点。}{每个分子在 A、B 的概率各为 $1/2$，各分子可按独立分布处理。普通概率为零到一之间的数，不能等同于微观态计数。}{每个分子两种选择共 $2^N$ 个等可能位置微观态；全部在 A 只有 1 个，故 $W_N=1/2^N$。三分子有 $2^3=8$ 个微观态，按 A 内分子数分成 1、3、3、1 个，从而得到所列概率。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{玻耳兹曼熵与可加性}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}S=k\ln\Omega,\qquad\Delta S=S_2-S_1=k\ln\frac{\Omega_2}{\Omega_1}>0\\\Omega=\Omega_1\Omega_2\cdots\Omega_n\\S=k\ln(\Omega_1\Omega_2\cdots\Omega_n)=k\ln\Omega_1+\cdots+k\ln\Omega_n\\S=S_1+S_2+\cdots+S_n,\qquad S=k\log W\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$S$ 为熵（$\mathrm{J\,K^{-1}}$），$\Omega$ 为与宏观态对应的微观态数，无量纲且可大于 1；$k$ 为玻耳兹曼常数。$n$ 在乘积中为子系统个数。末式为课件墓碑写法：$W$ 表示微观态数，$\log$ 按自然对数理解，不是机械功。}{基本统计熵定义取等概率微观态；熵可加的乘积要求子系统的微观态选择近似独立、相互作用可忽略。$\Delta S>0$ 写在 $\Omega_2>\Omega_1$ 的具体自然演化情形，普遍孤立系统结论为 $\Delta S\ge0$。}{状态计数比可直接给熵差，不必知道单独的 $\Omega_1$。乘积用对数转成求和即得可加性。熵最大是固定能量、体积、粒子数等约束下的结论；不能脱离约束仅用“混乱度”作定量计算。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{克劳修斯可逆循环关系}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\eta=1-\frac{Q_2}{Q_1}=1-\frac{T_2}{T_1},\qquad\frac{Q_2}{Q_1}=\frac{T_2}{T_1}\\\frac{Q_1}{T_1}+\frac{Q_2}{T_2}=0\quad\text{（此行放热 }Q_2<0\text{）}\\\sum_i\frac{\Delta Q_i}{T_i}=0,\qquad\oint\frac{\mathrm dQ}T=0\\\int_{a1b}\frac{\mathrm dQ}T+\int_{b2a}\frac{\mathrm dQ}T=0,\qquad\int_{a1b}\frac{\mathrm dQ}T=\int_{a2b}\frac{\mathrm dQ}T\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$\Delta Q_i$ 为第 $i$ 个恒温接触段带符号热量，$T_i$ 为其温度，$\oint$ 为沿闭合循环积分。$a1b$、$a2b$ 为从同一 a 到同一 b 的两条可逆路径。}{可逆循环。课件前两行在相邻位置改变 $Q_2$ 约定：效率比中是放热正大小，求和中是负热量，本册按原写法显式标注，不能当成同一带符号量连续代入。}{由卡诺热量正大小比先得 $Q_1/T_1-|Q_2|/T_2=0$，再把放热写成负的 $Q_2$ 即得求和式。任意可逆循环可分割为微小卡诺循环，内部交换相互抵消，边界余下 $\sum\Delta Q_i/T_i=0$；极限得到闭路积分为零。反向路径积分变号，故两条同端点可逆路径积分相同。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{熵差的热力学定义}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}S_2-S_1=\int_a^b\frac{\mathrm dQ}T=\int_1^2\frac{\mathrm dQ}T,\qquad\mathrm dS=\frac{\mathrm dQ}T\quad\text{（可逆过程）}\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$S_1,S_2$ 为初末状态熵，$\mathrm dQ$ 为所选可逆路径上的微小吸热，$T$ 为该步系统温度（K）。积分单位为 $\mathrm{J\,K^{-1}}$。}{定义积分必须沿连接同一初末态的可逆路径，初末态须可用平衡热力学描述。实际路径不可逆时，可以另选辅助可逆路径计算同样熵差。}{用上一节的路径无关性定义状态函数 $S$：先选参考态定一个加法常数，再定义任意态的积分差。$S$ 与路径无关不表示 $Q$ 与路径无关；真正不依赖路径的是可逆积分 $\int\mathrm dQ/T$。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{熵增不等式与孤立系统}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}S_2-S_1\ge\int_1^2\frac{\mathrm dQ}T,\qquad\mathrm dS\ge\frac{\mathrm dQ}T\\\mathrm dQ=0\ \Longrightarrow\ \mathrm dS\ge0\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{不等式右侧为实际过程由热交换输入的熵；对有限温差交换，分母 $T$ 应取所接触热源或边界交换温度，非平衡系统不一定存在统一温度。孤立系统无热、无功、无物质交换。}{可逆取等号，有正熵产生时取严格不等号；绝热封闭系统同样无热交换，但绝热不等于孤立。若包含物质流入流出，还须计入熵流。}{判断过程方向：孤立整体总熵不得减少。只看某局部系统，熵减可能由向外输出熵造成，不违反总熵增。课件把“孤立（绝热）”并列，计算条件相同的是无热交换，并非两术语等同。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{1 mol 绝热自由膨胀的两种熵计算}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\mathrm dQ=0+p\mathrm dV\quad\text{（辅助可逆等温路径）}\\pV=RT,\quad\Delta S=\int\frac{\mathrm dQ}T=R\int_{V_1}^{V_2}\frac{\mathrm dV}V=R\ln\frac{V_2}{V_1}\\\Omega_1=CV,\quad\Omega=(\Omega_1)^N,\quad S=k\ln\Omega=kN\ln(CV)\\S_2-S_1=kN[\ln(CV_2)-\ln(CV_1)]=kN\ln\frac{V_2}{V_1}\\=\frac{RN}{N_0}\ln\frac{V_2}{V_1}=R\ln\frac{V_2}{V_1}\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$V_1,V_2$ 为自由膨胀初末体积；$C$ 在统计行是固定能量条件下相空间计数的比例常数，非热容。$\Omega_1$ 在此指单分子的状态数，不是初态整体状态数；$N_0$ 在最后一行指 1 mol 分子数，与速率页“总分子数 $N_0$”用法不同。}{1 mol 理想气体，初末温度相同；实际绝热自由膨胀 $Q=W=0$。统计推导固定动量空间贡献并仅比较体积依赖，各粒子空间选择独立。}{热力学方法另选可逆等温辅助路径，实际不吸热而辅助路径吸热；统计方法单粒子可用状态数正比于体积，总态数按 $V^N$ 增长。$N=N_0$、$kN=R$，两式一致，$V_2>V_1$ 时熵增。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{1 mol 任意两态理想气体的熵变}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\Delta S=\Delta S_1+\Delta S_2\\\Delta S_1=\int_{T_1}^{T_2}\frac{C_V\mathrm dT}T=C_V\ln\frac{T_2}{T_1}\\\Delta S_2=\frac1{T_2}\int_{V_1}^{V_2}\frac{RT_2}V\mathrm dV=R\ln\frac{V_2}{V_1}\\\Delta S=C_V\ln\frac{T_2}{T_1}+R\ln\frac{V_2}{V_1}\\\Delta S=\int_1^2\frac{\mathrm dE+p\mathrm dV}T=\int_{T_1}^{T_2}\frac{C_V\mathrm dT}T+R\int_{V_1}^{V_2}\frac{\mathrm dV}V\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$C_V$ 是该例题课件对定体\textbf{摩尔}热容的简写，即此前的 $C_{V,\mathrm m}$，不能当作总系统热容。$T_1,V_1$ 与 $T_2,V_2$ 为初末态。}{1 mol 固定组成理想气体、$C_V$ 常量；无论实际过程是否可逆，只要初末为可描述的平衡态即可用最终两态式。积分推导路径仍必须可逆。}{选可逆“先等体变温、再等温变体积”，分别积分并相加。反过来“先等温、再等体”时，等温段虽在 $T_1$，$T_1$ 在分子分母仍抵消，故得到同一结果。最后一行由可逆第一定律直接推导；一般物质的量需将两项同时乘 $m/M$，这属于本式的推广而非原课件式。}
+
+
+\Needspace{360pt}
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{水与恒温热源的熵变}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\Delta S_1=\int_{T_1}^{T_2}\frac{mc\mathrm dT}T=mc\ln\frac{T_2}{T_1}=1.01\times10^3\unit{J\,K^{-1}}\\Q_2=-Q_1=-mc(T_2-T_1)=-3.34\times10^5\unit J\\\Delta S_2=\frac{Q_2}{T_2}=-895\unit{J\,K^{-1}}\\\Delta S=\Delta S_1+\Delta S_2=115\unit{J\,K^{-1}}\quad\text{（课件舍入值）}\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$m=1$ kg 为水质量，$c=4.18\times10^3\mathrm{J\,kg^{-1}K^{-1}}$ 为水比热；$T_1$ 为水初温 $20^\circ$C，$T_2$ 为热源恒温及水末温 $100^\circ$C。$Q_1>0$ 为水吸热，$Q_2<0$ 为热源放热。下标 1、2 此处标水与热源。}{水无相变、比热近似常数，热源温度恒定，二者构成无其他交换的孤立整体。水实际经历有限温差传热，水的熵计算积分为辅助可逆升温路径，不能用热源恒温替代水沿途温度。}{水的熵变按变温积分，热源的熵变为带符号热量除以恒温。先将两项舍入为 1010 和 -895，得课件值 115；用 $293.15,373.15$ K 计算后统一舍入，两项约为 $1008.6,-896.2$，总熵变约为 $112.5\mathrm{J\,K^{-1}}$。整体熵增加，过程不可逆；115 为提前舍入的近似值。}
+
+
+\chapterpage{信息熵、开放系统与真空应用}
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{等概率事件的信息熵}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}S=K\ln N,\qquad S=K\ln100,\quad S=K\ln50,\quad S=K\ln1=0\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$N$ 为等可能的结果种数，$K$ 为信息量单位约定的比例常数，不是温度单位 K，也不是玻耳兹曼常数 $k$。$S$ 在这里表示信息熵，不直接等于物理熵。}{有限个结果且每个等概率；课件说明按 bit 计取 $K\approx1.442$，即 $1/\ln2$。不等概率时不能只数结果种数。}{珠宝盗窃示例：100 个同等可能嫌疑人、排除至 50 人、确定唯一人，对应熵依次为 $\log_2 100,\log_2 50,0$ bit。补充解释：一般信息熵为 $-K\sum_jp_j\ln p_j$；等概率 $p_j=1/N$ 代入得到课件的 $K\ln N$。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{开放系统熵流与熵产生}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\mathrm dS=\mathrm d_iS+\mathrm d_eS,\qquad\mathrm d_iS\ge0\\\mathrm d_eS<0,\quad|\mathrm d_eS|>\mathrm d_iS\ \Longrightarrow\ \mathrm dS<0\\|\mathrm d_eS|=\mathrm d_iS\ \Longrightarrow\ \mathrm dS=0\\\mathrm d_eS>0\ \Longrightarrow\ \mathrm dS>0\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$\mathrm d_iS$ 为系统内部不可逆过程产生的熵；$\mathrm d_eS$ 为与外界交换能量、物质引起的净熵流入；二者单位均为 $\mathrm{J\,K^{-1}}$。下标 i、e 是产生与交换标签，不是普通求导。}{选定明确的开放系统边界；熵产生非负，熵流可正、可负、可零。课件生命阶段的“有序度”图是定性示意，不是可以无条件套用的生物学定量规律。}{判断局部熵为何可能减小：输出熵大小超过内部产生即可。对系统加外界的整体仍须满足总熵增。$\mathrm dS<0$ 不充分保证形成某种自组织结构，还需课件列出的远离平衡、非线性、耗散等条件；不能由熵符号直接判断衰老或疾病。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{真空区域的课件数值约定}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\text{粗真空：}\ 1.013\times10^5\sim1.333\times10^3\unit{Pa}\\\text{低真空：}\ 1.333\times10^3\sim1.333\times10^{-1}\unit{Pa}\\\text{高真空：}\ 1.333\times10^{-1}\sim1.333\times10^{-6}\unit{Pa}\\\text{超高真空：}\ 1.333\times10^{-6}\sim1.333\times10^{-10}\unit{Pa}\\\text{极高真空：}\ p<1.333\times10^{-10}\unit{Pa}\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$p$ 为绝对压强；各行是课件使用的范围，不是额外的气体状态方程。单位 Pa 对所有端点一致。}{仅按这份课件的真空分类阅读，不把区域名称当成与所有技术标准通用的精确界限。}{选择实验真空等级或估算自由程时，实际应使用测得压强。范围由大到小列出，课件“真空度高”通常对应更小压强，不能误解成更大的 $p$。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{真空自由程与表面入射通量}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}\bar\lambda=\frac{kT}{\sqrt2\pi\sigma^2p},\qquad\bar z=\frac{3.5\times10^{22}}{\sqrt{MT}}p\\p=10^{-6}\unit{Torr},\qquad\bar z\approx4.4\times10^{14}\ \text{分子}\,\mathrm{cm^{-2}s^{-1}}\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{$\sigma$ 在自由程式中是\textbf{分子直径}（m），不是碰撞截面；$\bar z$ 在此是每单位面积每秒撞到表面的分子数，\textbf{不是前文单分子的碰撞频率}。经验系数配套 $p$ 用 Torr、$T$ 用 K、$M$ 用相对分子质量的数值（如氮气取 28），等价于摩尔质量以 $\mathrm{g\,mol^{-1}}$ 表示的数值。}{平衡理想气体与平面表面，系数 3.5\,$\times10^{22}$ 为非 SI 单位组合。原课件将 $M$ 的单位写为“g”不够准确，不能把 $M=28\times10^{-3}\mathrm{kg\,mol^{-1}}$ 与 Torr 压强直接混入该数值式。}{自由程用 SI 量，表面通量按经验式专用单位计算。氮气室温取 $M=28,T\approx300$ K、$p=10^{-6}$ Torr，得到 $\bar z\approx3.8\times10^{14}\mathrm{cm^{-2}s^{-1}}$；课件的 $4.4\times10^{14}$ 是近似估计。原页未说明压强单位，本册由系数及其 Torr 例题注明其必要约定。}
+
+
+\par\noindent\begin{minipage}{\linewidth}
+\subsection{单分子层时间与镀膜路径碰撞}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}p=10^{-10}\sim10^{-11}\unit{Torr},\qquad5\times10^{14}\ \text{分子}\,\mathrm{cm^{-2}}\\\text{粒子能量：}\ 0.1\sim0.3\unit{eV},\qquad\text{镀膜压强：}\ 10^{-2}\sim10^{-4}\unit{Pa}\end{gather*}
+\end{infobox}
+\end{minipage}\par
+\explain{每平方厘米 $5\times10^{14}$ 个分子是课件单层覆盖量的估计；$p$ 为真空绝对压强，eV 为能量单位。课件第 56 页 $d$ 表示蒸发源至基片距离，约 30 cm，\textbf{与碰撞节中的分子直径 $d$ 不同}。}{覆盖估算假设每次碰撞均吸附、通量恒定且无脱附；飞行途中无碰撞比例采用均匀气体近似。气体升温、放气或混合气体都会改变估计。}{补充关系：覆盖时间为单位面积覆盖数除以入射通量；飞行途中碰撞概率 $1-e^{-d/\bar\lambda}$。当 $\bar\lambda=d$ 时约 63.2\%，当 $\bar\lambda=10d$ 时约 9.5\%，对应课件 63\%、9\% 的说法。因此镀膜应使分子间自由程远大于飞行距离，而不是用分子直径与 30 cm 比较。}
+
+
+\chapterpage{完整推导与公式联系}
+
+本章补齐前文定义式到计算式之间的推导。以下关系中，为解释而引入的中间参数会单独交代，最终回到课件原符号。定义、经验参数及基本定律不能由另一条纯数学恒等式证明；推导所依据的物理假设须始终保留。
+\subsection{状态方程：质量形式与分子数形式}
+固定组成气体的三定律给出 $pV/T=$ 常量。对同一气体与标准态比较，$pV/T=p_0V_0/T_0$。标准态的总量为 $m/M$ mol，$V_0=(m/M)V_{\mathrm{mol}}$，所以
+\[
+\frac{pV}{T}=\frac mM\frac{p_0V_{\mathrm{mol}}}{T_0}=\frac mM R.
+\]
+乘 $T$ 即 $pV=(m/M)RT$。又 $N=(m/M)N_A$，$k=R/N_A$，于是
+\[
+\frac mM RT=\frac N{N_A}RT=NkT.
+\]
+除以 $V$ 得 $p=nkT$，其中 $n=N/V$。再将总质量 $m=N\mu$ 与 $N=(m/M)N_A$ 联立，消去 $m,N$，得 $M=\mu N_A$，因而 $k/\mu=R/M$。这是三个统计速率的微观质量形式与摩尔质量形式能够互换的依据。
+
+\subsection{麦克斯韦分布：分量概率到速率概率}
+\term{起点}为经典平衡分子的玻耳兹曼速度权重，平动能为 $\varepsilon_k=\mu(v_x^2+v_y^2+v_z^2)/2$。令 $a=\mu/(2kT)>0$（仅为推导中间参数），一维分量概率密度为 $g(v_x)=B e^{-av_x^2}$。由归一化
+\[
+1=B\int_{-\infty}^{\infty}e^{-av_x^2}\mathrm dv_x=B\sqrt{\frac\pi a}
+\]
+得 $B=\sqrt{a/\pi}$。高斯积分依据为：令 $I=\int_{-\infty}^{\infty}e^{-x^2}\mathrm dx$，则 $I^2=\iint e^{-(x^2+y^2)}\mathrm dx\mathrm dy$，改为极坐标得 $I^2=2\pi\int_0^\infty re^{-r^2}\mathrm dr=\pi$；再作尺度替换得到上述一般 $a$ 形式。
+三分量独立，故三维速度密度为
+\[
+g(v_x)g(v_y)g(v_z)=\left(\frac a\pi\right)^{3/2}e^{-av^2}.
+\]
+速率在 $v$ 与 $v+\mathrm dv$ 间对应速度空间球壳，球壳体积为 $4\pi v^2\mathrm dv$。把密度乘球壳体积，
+\[
+f(v)\mathrm dv=4\pi\left(\frac a\pi\right)^{3/2}e^{-av^2}v^2\mathrm dv,
+\]
+代回 $a=\mu/(2kT)$ 即课件的麦克斯韦速率分布。$4\pi v^2$ 来自同一速率的不同方向数量，不是额外的热力学概率常数。
+
+\subsection{三个统计速率：积分与求极值}
+仍令 $a=\mu/(2kT)$。归一化、均方与均值积分可用
+\[
+\int_0^\infty v^2e^{-av^2}\mathrm dv=\frac{\sqrt\pi}{4a^{3/2}},\quad
+\int_0^\infty v^3e^{-av^2}\mathrm dv=\frac1{2a^2},\quad
+\int_0^\infty v^4e^{-av^2}\mathrm dv=\frac{3\sqrt\pi}{8a^{5/2}}.
+\]
+偶次项由分部积分递推 $I_j=\frac{j-1}{2a}I_{j-2}$（$j>1$），基值 $I_0=\sqrt\pi/(2\sqrt a)$；奇次 $I_3$ 令 $u=av^2$，得到 $I_3=(2a^2)^{-1}\int_0^\infty ue^{-u}\mathrm du=1/(2a^2)$。边界项均为零。于是
+\begin{align*}
+\int_0^\infty f(v)\mathrm dv&=4\pi(a/\pi)^{3/2}\frac{\sqrt\pi}{4a^{3/2}}=1,\\
+\bar v&=4\pi(a/\pi)^{3/2}\frac1{2a^2}=\frac2{\sqrt{\pi a}}=\sqrt{\frac{8kT}{\pi\mu}},\\
+\overline{v^2}&=4\pi(a/\pi)^{3/2}\frac{3\sqrt\pi}{8a^{5/2}}=\frac3{2a}=\frac{3kT}{\mu}.
+\end{align*}
+最后一行开方即方均根速率。在 $v>0$ 处用对数求导，
+\[
+\frac{\mathrm d}{\mathrm dv}\ln f(v)=\frac2v-2av=0
+\quad\Longrightarrow\quad v_p^2=\frac1a=\frac{2kT}\mu.
+\]
+$f(0)=0$ 且 $f(v)\to0$ 当 $v\to\infty$，驻点为唯一峰。以 $k/\mu=R/M$ 转为课件摩尔形式；系数 $\sqrt2<\sqrt{8/\pi}<\sqrt3$ 得三个速率的排序。
+限定区间平均则先将 $f$ 除以区间概率 $P=\int_{v_1}^{v_2}f(v)\mathrm dv$，得到条件密度 $f/P$，再对该密度取均值。这给出前文的分式，不可省略分母。
+
+\subsection{两个非麦克斯韦例题的积分步骤}
+三角形分布第一段 $Nf(v)=av/v_0$，第二段 $Nf(v)=a(3v_0-v)/(2v_0)$。面积归一化得到 $a=2N/(3v_0)$。平均的两段积分为
+\begin{align*}
+\int_0^{v_0}v\frac a{v_0}v\mathrm dv&=\frac{av_0^2}{3},\\
+\int_{v_0}^{3v_0}v\frac a{2v_0}(3v_0-v)\mathrm dv&=\frac a{2v_0}\left[\frac{3v_0v^2}{2}-\frac{v^3}{3}\right]_{v_0}^{3v_0}=\frac{5av_0^2}{3}.
+\end{align*}
+相加除以 $N$ 得 $2av_0^2/N=4v_0/3$。峰在 $v_0$，故 $v_P=v_0$。
+截断电子气分布用 $\int_0^{v_F}Av^2\mathrm dv=Av_F^3/3=1$，所以 $A=3/v_F^3$。依次求矩：
+\[
+\bar v=\frac3{v_F^3}\frac{v_F^4}4=\frac34v_F,\qquad
+\overline{v^2}=\frac3{v_F^3}\frac{v_F^5}5=\frac35v_F^2.
+\]
+开方为 $\sqrt{0.6}v_F$；$Av^2$ 单调增，最大密度出现在截断边缘。三角形例和电子例的计算结构相同，但不能套麦克斯韦数值系数。
+
+\subsection{相空间分布到等温气压}
+相空间密度中指数可以分解为 $e^{-\varepsilon_k/(kT)}e^{-\varepsilon_p/(kT)}$。对全部速度积分，动能因子连同 $(\mu/2\pi kT)^{3/2}$ 的积分等于 1，留下
+\[
+\mathrm dN^{\prime}=n_0e^{-\varepsilon_p/(kT)}\mathrm dx\mathrm dy\mathrm dz.
+\]
+再除以体积元 $\mathrm dx\mathrm dy\mathrm dz$ 得 $n=n_0e^{-\varepsilon_p/(kT)}$。匀强重力场 $\varepsilon_p=\mu gz$；乘局部状态方程的 $kT$ 得 $p=p_0e^{-\mu gz/(kT)}$，其中 $p_0=n_0kT$。由 $\mu/k=M/R$ 转成摩尔形式，取自然对数并解 $z$ 得高度计式。
+从宏观静力学也可得到同一关系：高度 $\mathrm dz$ 的水平气柱上下压力差平衡其重量，$\mathrm dp=-\rho g\mathrm dz$；状态方程给 $\rho=pM/(RT)$。等温时
+\[
+\frac{\mathrm dp}p=-\frac{Mg}{RT}\mathrm dz
+\quad\Longrightarrow\quad\ln\frac p{p_0}=-\frac{Mgz}{RT}.
+\]
+两个途径分别从统计权重和宏观力平衡出发，落在同一个公式。
+
+\subsection{器壁碰撞、压强和温度}
+面元 $\mathrm dS$ 前方、长度 $v_x\mathrm dt$ 的小柱体中，朝器壁运动的分子会在 $\mathrm dt$ 内撞击。单次给壁冲量为 $2\mu v_x$；正向半群的数目在速度正负对称时占一半，因此全速度组求和得到 $\mathrm dI=\mu\sum_i n_iv_{ix}^2\mathrm dS\mathrm dt$。除以时间和面积即 $p=\mu\sum_i n_iv_{ix}^2=\mu n\overline{v_x^2}$。各向同性给 $\overline{v_x^2}=\overline{v^2}/3$，从而
+\[
+p=\frac13n\mu\overline{v^2}=\frac23n\bar\varepsilon_k.
+\]
+同宏观状态方程 $p=nkT$ 比较，约去 $n$ 得 $\bar\varepsilon_{kt}=3kT/2$。再代入 $\bar\varepsilon_{kt}=\mu\overline{v^2}/2$ 得方均根速率式。该推导也解释：\textbf{温度由平均平动动能表征，压强还需数密度}；速率与质量相关而同温动能与种类无关。
+从 $pV=(m/M)RT$ 解 $M$，得到 $M=\rho RT/p$；把 $RT/M=p/\rho$ 代入方均根式即 $\sqrt{\overline{v^2}}=\sqrt{3p/\rho}$。同时 $n\bar\varepsilon_{kt}=3p/2$，是单位体积平动能量。
+
+\subsection{能量均分：二次项积分到内能}
+对任意有效独立二次能量项 $aq^2$，$a>0$ 为该项系数，$q$ 为相应速度、角速度或位移坐标，平衡权重为 $e^{-aq^2/(kT)}$。此处 $a,q$ 仅是中间记号。令 $b=a/(kT)$，由高斯积分及对 $b$ 求导，
+\[
+\langle aq^2\rangle=a\frac{\int_{-\infty}^{\infty}q^2e^{-bq^2}\mathrm dq}{\int_{-\infty}^{\infty}e^{-bq^2}\mathrm dq}
+=a\frac{\sqrt\pi/(2b^{3/2})}{\sqrt\pi/b^{1/2}}=\frac{kT}{2}.
+\]
+$i$ 个这样的能量项相加，单分子平均总能量为 $ikT/2$；$N$ 分子总内能为 $NikT/2=(m/M)iRT/2$。一个振动模式有动能和势能两个项，共 $kT$，所以已激发的双原子振动在原来 5 项上增加 2 项得 7 项。此处“有效”要求量子能级间隔相对 $kT$ 足够小；未激发的项不能机械加入。
+方向余弦关系来自单位方向向量的平方和为 1，即 $(\cos\alpha)^2+(\cos\beta)^2+(\cos\gamma)^2=1$，故只需两个独立方向角；绕轴自转再需一个角，共三个一般刚体转动坐标。线性分子沿分子轴的转动惯量很小，通常不计该有效转动自由度。
+
+\subsection{范德瓦耳斯修正的模型依据}
+理想状态方程假设所有体积都可供质心活动。有限大小模型把有效可用体积写成 $V-(m/M)b$，所以先得 $p=(m/M)RT/[V-(m/M)b]$。引力使抵壁分子的法向动量较小；壁附近分子数与 $n$ 成比例，每个分子所受平均吸引也与 $n$ 成比例，因而压强减少项与 $n^2$ 成比例。把物质常数吸收为 $a$，写作 $p_i=(m/M)^2a/V^2$。二者组合并移项即完整方程。
+这里从模型解释形式，并不能仅靠状态方程求出 $a,b$ 的具体数值，它们由物质的相互作用及实验决定。排除体积与两粒子不能重叠的相对位置有关，故 $b$ 不是简单的实际分子体积总和。
+
+\subsection{碰撞截面、相对速率与自由程}
+两个相同直径 $d$ 的硬球，质心距离小于 $d$ 即碰撞，相对运动的有效横截面积为 $\pi d^2$。相对速率为 $u$ 时，单位时间扫过体积 $\pi d^2u$，乘数密度得碰撞数率；统计平均得到 $\bar z=\pi d^2\bar u n$。
+两个独立分子的每个速度分量均为方差 $kT/\mu$ 的高斯变量，其差的方差为 $2kT/\mu$，所以相对速度也服从同形分布但速率尺度放大 $\sqrt2$，即 $\bar u=\sqrt2\bar v$。因此 $\bar z=\sqrt2\pi d^2\bar v n$。长期总路程除以碰撞次数给出 $\bar\lambda=\bar v/\bar z$，约去 $\bar v$ 得 $1/(\sqrt2\pi d^2n)$，再代 $n=p/(kT)$ 得压强形式。
+沿小路程 $\mathrm dl$ 的碰撞概率近似为 $\mathrm dl/\bar\lambda$，无碰撞生存概率 $P$ 满足 $\mathrm dP=-(P/\bar\lambda)\mathrm dl$。以 $P(0)=1$ 积分得 $P=e^{-l/\bar\lambda}$；故走过一倍自由程无碰撞率 $e^{-1}$，有碰撞率 $1-e^{-1}$。这一近似也连接真空镀膜的 63\% 和 9\% 估算。
+
+\subsection{第一定律到热容及三个基本过程}
+物体的体积功由力乘位移：$\mathrm dW=F\mathrm dl=pS\mathrm dl=p\mathrm dV$。按吸热与对外功为正的约定，能量守恒给 $\mathrm dQ=\mathrm dE+p\mathrm dV$。理想气体、$i$ 固定时，$\mathrm dE=(m/M)(i/2)R\mathrm dT$。
+等体 $\mathrm dV=0$，故 $\mathrm dQ=\mathrm dE$；对 1 mol 比较热容定义得 $C_{V,\mathrm m}=iR/2$。等压时由状态方程 $p\mathrm dV=(m/M)R\mathrm dT$，因此
+\[
+\mathrm dQ_p=\frac mM(C_{V,\mathrm m}+R)\mathrm dT
+\quad\Longrightarrow\quad C_{p,\mathrm m}=C_{V,\mathrm m}+R.
+\]
+热容比立即得到 $\gamma=(i+2)/i$。等体、等压有限过程分别将常数热容对温度积分；等压功将常数 $p$ 对体积积分，得到前文所有温差式。
+等温理想气体 $\mathrm dE=0$，所以 $\mathrm dQ_T=\mathrm dW$。代 $p=(m/M)RT/V$ 积分，$T$ 提出积分号，得到 $(m/M)RT[\ln V]_{V_1}^{V_2}$；两态 $p_1V_1=p_2V_2$ 给 $V_2/V_1=p_1/p_2$，因此对数的两种形式等价。
+绝热方程、多方功与多方热容的完整代数步骤已在前文对应节展开；它们继续使用同一组第一定律、状态方程和迈耶公式，不是独立于这些定律的新假设。
+
+\subsection{热机和制冷机：守恒到比值}
+循环返回初态，状态量内能增量为零。第一定律给 $W=Q_{\text{吸}}-|Q_{\text{放}}|$；除以全部正吸热得到热机效率。制冷机仍守恒但气体净功为负，把输入功大小写成 $|W|=|Q_{\text{放}}|-Q_{\text{吸}}$，再以低温吸热除以输入功得到制冷系数。
+卡诺循环的两个等温热量由等温功公式取得，两个绝热端点关系使两段等温体积比相等，故热量大小之比为 $T_2/T_1$。热机效率、卡诺制冷系数随之得出。两等压两绝热循环及奥托循环均先取两换热段的 $Q_2/Q_1$，再由两条绝热关系消去中间温度；前文给出的相除或相减步骤是它们连接热量公式和过程公式的关键。不同循环不能仅凭图形相似互换效率式。
+卡诺定理与熵增属于第二定律的结果，不由第一定律单独推出。反证方法是把假设更高效率的热机与逆向可逆机组合，调整循环量使冷源交换抵消，便出现从单热源吸热全变功的组合循环，违反开尔文表述；因此相同两热源之间 $\eta\le1-T_2/T_1$。
+
+\subsection{克劳修斯不等式到熵变}
+将一般循环与辅助可逆卡诺装置组合，使各热源的净交换逐个抵消后，若一般循环满足 $\oint\mathrm dQ/T>0$，组合可给出违反第二定律的结果。因此 $\oint\mathrm dQ/T\le0$，可逆时取等号；这里分母是相应交换热源温度。
+把实际 $1\to2$ 与辅助可逆 $2\to1$ 组成循环，
+\[
+\int_{1\to2,\,\text{实际}}\frac{\mathrm dQ}T+\int_{2\to1,\,\text{可逆}}\frac{\mathrm dQ}T\le0.
+\]
+第二项为 $S_1-S_2$，移项即 $S_2-S_1\ge\int_{1\to2,\,\text{实际}}\mathrm dQ/T$。可逆时等号，绝热封闭时右侧为零；孤立整体自然过程总熵不减。
+对于 1 mol 理想气体，在可逆辅助路径上
+\[
+\mathrm dS=\frac{\mathrm dQ}T=\frac{\mathrm dE+p\mathrm dV}T=C_V\frac{\mathrm dT}T+R\frac{\mathrm dV}V.
+\]
+常数 $C_V$ 时两项分别积分得到 $C_V\ln(T_2/T_1)+R\ln(V_2/V_1)$。利用两态状态方程，$\ln(V_2/V_1)=\ln(T_2/T_1)-\ln(p_2/p_1)$，可得到补充的压力形式 $\Delta S=C_p\ln(T_2/T_1)-R\ln(p_2/p_1)$。其中 $C_p=C_V+R$ 是该熵例题的摩尔热容简写；该补充式并非替换课件的体积式。
+
+\subsection{水和热源总熵变化为何为正}
+水比热常数，沿辅助可逆升温路径 $\mathrm dQ=mc\mathrm dT$；积分得 $mc\ln(T_2/T_1)$。恒温热源实际失去 $mc(T_2-T_1)$，故熵变为 $-mc(T_2-T_1)/T_2$。相加，
+\[
+\Delta S=mc\left[\ln\frac{T_2}{T_1}-\frac{T_2-T_1}{T_2}\right].
+\]
+令 $x=T_2/T_1>1$，括号为 $\ln x-1+1/x$，在 $x=1$ 时为零，对 $x$ 导数为 $(x-1)/x^2>0$，所以 $T_2>T_1$ 时总熵严格增加。这也解释为何水升温量虽正、热源熵变虽负，两者不会恰好抵消。
+
+\subsection{真空表面通量与经验系数}
+令表面法向为 $x$，只有 $v_x>0$ 分子撞向表面。单位面积单位时间入射数为
+\begin{align*}
+\bar z&=n\int_0^\infty v_x\sqrt{\frac\mu{2\pi kT}}e^{-\mu v_x^2/(2kT)}\mathrm dv_x\\
+&=n\sqrt{\frac{kT}{2\pi\mu}}=\frac14n\bar v
+=\frac p{\sqrt{2\pi\mu kT}}.
+\end{align*}
+这里用 $\int_0^\infty xe^{-ax^2}\mathrm dx=1/(2a)$、$n=p/(kT)$。$\bar z$ 为面通量，SI 单位为 $\mathrm{m^{-2}s^{-1}}$；其名称虽与碰撞节相同，但量纲不同。
+若 $M$ 取摩尔质量的 $\mathrm{g\,mol^{-1}}$ 数值，$\mu=10^{-3}M/N_A$ kg；若 $p$ 用 Torr 数值，实际压强为 $133.322p$ Pa；最后每平方米换成每平方厘米要除 $10^4$。因此
+\[
+\bar z=\frac{133.322}{10^4}\sqrt{\frac{N_A}{2\pi\times10^{-3}k}}\frac p{\sqrt{MT}}
+\approx\frac{3.51\times10^{22}}{\sqrt{MT}}p.
+\]
+按课件精度即 $3.5\times10^{22}$。单位约定由换算产生，不能把该系数当成无量纲常数。单层时间为 $t=(5\times10^{14})/\bar z$，沿用课件每平方厘米覆盖量；吸附概率小于一或存在脱附时，所需时间还会改变。
+
+\chapterpage{主要联系与符号辨析}
+
+\subsection{公式的依赖关系}
+\begin{center}\begin{tabularx}{\linewidth}{l Y}\toprule 起点 & 由此获得的计算关系\\\midrule
+状态方程 & 各两态关系、数密度、质量密度、等温功、等温气压中的宏观联系\\
+麦克斯韦分布 & 归一化、区间概率、三个统计速率、平均相对速率、表面通量\\
+动量定理与统计假设 & 微观压强；与状态方程结合得到温度的微观解释\\
+能量均分与有效自由度 & 分子能量、总内能、定体热容，再由第一定律得到定压热容\\
+第一定律与体积功 & 等体、等压、等温能量式，绝热幂律、多方功与多方热容\\
+过程能量式与循环闭合 & 净功、一般效率、制冷系数；具体段条件决定具体循环效率\\
+第二定律与可逆辅助路径 & 卡诺上限、熵积分、熵增不等式、不可逆过程初末态熵差\\
+统计态数与熵定义 & 集中概率、熵可加性、自由膨胀统计熵变\\\bottomrule\end{tabularx}\end{center}
+课件“能量退降”部分没有另给可用于代入计算的定量公式。其物理含义为：能量守恒，随不可逆性产生的熵增加，能量在指定环境下做功的可用性降低。不能把“退降与熵增成正比”理解为能量总量减少；若要计算可用功损失，必须先补充环境温度和过程条件。
+
+\subsection{同字母的不同意义}
+\begin{longtable}{p{18mm}p{54mm}p{72mm}}
+\toprule 记号 & 不同物理量 & 判别依据\\\midrule\endhead
+$n$ & 数密度；物质的量；多方指数；组数 & $p=nkT$ 为 $\mathrm m^{-3}$；氢气指数式为 mol；$pV^n$ 的指数无量纲\\
+$\mu$ & 单分子质量；约化质量 & 速率分布用前者，分子内相对振动用后者\\
+$k$ & 玻耳兹曼常数；力常量 & $kT$ 为能量；$kx^2/2$ 为弹性势能\\
+$\varepsilon$ & 分子能量；制冷系数 & 前者为 J，后者无量纲；能量下标须区分 k、kt、kr、v\\
+$W$ & 机械功；微观态计数；普通概率 & 第一定律为 J；$S=k\log W$ 为态数；$W_N=2^{-N}$ 为概率\\
+$S$ & 活塞或面元面积；熵；信息熵 & 单位分别为 $\mathrm m^2$、$\mathrm{J\,K^{-1}}$、bit 等信息单位\\
+$\bar z$ & 单分子碰撞频率；表面入射通量 & 前者为 $\mathrm s^{-1}$，后者为 $\mathrm{cm^{-2}s^{-1}}$ 或 SI 面通量\\
+$z$ & 高度 & 玻耳兹曼重力分布中为 m，与带横线碰撞量不同\\
+$d$ & 分子直径；源至基片距离 & 碰撞公式为分子尺度；镀膜文字中约为 30 cm\\
+$\sigma$ & 分子直径 & 真空自由程式中仍为 m，不是面积\\
+$C,C_j$ & 热容量；过程常数；计数系数 & 由对应定义和量纲判别，不能跨式直接等同\\
+$i$ & 能量自由度；过程标签；求和编号 & 内能 $i$ 为自由度；$C_i$ 为过程；$\sum_i$ 为编号\\
+$r$ & 转动自由度；压缩比 & $\varepsilon_{kr}$ 公式为自由度；奥托效率为 $V/V_0$\\
+$Q_2$ & 正放热大小；带符号负热量 & 效率比通常为大小；克劳修斯求和及热源熵变使用负值\\
+\bottomrule\end{longtable}
+单位用于识别公式含义，也可检查抄写错误。若一式两边量纲不同，应先检查物质的量、每摩尔因子、体积因子和单位组合，而不是直接算数。
+\Needspace{230pt}
+\subsection{应保留的课件勘误说明}
+\begin{enumerate}
+\item 定压升温的硬球碰撞频率由课件公式推得随 $T^{-1/2}$ 减小，原表的增加趋势不能同时成立。
+\item 平均分子间自由程超过装置尺寸时，器壁限制实际飞行，但不能直接把该统计量改为装置尺寸。
+\item CO$_2$ 是线性分子；忽略振动时与 O$_2$ 同取刚性有效 $i=5$，不应一概归入 $i=6$。
+\item 绝热线斜率是负数，比较时应说绝对值更大；准静态绝热幂律不能套自由膨胀。
+\item 课件单位体积平动能量例题漏写每立方米；真空入射公式系数要求特定非 SI 单位组合。
+\item 熵积分必须保留可逆路径条件；热机放热正大小与熵公式负热量要按所在页转换。
+\item 循环净功与功率区别需要循环频率；水的总熵变原值含提前舍入误差。
+\end{enumerate}
+\end{document}
