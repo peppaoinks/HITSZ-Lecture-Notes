@@ -1,0 +1,1102 @@
+% 长期维护主源文件。字体、颜色、信息框均在导言区集中定义。
+\documentclass[UTF8,fontset=none,zihao=-4,a4paper]{ctexart}
+\usepackage[left=26mm,right=26mm,top=25mm,bottom=25mm,headheight=15pt]{geometry}
+\setCJKmainfont{Songti SC}[BoldFont={Songti SC Bold}]
+\setCJKsansfont{Songti SC}[BoldFont={Songti SC Bold}]
+\setCJKmonofont{Songti SC}[BoldFont={Songti SC Bold}]
+\setCJKfamilyfont{kai}{Kaiti SC}
+\setmainfont{Times New Roman}
+\usepackage{amsmath,amssymb,mathtools,booktabs,tabularx,array,enumitem,fancyhdr,needspace,longtable,tikz}
+\usepackage[most]{tcolorbox}
+\usepackage[hidelinks]{hyperref}
+\definecolor{Theme}{HTML}{35566E}
+\definecolor{BoxBack}{HTML}{F2F6F8}
+\definecolor{BoxLine}{HTML}{B8C8D3}
+\tcbset{coursebox/.style={enhanced,breakable,colback=BoxBack,colframe=BoxLine,coltitle=Theme,colbacktitle=BoxBack,fonttitle=\normalsize\bfseries,fontupper=\normalsize,boxrule=0.5pt,arc=0pt,left=9pt,right=9pt,top=4pt,bottom=4pt,toptitle=5pt,bottomtitle=3pt,before skip=4pt,after skip=4pt,parbox=false}}
+\newtcolorbox{infobox}[1]{coursebox,title={#1}}
+\newcommand{\term}[1]{\textbf{#1}}
+\newcommand{\example}[1]{\begin{infobox}{例题}#1\end{infobox}}
+\newcommand{\solution}{\par\noindent\textbf{解：}}
+\newcommand{\proof}{\par\noindent\textbf{证明：}}
+\newcommand{\chapterpage}[1]{\clearpage\section{#1}}
+\newcommand{\com}[2]{\binom{#1}{#2}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\ctexset{section={format=\large\bfseries,beforeskip=0pt,afterskip=14pt},subsection={format=\normalsize\bfseries,beforeskip=12pt,afterskip=6pt}}
+\setcounter{tocdepth}{1}
+\linespread{1.22}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{3pt}
+\renewcommand{\arraystretch}{1.3}
+\setlist{itemsep=3pt,topsep=4pt,parsep=0pt,leftmargin=2em}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small 概率论与数理统计}\fancyhead[R]{\small\nouppercase{\leftmark}}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\renewcommand{\sectionmark}[1]{\markboth{#1}{}}
+\hypersetup{pdftitle={概率论与数理统计},pdfsubject={随机事件、条件概率、随机变量与多维分布}}
+\allowdisplaybreaks[2]\raggedbottom
+\begin{document}
+\begin{titlepage}\thispagestyle{empty}\vspace*{0.28\textheight}
+\begin{center}{\fontsize{36}{45}\selectfont\bfseries 概率论与数理统计}\end{center}
+\end{titlepage}
+\pagenumbering{Roman}\thispagestyle{empty}\tableofcontents
+\clearpage\pagenumbering{arabic}
+
+\section{随机事件与概率}
+概率论研究随机现象的数量规律。一次试验的结果具有不确定性，而在固定条件下大量重复试验，其结果频率可以呈现统计规律。描述这类规律，需要先明确试验、可能结果和事件，再建立概率模型。
+\subsection{随机试验、样本空间与事件}
+\begin{infobox}{定义：随机试验与事件}
+\term{随机试验}通常记为 $E$，具有三个特点：可以在相同条件下重复；全部可能结果事先明确且不止一个；一次试验出现哪一个结果事先不能确定。
+
+一次试验的基本结果称为\term{样本点}，记为 $e$；全部样本点组成\term{样本空间} $S$。\term{随机事件} $A$ 是由样本点构成的集合；实际结果属于 $A$ 时，称 $A$ 发生。$S$ 为\term{必然事件}，空集 $\varnothing$ 为\term{不可能事件}。
+\end{infobox}
+在有限或可列样本空间中，通常把所有子集作为事件。在一般连续模型中，事件应取自选定的可测集合族；本讲义涉及的区间、平面区域及其常见集合运算均可作为事件，不展开测度论。
+
+课件把基本结果称为“基本事件（样本点）”。严格区分时，$e$ 是样本点，单点集合 $\{e\}$ 才是基本事件；后文用 $e\in S$ 与 $A\subseteq S$ 区分二者。
+\example{连续抛掷两次硬币并记录先后结果，写出样本空间及“恰好一次正面”的事件。}
+\solution 用 $H,T$ 分别表示正面、反面，则
+\[
+S=\{HH,HT,TH,TT\},\qquad A=\{HT,TH\}.
+\]
+$HT$ 与 $TH$ 是不同结果。若改为只记录正面次数，则记录值为 $0,1,2$，在公平且独立抛掷时，它们的概率为 $1/4,1/2,1/4$，并不等可能。
+
+连续射击直到首次命中，若记录首次命中的次数，可取 $S=\{1,2,\ldots\}$。这一模型假定最终命中以概率 $1$ 发生；若不保证这一点，应加入“永不命中”的结果。灯泡寿命可取 $S=[0,+\infty)$，在单位区间均匀取点可取 $S=[0,1]$。样本空间既可以有限，也可以可列无限或不可列无限。
+\subsection{事件的关系与运算}
+\begin{center}\begin{tabularx}{\linewidth}{l c Y}
+\toprule 名称&记号&含义\\\midrule
+包含&$A\subseteq B$&$A$ 发生必导致 $B$ 发生\\
+相等&$A=B$&$A,B$ 包含同样的样本点\\
+交（积）&$A\cap B=AB$&$A,B$ 同时发生\\
+并（和）&$A\cup B$&$A,B$ 至少一个发生\\
+差&$A-B=A\cap\overline B$&$A$ 发生而 $B$ 不发生\\
+对立&$\overline A=S-A$&$A$ 不发生\\
+互斥&$AB=\varnothing$&$A,B$ 不能同时发生\\\bottomrule
+\end{tabularx}\end{center}
+\term{对立事件}既互斥，又穷尽整个样本空间；互斥事件不一定对立。例如掷骰子时，“出现 $1$ 点”和“出现 $2$ 点”互斥，但不是对立事件。
+
+课件在互斥时用 $A+B$ 表示并。本讲义统一使用 $A\cup B$；只有特别注明互斥分解时使用加号，以免把集合运算与数值加法混淆。$\bigcup_{i=1}^n A_i$ 表示至少一个发生，$\bigcap_{i=1}^n A_i$ 表示全部发生。
+
+事件运算满足交换律、结合律、分配律和\term{德摩根律}：
+\begin{align*}
+A\cup B&=B\cup A,&AB&=BA,\\
+(A\cup B)\cup C&=A\cup(B\cup C),&(AB)C&=A(BC),\\
+(A\cup B)C&=AC\cup BC,&AB\cup C&=(A\cup C)(B\cup C),\\
+\overline{A\cup B}&=\overline A\,\overline B,&\overline{AB}&=\overline A\cup\overline B.
+\end{align*}
+德摩根律可推广到有限或可列个事件。其依据是：“没有任何一个发生”等价于“每一个都不发生”；“并非全部发生”等价于“至少一个不发生”。
+\example{用 $A,B,C$ 表示三个事件中“恰好两个发生”“至少两个发生”和“至多一个发生”。}
+\solution 恰好两个发生为
+\[
+AB\overline C\ \cup\ A\overline B C\ \cup\ \overline A BC.
+\]
+三个组成事件两两互斥。至少两个发生为 $AB\cup AC\cup BC$，其中包含三个都发生的情形，且三个交事件一般不互斥。至多一个发生为
+\[
+\overline{AB\cup AC\cup BC}
+=\overline A\,\overline B\,\overline C
+\cup A\overline B\,\overline C
+\cup\overline A B\overline C
+\cup\overline A\,\overline B C.
+\]
+至多两个发生为 $\overline{ABC}$；至少一个发生为 $A\cup B\cup C$。
+\subsection{概率的公理与基本性质}
+\begin{infobox}{定义：概率}
+对样本空间 $S$ 的事件指定数值 $P(A)$。若满足以下三条公理，则称 $P$ 为\term{概率}：
+\begin{enumerate}
+\item 非负性：对每个事件 $A$，$P(A)\ge0$。
+\item 规范性：$P(S)=1$。
+\item 可列可加性：若 $A_1,A_2,\ldots$ 两两互斥，则
+\[
+P\left(\bigcup_{i=1}^{\infty}A_i\right)=\sum_{i=1}^{\infty}P(A_i).
+\]
+\end{enumerate}
+\end{infobox}
+有限可加性是可列可加性的特例。由 $S=S\cup\varnothing\cup\varnothing\cup\cdots$ 的互斥分解得 $P(\varnothing)=0$；由 $S=A\cup\overline A$ 得
+\[
+P(\overline A)=1-P(A),\qquad 0\le P(A)\le1.
+\]
+若 $A\subseteq B$，由 $B=A\cup(B-A)$ 的互斥分解可得
+\[
+P(B-A)=P(B)-P(A)\ge0,
+\]
+因而 $P(A)\le P(B)$，称为概率的\term{单调性}。
+\begin{infobox}{定理：加法公式与差事件公式}
+对任意事件 $A,B$，
+\[
+P(A\cup B)=P(A)+P(B)-P(AB),\qquad
+P(A-B)=P(A)-P(AB).
+\]
+对三个事件，
+\[
+\begin{aligned}
+P(A\cup B\cup C)={}&P(A)+P(B)+P(C)\\
+&-P(AB)-P(AC)-P(BC)+P(ABC).
+\end{aligned}
+\]
+\end{infobox}
+\proof $A\cup B=A\cup(B-A)$ 是互斥分解，而 $B=AB\cup(B-A)$，故
+\[
+P(A\cup B)=P(A)+P(B-A)=P(A)+P(B)-P(AB).
+\]
+三事件公式对 $(A\cup B)\cup C$ 重复使用二事件公式即可。一般有限个事件的\term{容斥公式}为
+\[
+P\left(\bigcup_{i=1}^n A_i\right)
+=\sum_{\varnothing\ne I\subseteq\{1,\ldots,n\}}
+(-1)^{|I|+1}P\left(\bigcap_{i\in I}A_i\right),
+\]
+其中 $I$ 是非空指标集合，$|I|$ 为其中指标数。仅需上界时，可用 $P(\bigcup_i A_i)\le\sum_i P(A_i)$。
+\begin{infobox}{注意：概率为零与不可能}
+$A=\varnothing$ 必有 $P(A)=0$，但反向一般不成立。在 $[0,1]$ 上均匀取点，任一指定单点事件非空，其概率仍为 $0$。同样，$P(A)=1$ 不保证 $A=S$。概率为 $1$ 的性质称为“几乎必然”成立。
+\end{infobox}
+\subsection{计数原理、排列与组合}
+\term{加法原理}用于互不重复的分类：第 $i$ 类有 $n_i$ 种方法，总数为 $\sum_i n_i$。\term{乘法原理}用于依次完成的步骤：若无论此前如何选择，第 $i$ 步均有 $n_i$ 种选择，总数为 $\prod_i n_i$；若后续选择数随前序结果改变，应逐类求和。
+
+对 $n$ 个不同元素，无重复取 $k$ 个且计顺序的\term{排列数}为
+\[
+A_n^k=n(n-1)\cdots(n-k+1)=\frac{n!}{(n-k)!}.
+\]
+不计顺序的\term{组合数}为
+\[
+C_n^k=\com nk=\frac{n!}{k!(n-k)!},\qquad 0\le k\le n.
+\]
+约定 $0!=1$；整数 $k$ 超出 $0,\ldots,n$ 时，$\com nk=0$。允许重复、有序取 $k$ 个的数目为 $n^k$，此时 $k$ 可以大于 $n$。
+
+将 $n$ 个不同元素分入 $m$ 个有区别的组，各组分别有 $r_1,\ldots,r_m$ 个，满足 $r_i\ge0$、$\sum_i r_i=n$，分法数为
+\[
+\com n{r_1}\com{n-r_1}{r_2}\cdots
+=\frac{n!}{r_1!\cdots r_m!}.
+\]
+若组无区别，不能直接套用该式，必须分析交换组是否造成重复。
+\example{将 $10$ 本不同的书排成一列，要求指定的三本相邻，求排列数。}
+\solution 把指定三本看成一个整体，与其余七本共八个对象，有 $8!$ 种排列；整体内部三本有 $3!$ 种顺序，故总数为 $8!\,3!$。
+\subsection{古典概型与抽样模型}
+\begin{infobox}{定义：古典概率}
+若样本空间有限且每个样本点等可能，称为\term{古典概型}。设 $|S|=N$，事件 $A$ 含 $M$ 个样本点，则
+\[
+P(A)=\frac{|A|}{|S|}=\frac MN.
+\]
+使用该式前，必须同时核对有限性和等可能性。
+\end{infobox}
+分子分母应采用同一层次的结果：均计顺序或均不计顺序。颜色相同的球仍可编号为不同实体；把实体压缩成颜色序列后，所得序列未必等可能。
+\example{一批产品有 $10$ 件正品和 $2$ 件次品，无放回地连续抽取两件，求第二件为次品的概率。}
+\solution 把有序的两件不同产品作为样本点，总数 $12\times11$。第二件为次品有 $2$ 种选择，第一件有 $11$ 种选择，因此
+\[
+P(A)=\frac{2\times11}{12\times11}=\frac16.
+\]
+一般地，$a$ 个黑球、$b$ 个白球随机无放回依次抽取，第 $k$ 个为黑球的概率为 $a/(a+b)$，$1\le k\le a+b$。对全部球的等可能排列，指定位置上放黑球共有 $a(a+b-1)!$ 种。
+\example{$r$ 个人独立地以相同概率选择 $n$ 个有编号的房间之一，求指定 $r$ 间各一人、恰好 $r$ 间各一人，以及指定一间恰有 $k$ 人的概率。}
+\solution 总结果数为 $n^r$。前两问要求 $r\le n$，分别有 $r!$ 和 $\com nr r!=A_n^r$ 个有利结果。第三问先选进入指定房间的人，再安排其余人，故
+\[
+P(A_1)=\frac{r!}{n^r},\quad P(A_2)=\frac{A_n^r}{n^r},\quad
+P(A_3)=\frac{\com rk(n-1)^{r-k}}{n^r},\quad 0\le k\le r.
+\]
+第三式通常取 $n\ge2$；$n=1$ 时房间人数必为 $r$。人可区分、房间可区分、独立均匀选择，都是本模型的必要假设。
+\example{$r$ 个人的生日相互独立且均匀分布于 $365$ 天，忽略闰日，求至少两人同生日的概率。}
+\solution 对 $2\le r\le365$，先算生日各不相同：
+\[
+P(\overline A)=\frac{365\times364\times\cdots\times(365-r+1)}{365^r},
+\qquad P(A)=1-P(\overline A).
+\]
+$r=23$ 时 $P(A)\approx0.5073$；$r>365$ 时由抽屉原理，$P(A)=1$。这里“至少两人相同”不同于“至少一人和某指定人生日相同”。
+\example{盒中有 $12$ 个红球、$6$ 个白球和 $6$ 个黄球，任取 $4$ 个，求至少一个红球且至少一个白球的概率。}
+\solution 设 $R$ 为至少一个红球，$W$ 为至少一个白球，使用对立与容斥：
+\[
+P(RW)=1-\frac{\com{12}4}{\com{24}4}
+-\frac{\com{18}4}{\com{24}4}
++\frac{\com64}{\com{24}4}.
+\]
+无红球可从白、黄共 $12$ 个中取；无白球可从红、黄共 $18$ 个中取；两色均无只可从 $6$ 个黄球中取。
+\subsection{几何概型与区域计算}
+\begin{infobox}{定义：几何概率}
+设 $S$ 为长度、面积或体积有限且正的区域，点在 $S$ 中按相应度量均匀分布。对可测子区域 $A\subseteq S$，
+\[
+P(A)=\frac{\mu(A)}{\mu(S)},\qquad 0<\mu(S)<\infty,
+\]
+其中 $\mu$ 表示与空间维数一致的长度、面积或体积。
+\end{infobox}
+“随机取点”本身不保证均匀，必须明确分布假设；不存在整个实数轴上的均匀概率分布。几何概型的零长度、零面积集合可以非空。
+\example{两人独立地在一小时内均匀到达，先到者等待 $20$ 分钟，求会面的概率。}
+\solution 用分钟计到达时刻 $x,y$，样本区域为 $[0,60]^2$，会面要求 $|x-y|\le20$。不能会面的区域是两个直角三角形，每个直角边长 $40$，故
+\[
+P(A)=1-\frac{2\times\frac12\times40^2}{60^2}=\frac59.
+\]
+\begin{center}\begin{tikzpicture}[scale=0.062]
+\fill[BoxBack] (0,0)--(20,0)--(60,40)--(60,60)--(40,60)--(0,20)--cycle;
+\draw[Theme] (0,0) rectangle (60,60);
+\draw[Theme] (0,20)--(40,60) (20,0)--(60,40);
+\draw[->] (0,0)--(70,0) node[right] {$x$};
+\draw[->] (0,0)--(0,70) node[above] {$y$};
+\node[below left] at (0,0) {$0$};\node[below] at (20,0) {$20$};\node[below] at (60,0) {$60$};
+\node[left] at (0,20) {$20$};\node[left] at (0,60) {$60$};
+\node at (30,30) {会面区域};
+\end{tikzpicture}\end{center}
+一般等待 $w$ 分钟、到达窗口为 $T$ 分钟且 $0\le w\le T$ 时，概率为 $1-(T-w)^2/T^2$。
+\subsection{频率与概率的统计解释}
+固定条件下重复试验 $n$ 次，事件 $A$ 发生 $m$ 次，其\term{频率}为 $f_n(A)=m/n$。频率随试验结果变化，概率 $P(A)$ 是指定模型中的固定数值。频率满足非负性、规范性以及互斥事件的有限可加性。
+
+在独立同分布的重复试验条件下，频率随样本量增大趋近概率，可据此以频率估计概率。该结论不表示每增加一次试验偏差就变小，也不表示有限次试验的频率必须等于概率。课件中的频率稳定性提供统计解释；严格定义统一采用概率公理。
+
+\chapterpage{条件概率与独立性}
+\subsection{条件概率及其性质}
+\begin{infobox}{定义：条件概率}
+若 $P(B)>0$，在事件 $B$ 已发生的条件下事件 $A$ 的\term{条件概率}为
+\[
+P(A\mid B)=\frac{P(AB)}{P(B)}.
+\]
+条件必须写在竖线右侧。一般而言，$P(A\mid B)$ 与 $P(B\mid A)$ 不相等。
+\end{infobox}
+固定 $B$ 后，$P(\cdot\mid B)$ 本身是一个概率：非负，$P(S\mid B)=1$，且对两两互斥的 $A_i$ 可列可加。于是
+\begin{align*}
+P(\overline A\mid B)&=1-P(A\mid B),\\
+P(A\cup C\mid B)&=P(A\mid B)+P(C\mid B)-P(AC\mid B).
+\end{align*}
+在古典概型中，可将结果限制在 $B$ 内，再按等可能结果计数；非等可能模型必须使用概率比值，不能仅比较样本点数。
+\example{两台车床共生产 $100$ 个零件，第一台生产的 $40$ 个中有 $35$ 个合格，第二台生产的 $60$ 个中有 $50$ 个合格。任取一个，求已知来自第一台时的合格概率。}
+\solution 设 $A$ 为合格，$B$ 为来自第一台，则
+\[
+P(A)=\frac{85}{100},\quad P(B)=\frac{40}{100},\quad
+P(AB)=\frac{35}{100},\quad P(A\mid B)=\frac{35}{40}=\frac78.
+\]
+若已知合格，来自第一台的概率为 $P(B\mid A)=35/85=7/17$。
+\example{袋中有 $5$ 个白球和 $6$ 个黑球，一次随机取出 $3$ 个，已知三球同色，求都是黑球的概率。}
+\solution 设 $D$ 为同色，$B$ 为全黑。全白与全黑互斥，因此
+\[
+P(B\mid D)=\frac{\com63/\com{11}3}{(\com53+\com63)/\com{11}3}
+=\frac{20}{10+20}=\frac23.
+\]
+\subsection{乘法定理与分阶段计算}
+\begin{infobox}{定理：乘法公式}
+若 $P(A)>0$，则 $P(AB)=P(A)P(B\mid A)$。若 $P(B)>0$，也有 $P(AB)=P(B)P(A\mid B)$。
+
+若每个前缀交事件 $A_1\cdots A_j$ 的概率均为正（$1\le j<n$），则
+\[
+P(A_1\cdots A_n)=P(A_1)\prod_{j=2}^{n}P(A_j\mid A_1\cdots A_{j-1}).
+\]
+\end{infobox}
+\proof 第一式直接由条件概率定义移项得到。依次对前缀交事件应用第一式，条件概率分母与此前乘积相消，得到推广式。若某个前缀概率为零，则整个交事件概率为零，不应再计算以它为条件的概率。
+\example{$100$ 件产品中有 $10$ 件次品，逐件无放回抽取，求第三次才抽到正品的概率。}
+\solution “第三次才”要求前两次均为次品、第三次为正品，故
+\[
+P(A)=\frac{10}{100}\frac9{99}\frac{90}{98}=\frac9{1078}.
+\]
+若只要求“第三次为正品”，则概率为 $90/100$，并不限制前两次结果。
+\example{猎手第一枪命中概率为 $0.6$；第一枪未中时，第二枪命中概率为 $0.25$；前两枪未中时，第三枪命中概率为 $0.1$。求三枪内命中的概率。}
+\solution 计算三枪均未中的条件概率乘积：
+\[
+P(A)=1-(1-0.6)(1-0.25)(1-0.1)=0.73.
+\]
+这些数值是在不同历史条件下的命中概率，计算使用乘法定理，不需要假定三枪命中事件独立。
+\subsection{全概率公式与贝叶斯公式}
+\term{划分}（完备事件组）$A_1,\ldots,A_n$ 满足两两互斥、并为 $S$。若全部 $P(A_i)>0$，任意事件 $B$ 可分解为互斥并 $B=\bigcup_i BA_i$。
+\begin{infobox}{定理：全概率公式与贝叶斯公式}
+对上述划分，\term{全概率公式}为
+\[
+P(B)=\sum_{i=1}^n P(A_i)P(B\mid A_i).
+\]
+若进一步 $P(B)>0$，则\term{贝叶斯公式}（Bayes formula）为
+\[
+P(A_j\mid B)=\frac{P(A_j)P(B\mid A_j)}{\sum_{i=1}^n P(A_i)P(B\mid A_i)},\quad j=1,\ldots,n.
+\]
+\end{infobox}
+\proof 由互斥可加性及乘法定理，
+\[
+P(B)=\sum_i P(BA_i)=\sum_i P(A_i)P(B\mid A_i).
+\]
+再把 $P(A_jB)=P(A_j)P(B\mid A_j)$ 和上式代入 $P(A_j\mid B)=P(A_jB)/P(B)$。
+
+全概率公式把各类条件下的概率按类别概率加权；贝叶斯公式在观察到 $B$ 后更新类别概率。$P(A_j)$ 称\term{先验概率}，$P(A_j\mid B)$ 称\term{后验概率}。类别不一定具有因果意义。
+
+若 $\bigcup_i A_i$ 仅包含 $B$ 而不是整个 $S$，同样有 $B=\bigcup_i BA_i$，上述计算仍成立。课件采用这一较弱条件；取样本空间的划分更便于统一使用。概率为零的类别应删去，避免写未定义的条件概率。可列划分亦可用求和推广。
+\example{等概率选取两箱之一。第一箱 $50$ 件中有 $10$ 件一等品，第二箱 $30$ 件中有 $18$ 件一等品；在所选箱中无放回抽两件。求第一件为一等品及两件均为一等品的概率。}
+\solution 设 $A_i$ 为选第 $i$ 箱，$B_j$ 为第 $j$ 件是一等品，则
+\begin{align*}
+P(B_1)&=\frac12\frac{10}{50}+\frac12\frac{18}{30}=\frac25,\\
+P(B_1B_2)&=\frac12\frac{10}{50}\frac9{49}
++\frac12\frac{18}{30}\frac{17}{29}=\frac{276}{1421}.
+\end{align*}
+第二式先在每箱内用乘法定理，再对选箱求全概率；不能把两件无条件地视为独立。
+\example{机器开工时调整良好的概率为 $0.75$；良好时合格率为 $0.9$，故障时合格率为 $0.3$。已知第一件产品合格，求机器良好的概率。}
+\solution 设 $A$ 为机器良好，$B$ 为产品合格。由全概率公式，
+\[
+P(B)=0.75\times0.9+0.25\times0.3=0.75.
+\]
+于是
+\[
+P(A\mid B)=\frac{0.75\times0.9}{0.75}=0.9.
+\]
+观察合格品把机器良好的概率从 $0.75$ 更新为 $0.9$，但不能据此断定机器必定良好。
+\subsection{事件独立性、互斥与对立}
+\begin{infobox}{定义：两个事件独立}
+若 $P(AB)=P(A)P(B)$，称 $A,B$ \term{相互独立}。
+
+若 $P(B)>0$，独立等价于 $P(A\mid B)=P(A)$；若 $P(A)>0$，独立等价于 $P(B\mid A)=P(B)$。乘积定义也适用于零概率事件。
+\end{infobox}
+\term{互斥}描述不能同时发生，\term{独立}描述概率乘积关系。若 $P(A)>0,P(B)>0$，互斥要求 $P(AB)=0$，独立要求 $P(AB)>0$，故不能同时成立。若其中一个概率为零，两者可以同时成立。
+
+若 $A,B$ 独立，则 $A,\overline B$、$\overline A,B$、$\overline A,\overline B$ 也独立。以第一对为例，
+\[
+P(A\overline B)=P(A)-P(AB)=P(A)[1-P(B)]=P(A)P(\overline B).
+\]
+由此再分别取补集，即得其余结论。对立事件 $A,\overline A$ 只有在 $P(A)=0$ 或 $1$ 时才独立。
+\subsection{多个事件的独立性}
+\begin{infobox}{定义：两两独立与相互独立}
+$A_1,\ldots,A_n$ \term{两两独立}指每一对不同事件独立。它们\term{相互独立}指任意至少两个事件的子组均满足
+\[
+P\left(\bigcap_{j=1}^{k} A_{i_j}\right)=\prod_{j=1}^{k}P(A_{i_j}),
+\quad 2\le k\le n,\quad i_1<\cdots<i_k.
+\]
+需要的乘积等式共有 $2^n-n-1$ 个。
+\end{infobox}
+相互独立蕴含两两独立，逆向一般不成立。仅验证 $n$ 个事件的总交乘积也不足以判断相互独立。相互独立事件中的任意若干事件取补后，仍相互独立；证明可对每一个补事件应用 $P(D\overline A)=P(D)-P(DA)$ 逐次展开。
+\example{独立公平地抛两次硬币。设 $A$ 为第一次正面，$B$ 为第二次正面，$C$ 为两次结果相同，判断三事件的独立性。}
+\solution 三事件概率均为 $1/2$，任意两者交的概率均为 $1/4$，所以两两独立。但 $ABC=\{HH\}$，
+\[
+P(ABC)=\frac14\ne\frac18=P(A)P(B)P(C),
+\]
+故不相互独立。
+\subsection{独立系统、至少一次与可靠性}
+若 $A_1,\ldots,A_n$ 相互独立，且 $P(A_i)=p_i$，则
+\[
+P\left(\bigcup_{i=1}^n A_i\right)=1-\prod_{i=1}^n(1-p_i).
+\]
+\example{三人独立破译密码，成功概率分别为 $1/5,1/3,1/4$，求至少一人成功的概率。}
+\solution 三人都失败的概率为 $(4/5)(2/3)(3/4)=2/5$，故至少一人成功的概率为 $3/5$。
+
+每次独立命中概率为 $0.6$，若要求至少一次命中概率不低于 $0.99$，则
+\[
+1-0.4^n\ge0.99\ \Longleftrightarrow\ n\ge\frac{\log0.01}{\log0.4}\approx5.03,
+\]
+故最少需 $6$ 次。除以负数 $\log0.4$ 时不等号方向必须改变。
+
+对可靠性系统，设 $A_i$ 为第 $i$ 个元件正常工作的事件。\term{串联系统}要求全部正常，可靠性为 $\prod_i p_i$；\term{并联系统}要求至少一个正常，可靠性为 $1-\prod_i(1-p_i)$。这些乘积式要求元件相互独立。混联系统应先写出成功事件，再按互斥分解或独立子系统计算；共享元件的支路通常不能直接视为独立。
+\subsection{伯努利试验与二项概率公式}
+\begin{infobox}{定义与定理：重复独立试验}
+一次试验只区分成功 $A$ 和失败 $\overline A$，称\term{伯努利试验}（Bernoulli trial）。若独立重复 $n$ 次，每次成功概率均为 $p$，令 $q=1-p$，成功次数记为 $X$，则
+\[
+P(X=k)=\com nk p^kq^{n-k},\qquad k=0,1,\ldots,n.
+\]
+这称为\term{二项概率公式}。通常取 $0<p<1$，$p=0,1$ 时为退化情形。
+\end{infobox}
+\proof 指定某 $k$ 次成功、其余失败，由相互独立性，其概率为 $p^kq^{n-k}$。选择成功位置有 $\com nk$ 种方式，各方式互斥，故相加得到公式。由二项式定理，全部概率之和为 $(p+q)^n=1$。
+
+“恰好 $k$ 次”用一个概率项；“至多 $m$ 次”用 $\sum_{k=0}^m\com nk p^kq^{n-k}$；“至少一次”用 $1-q^n$。固定试验次数、各次独立、成功概率恒定，缺一不能直接使用二项模型。
+\example{独立掷公平骰子 $n$ 次，求恰好 $k$ 次出现 $6$ 点的概率。}
+\solution 一次成功概率为 $p=1/6$，故概率为 $\com nk(1/6)^k(5/6)^{n-k}$。
+\subsection{二项概率的泊松近似}
+\begin{infobox}{定理：泊松极限}
+设 $p_n\to0$ 且 $np_n\to\lambda>0$。对每个固定的非负整数 $k$，
+\[
+\com nk p_n^k(1-p_n)^{n-k}\longrightarrow e^{-\lambda}\frac{\lambda^k}{k!}.
+\]
+实际计算中，$n$ 较大、$p$ 较小且 $\lambda=np$ 适中时，可用右侧近似二项概率。
+\end{infobox}
+\proof 写成
+\[
+\com nk p_n^k(1-p_n)^{n-k}
+=\frac{(np_n)^k}{k!}\prod_{j=0}^{k-1}\left(1-\frac jn\right)
+(1-p_n)^n(1-p_n)^{-k}.
+\]
+对固定 $k$，各因子分别趋于 $\lambda^k/k!$、$1$、$e^{-\lambda}$、$1$，即得极限。
+
+课件的 $n\ge10,p\le0.1$ 是粗略经验条件，不保证统一的近似精度。若 $p$ 接近 $1$，应对失败次数 $n-X$ 用参数 $n(1-p)$ 作近似，再换回所求事件。
+\example{每次独立命中概率为 $0.01$，射击 $300$ 次，求恰好命中 $4$ 次的概率。}
+\solution 精确值与泊松近似分别为
+\[
+\com{300}4(0.01)^4(0.99)^{296}\approx0.1689,
+\qquad e^{-3}\frac{3^4}{4!}\approx0.1680.
+\]
+例如独立产品废品率为 $0.005$，取 $1000$ 件时令 $\lambda=5$，至多 $5$ 件废品和至少两件废品的概率分别近似为
+\[
+e^{-5}\sum_{k=0}^5\frac{5^k}{k!},\qquad 1-e^{-5}(1+5).
+\]
+
+\chapterpage{随机变量及其分布}
+\subsection{随机变量、取值与事件}
+\begin{infobox}{定义：随机变量}
+设样本空间为 $S$，给每个样本点 $e$ 唯一指定实数 $X(e)$，并且对任意实数 $x$，$\{e:X(e)\le x\}$ 是事件，则称 $X$ 为\term{随机变量}（random variable）。通常用 $X,Y,Z$ 表示随机变量，用 $x,y,z$ 表示其取值。
+\end{infobox}
+随机变量是定义在样本空间上的函数；一次试验后得到的数值是该函数在实际样本点处的取值。多个不同样本点可以有相同取值。例如抛两次硬币的正面次数 $X$ 满足 $X(HT)=X(TH)=1$。
+
+记号 $\{X\le x\}$ 是事件 $\{e\in S:X(e)\le x\}$ 的简写，$P(X\le x)$ 是这一事件的概率。对事件 $A$，\term{示性随机变量}定义为
+\[
+I_A(e)=\begin{cases}1,&e\in A,\\0,&e\notin A.\end{cases}
+\]
+于是 $\{I_A=1\}=A$。随机变量把非数值结果和数值结果统一为数值事件的研究对象。
+\subsection{离散型随机变量与分布列}
+\begin{infobox}{定义：分布列}
+取值为有限个或可列无限个数的随机变量称为\term{离散型随机变量}。若不同取值为 $x_1,x_2,\ldots$，则
+\[
+P(X=x_k)=p_k,\quad p_k\ge0,\quad\sum_k p_k=1
+\]
+称为其\term{概率分布列}，简称分布列。
+\end{infobox}
+分布列的非负性和归一性是判定条件。对任意取值集合 $D$，
+\[
+P(X\in D)=\sum_{k:x_k\in D}p_k.
+\]
+建立分布列的步骤为：列出可能取值；将每个取值对应到试验事件；计算概率；检查概率非负且总和为 $1$。
+\example{汽车依次经过三个交通岗，各岗独立出现红灯或绿灯，概率均为 $1/2$。$X$ 为首次遇到红灯前通过的交通岗数，求分布列。}
+\solution $X$ 可取 $0,1,2,3$。前三个值分别对应“红”“绿红”“绿绿红”；$X=3$ 对应“三岗均绿”，不存在第四个交通岗，因而不再乘一个红灯概率。
+\begin{center}\begin{tabular}{ccccc}\toprule
+$x$&0&1&2&3\\\midrule
+$P(X=x)$&$1/2$&$1/4$&$1/8$&$1/8$\\\bottomrule
+\end{tabular}\end{center}
+总和为 $1$。该变量有有限上限，与无限重复直到成功的几何分布不同。
+\subsection{常用离散分布}
+\textbf{1. 两点分布与二项分布。}若 $X$ 取 $0,1$，且 $P(X=1)=p$、$P(X=0)=1-p$，称为\term{两点分布}或伯努利分布，记 $X\sim B(1,p)$。事件示性变量 $I_A$ 的参数为 $p=P(A)$。
+
+若 $X$ 是 $n$ 重伯努利试验的成功次数，则 $X\sim B(n,p)$，概率为前章二项公式。二项分布的 $n$ 是固定次数，$p$ 是单次成功概率。
+\example{设 $X\sim B(2,p)$，$Y\sim B(3,p)$，且 $P(X\ge1)=5/9$，求 $P(Y\ge1)$。}
+\solution $P(X=0)=(1-p)^2=4/9$。因 $0\le p\le1$，取 $1-p=2/3$，故 $p=1/3$，于是
+\[
+P(Y\ge1)=1-(1-p)^3=1-\left(\frac23\right)^3=\frac{19}{27}.
+\]
+本题只使用各自分布，无须假定 $X,Y$ 独立。
+
+\textbf{2. 泊松分布。}若
+\[
+P(X=k)=e^{-\lambda}\frac{\lambda^k}{k!},\quad k=0,1,2,\ldots,\quad\lambda>0,
+\]
+则称 $X$ 服从\term{泊松分布}（Poisson distribution），记 $X\sim P(\lambda)$。指数级数给出
+\[
+\sum_{k=0}^{\infty}e^{-\lambda}\frac{\lambda^k}{k!}=e^{-\lambda}e^{\lambda}=1.
+\]
+它可描述固定时间或区域内的稀疏计数，如呼叫次数、缺陷数；是否适合具体数据，需要模型依据，不能仅凭“计数”就断定服从泊松分布。
+\example{铸件砂眼数 $X\sim P(0.5)$，求至多一个和至少两个砂眼的概率。}
+\solution
+\[
+P(X\le1)=e^{-0.5}(1+0.5)\approx0.9098,\quad
+P(X\ge2)=1-1.5e^{-0.5}\approx0.0902.
+\]
+
+\textbf{3. 几何分布。}独立重复伯努利试验，每次成功概率为 $p\in(0,1)$，直到首次成功所需次数 $X$ 的分布为
+\[
+P(X=k)=(1-p)^{k-1}p,\quad k=1,2,\ldots.
+\]
+称为\term{几何分布}（geometric distribution），记 $X\sim G(p)$。前 $k-1$ 次失败、第 $k$ 次成功给出该式；等比级数保证总和为 $1$。本讲义计入成功的那一次，取值从 $1$ 开始。若改记首次成功前失败次数 $Y=X-1$，则取值从 $0$ 开始，概率为 $(1-p)^kp$。
+
+几何分布的尾概率为 $P(X>n)=(1-p)^n$，其中 $n$ 为非负整数。由条件概率，
+\[
+P(X>n+m\mid X>n)=\frac{(1-p)^{n+m}}{(1-p)^n}
+=(1-p)^m=P(X>m).
+\]
+这称为\term{无记忆性}：已经连续失败 $n$ 次后，再等待超过 $m$ 次的条件概率，与从头等待相同。
+
+\textbf{4. 超几何分布。}总体有 $N$ 件产品，其中 $M$ 件次品，均匀无放回抽取 $n$ 件，满足 $0\le M\le N$、$0\le n\le N$。次品数 $X$ 服从\term{超几何分布}：
+\[
+P(X=k)=\frac{\com Mk\com{N-M}{n-k}}{\com Nn},
+\quad \max\{0,n-(N-M)\}\le k\le\min\{M,n\}.
+\]
+上下界都是必要的：抽到的正品不能超过总体正品数。分子先选 $k$ 件次品，再选 $n-k$ 件正品；分母是全部 $n$ 件子集数。
+\begin{infobox}{注意：二项与超几何模型}
+有放回且每次均匀、独立抽样，成功数可服从二项分布；有限总体无放回抽样通常用超几何分布。若 $n$ 固定、$N\to\infty$ 且 $M/N\to p$，超几何概率趋于 $\com nk p^k(1-p)^{n-k}$。
+
+抽样比 $n/N$ 小时可考虑二项近似；课件的 $n\le0.1N$ 为经验规则，具体精度还取决于参数和所求事件。
+\end{infobox}
+\subsection{分布函数与端点概率}
+\begin{infobox}{定义与性质：分布函数}
+任意随机变量 $X$ 的\term{分布函数}（CDF）定义为
+\[
+F_X(x)=P(X\le x),\qquad -\infty<x<+\infty.
+\]
+它单调非减、右连续，并满足
+\[
+\lim_{x\to-\infty}F_X(x)=0,\quad
+\lim_{x\to+\infty}F_X(x)=1,\quad 0\le F_X(x)\le1.
+\]
+这些性质也是一个函数成为分布函数的充要条件。
+\end{infobox}
+单调性来自 $\{X\le x_1\}\subseteq\{X\le x_2\}$（$x_1<x_2$）。右连续性来自 $x_j\downarrow x$ 时事件 $\{X\le x_j\}$ 递减趋于 $\{X\le x\}$，以及概率对递减事件列的连续性。
+
+记左极限 $F_X(a-)=\lim_{x\uparrow a}F_X(x)$。由 $\{X<x\}$ 与 $\{X=x\}$ 的分解，
+\begin{align*}
+P(X<a)&=F_X(a-),&P(X=a)&=F_X(a)-F_X(a-),\\
+P(a<X\le b)&=F_X(b)-F_X(a),&P(a\le X\le b)&=F_X(b)-F_X(a-),\\
+P(a<X<b)&=F_X(b-)-F_X(a),&P(X>a)&=1-F_X(a).
+\end{align*}
+区间端点是否包含，决定用函数值还是左极限；离散变量尤其不能忽略这一点。
+\example{$X$ 在 $-1,2,3$ 处的概率分别为 $1/2,1/3,1/6$，求分布函数和 $P(2<X\le3)$。}
+\solution 按取值累加：
+\[
+F_X(x)=\begin{cases}
+0,&x<-1,\\1/2,&-1\le x<2,\\5/6,&2\le x<3,\\1,&x\ge3.
+\end{cases}
+\]
+故 $P(2<X\le3)=F_X(3)-F_X(2)=1/6$。跳跃高度分别等于各点概率；$F_X$ 在跳跃处取右侧值。一般离散变量满足 $F_X(x)=\sum_{x_k\le x}p_k$。
+\subsection{连续型随机变量与概率密度}
+\begin{infobox}{定义：概率密度}
+若存在非负可积函数 $f_X$，使任意实数 $x$ 均有
+\[
+F_X(x)=\int_{-\infty}^{x}f_X(t)\,dt,
+\]
+则称 $X$ 为\term{连续型随机变量}，$f_X$ 为其\term{概率密度函数}（PDF）。密度满足
+\[
+f_X(x)\ge0,\qquad \int_{-\infty}^{+\infty}f_X(x)\,dx=1.
+\]
+\end{infobox}
+本课程中的连续型是指具有密度的分布。分布函数连续本身并不足以保证存在密度；这里只研究课程给出的常用离散型与具有密度的连续型模型。
+
+对 $a<b$，
+\[
+P(a<X\le b)=\int_a^b f_X(x)\,dx.
+\]
+连续型变量有 $P(X=a)=0$，因此单个端点的开闭不改变区间概率。在 $f_X$ 的连续点，$F_X'(x)=f_X(x)$；一般在几乎处处的意义下成立。密度在有限个点处的取值不影响分布。
+
+密度不是点概率，可以大于 $1$。例如 $U[0,1/2]$ 的密度为 $2$；概率是曲线下的面积。在密度连续点 $x$ 及小的正数 $\Delta x$ 下，
+\[
+P(x<X\le x+\Delta x)\approx f_X(x)\Delta x.
+\]
+若 $X$ 的单位为小时，密度的单位为“每小时”，积分后的概率无量纲。
+\example{设 $f_X(x)=cx$（$0<x<2$），其余为 $0$，求 $c$、分布函数以及 $P(1<X<3/2)$。}
+\solution 由归一性 $1=c\int_0^2x\,dx=2c$，得 $c=1/2$。于是
+\[
+F_X(x)=\begin{cases}0,&x\le0,\\x^2/4,&0<x<2,\\1,&x\ge2,\end{cases}
+\qquad P(1<X<3/2)=\frac{(3/2)^2-1}{4}=\frac5{16}.
+\]
+
+\subsection{均匀分布与指数分布}
+\textbf{1. 均匀分布。}对 $a<b$，若
+\[
+f_X(x)=\begin{cases}\dfrac1{b-a},&a<x<b,\\0,&\text{其他},\end{cases}
+\]
+称 $X$ 服从\term{均匀分布}（uniform distribution），记 $X\sim U[a,b]$，也写 $U(a,b)$。密度端点取值不影响分布。积分得
+\[
+F_X(x)=\begin{cases}0,&x\le a,\\(x-a)/(b-a),&a<x<b,\\1,&x\ge b.\end{cases}
+\]
+对区间内 $x_1<x_2$，$P(x_1<X<x_2)=(x_2-x_1)/(b-a)$；相同长度的子区间概率相同，单点概率均为零。
+
+每 $10$ 分钟一班的公交车，若乘客到站时刻相对班次的相位均匀，且车辆准点，则等待时间 $X\sim U[0,10]$，等待超过 $6$ 分钟的概率为 $4/10$。班次间隔固定本身不保证乘客到达相位均匀。
+
+\textbf{2. 指数分布。}对 $\lambda>0$，若
+\[
+f_X(x)=\begin{cases}\lambda e^{-\lambda x},&x>0,\\0,&x\le0,\end{cases}
+\quad
+F_X(x)=\begin{cases}0,&x\le0,\\1-e^{-\lambda x},&x>0,\end{cases}
+\]
+称 $X$ 服从\term{指数分布}（exponential distribution），记 $X\sim E(\lambda)$。这里 $\lambda$ 是率参数；另一些资料以尺度参数 $\theta=1/\lambda$ 写密度 $e^{-x/\theta}/\theta$，不能把两种参数混用。若 $x$ 用小时计，$\lambda$ 的单位为每小时。
+
+指数分布尾概率为 $P(X>t)=e^{-\lambda t}$（$t\ge0$）。对 $s,t\ge0$，
+\[
+P(X>s+t\mid X>s)=\frac{e^{-\lambda(s+t)}}{e^{-\lambda s}}=e^{-\lambda t}=P(X>t),
+\]
+即指数分布也有无记忆性。一般寿命分布没有这一性质。
+\example{机器两次故障间隔 $X\sim E(1/5)$，单位为小时。已无故障工作 $8$ 小时，求再工作 $10$ 小时仍无故障的概率。}
+\solution
+\[
+P(X>18\mid X>8)=P(X>10)=e^{-10/5}=e^{-2}\approx0.1353.
+\]
+\subsection{正态分布与标准化}
+\begin{infobox}{定义：正态分布}
+若 $X$ 的密度为
+\[
+f_X(x)=\frac1{\sqrt{2\pi}\,\sigma}
+\exp\left[-\frac{(x-\mu)^2}{2\sigma^2}\right],\quad x\in\mathbb R,
+\]
+其中 $\mu\in\mathbb R$、$\sigma>0$，则称 $X$ 服从\term{正态分布}（normal / Gaussian distribution），记 $X\sim N(\mu,\sigma^2)$。$\mu$ 为位置参数，$\sigma$ 为尺度参数；在数字特征中分别对应均值与标准差。
+\end{infobox}
+曲线关于 $x=\mu$ 对称，在 $\mu$ 处最大，向两端趋于 $0$。固定 $\sigma$ 改变 $\mu$ 只平移曲线；固定 $\mu$ 增大 $\sigma$，曲线变宽、峰值降低。概率等于曲线下对应区间的面积。
+
+\term{标准正态分布}为 $N(0,1)$，密度与分布函数记为
+\[
+\varphi(z)=\frac1{\sqrt{2\pi}}e^{-z^2/2},\qquad
+\Phi(z)=\int_{-\infty}^z\varphi(t)\,dt.
+\]
+对称性给出 $\Phi(-z)=1-\Phi(z)$，特别地 $\Phi(0)=1/2$。
+\begin{infobox}{方法：正态标准化}
+若 $X\sim N(\mu,\sigma^2)$，则 $Z=(X-\mu)/\sigma\sim N(0,1)$。因此
+\[
+F_X(x)=\Phi\left(\frac{x-\mu}{\sigma}\right),
+\]
+\[
+P(a<X\le b)=\Phi\left(\frac{b-\mu}{\sigma}\right)
+-\Phi\left(\frac{a-\mu}{\sigma}\right).
+\]
+标准化除以 $\sigma$，不是 $\sigma^2$。
+\end{infobox}
+\proof 令 $t=(u-\mu)/\sigma$，则 $du=\sigma\,dt$，故
+\[
+F_X(x)=\int_{-\infty}^x\frac{e^{-(u-\mu)^2/(2\sigma^2)}}{\sqrt{2\pi}\sigma}\,du
+=\int_{-\infty}^{(x-\mu)/\sigma}\varphi(t)\,dt.
+\]
+\example{电池寿命 $X\sim N(160,20^2)$，单位为小时，求寿命小于 $120$ 和大于 $200$ 小时的概率。}
+\solution 标准化端点为 $-2$ 与 $2$。因此
+\[
+P(X<120)=\Phi(-2)\approx0.0228,\quad
+P(X>200)=1-\Phi(2)\approx0.0228.
+\]
+一般地 $P(|X-\mu|<c\sigma)=2\Phi(c)-1$（$c>0$），故一、二、三个标准差内的概率分别约为 $0.6827,0.9545,0.9973$。这些是近似数值，不能把三个标准差外的概率当成零。
+\subsection{随机变量函数的分布：离散型}
+已知 $X$ 的分布，令 $Y=g(X)$。若 $X$ 为离散型，先求 $g(x_k)$ 的不同取值，再合并所有产生相同值的概率：
+\[
+P(Y=y)=\sum_{k:g(x_k)=y}P(X=x_k).
+\]
+\example{$X$ 在 $-1,0,1,2$ 处的概率分别为 $0.1,0.2,0.3,0.4$，求 $Y=X^2$ 的分布列。}
+\solution $Y$ 的不同取值为 $0,1,4$。其中 $Y=1$ 同时对应 $X=-1$ 和 $X=1$，所以
+\begin{center}\begin{tabular}{cccc}\toprule
+$y$&0&1&4\\\midrule
+$P(Y=y)$&0.2&0.4&0.4\\\bottomrule
+\end{tabular}\end{center}
+不合并相同变换值会重复列出同一个取值，不能构成规范分布列。
+\subsection{随机变量函数的分布：连续型}
+\begin{infobox}{方法：分布函数法}
+对任意可测函数 $g$，先求
+\[
+F_Y(y)=P(g(X)\le y).
+\]
+按 $y$ 的范围解出 $X$ 应落入的集合，用已知分布求概率。若所得分布具有密度，再对 $F_Y$ 求导。必须写出完整支持范围。
+\end{infobox}
+\example{设 $X\sim U(0,3)$，求 $Y=2X+3$ 的密度。}
+\solution $3<Y<9$。当 $3<y<9$ 时，
+\[
+F_Y(y)=P\left(X\le\frac{y-3}{2}\right)=\frac{y-3}{6}.
+\]
+$y\le3$ 时为 $0$，$y\ge9$ 时为 $1$，所以 $f_Y(y)=1/6$（$3<y<9$），其他为 $0$；即 $Y\sim U(3,9)$。
+\begin{infobox}{定理：单调变换的密度公式}
+设 $X$ 有密度 $f_X$，$g$ 在取值区间上严格单调、可微，反函数 $h=g^{-1}$ 可微，则在对应值域内部
+\[
+f_Y(y)=f_X(h(y))\,|h'(y)|.
+\]
+若 $g$ 分段单调且各反解 $x_j(y)$ 处 $g'(x_j(y))\ne0$，则在公式适用的点
+\[
+f_Y(y)=\sum_j\frac{f_X(x_j(y))}{|g'(x_j(y))|},
+\]
+求和只包括位于 $X$ 支持集内的反解。孤立临界点可另行处理，不影响密度积分。
+\end{infobox}
+递增时 $F_Y(y)=F_X(h(y))$；递减时 $F_Y(y)=1-F_X(h(y))$（$X$ 连续），求导后共同得到绝对值公式。若 $g$ 在某个正概率区间上为常数，则 $Y$ 会产生点质量，不能直接当作连续型使用密度公式。
+\example{设 $X\sim N(0,1)$，求 $Y=X^2$ 的分布。}
+\solution $Y\ge0$，当 $y>0$ 时，
+\[
+F_Y(y)=P(-\sqrt y\le X\le\sqrt y)=2\Phi(\sqrt y)-1.
+\]
+求导得
+\[
+f_Y(y)=\frac{\varphi(\sqrt y)}{\sqrt y}
+=\frac1{\sqrt{2\pi y}}e^{-y/2},\quad y>0,
+\]
+其余为 $0$。变换有正、负两个反解，两条分支都要计入。
+
+\chapterpage{多维随机变量及其分布}
+\subsection{随机向量与联合分布函数}
+在同一个样本空间上定义 $X_1,\ldots,X_n$，称 $(X_1,\ldots,X_n)$ 为\term{随机向量}或 $n$ 维随机变量。它描述多个数值结果的共同变化。以下以二维 $(X,Y)$ 为主。
+\begin{infobox}{定义：联合分布与边缘分布}
+二维随机向量的\term{联合分布函数}为
+\[
+F(x,y)=P(X\le x,Y\le y).
+\]
+$X,Y$ 各自的分布称为\term{边缘分布}，其分布函数为
+\[
+F_X(x)=\lim_{y\to+\infty}F(x,y),\qquad
+F_Y(y)=\lim_{x\to+\infty}F(x,y).
+\]
+\end{infobox}
+联合分布函数取值在 $[0,1]$ 中，对每个自变量单调非减且右连续。任一坐标趋于 $-\infty$、另一固定时，极限为 $0$；两个坐标同时趋于 $+\infty$ 时极限为 $1$。此外，任意矩形的概率必须非负：对 $a<b,c<d$，
+\begin{align*}
+&P(a<X\le b,c<Y\le d)\\
+&\quad=F(b,d)-F(a,d)-F(b,c)+F(a,c)\ge0.
+\end{align*}
+该式由对矩形的两次差集分解得到。分别单调并不能替代矩形增量非负条件。
+
+联合分布能确定边缘分布，边缘分布通常不能确定联合分布。例如 $X$ 在 $0,1$ 上各取概率 $1/2$，令 $Y=X$ 或令 $Y=1-X$，两种模型的边缘均相同，但第一种 $P(X=Y)=1$，第二种为 $0$。
+\subsection{二维离散型分布列与边缘分布列}
+\begin{infobox}{定义：联合分布列}
+若 $(X,Y)$ 仅取有限对或可列无限对数值，称为\term{二维离散型随机变量}。令
+\[
+p_{ij}=P(X=x_i,Y=y_j),\qquad p_{ij}\ge0,\quad\sum_i\sum_jp_{ij}=1.
+\]
+边缘分布列通过对另一坐标求和得到：
+\[
+p_{i\cdot}=P(X=x_i)=\sum_jp_{ij},\quad
+p_{\cdot j}=P(Y=y_j)=\sum_ip_{ij}.
+\]
+\end{infobox}
+点集 $D$ 上的概率为 $\sum_{(x_i,y_j)\in D}p_{ij}$；联合分布函数为 $F(x,y)=\sum_{x_i\le x,\ y_j\le y}p_{ij}$。表格行列所代表的变量应明确，避免把边缘和求错方向。
+\example{四个球标号为 $1,2,2,3$，无放回依次取两球，$X,Y$ 分别为第一次与第二次的标号，求联合分布列与边缘分布列。}
+\solution 将两个标号 $2$ 的球分别编号为不同实体。有序抽法共 $4\times3=12$ 种。按行表示 $X$、列表示 $Y$：
+\begin{center}\begin{tabular}{c|ccc|c}\toprule
+$X\backslash Y$&1&2&3&$p_{i\cdot}$\\\midrule
+1&0&$1/6$&$1/12$&$1/4$\\
+2&$1/6$&$1/6$&$1/6$&$1/2$\\
+3&$1/12$&$1/6$&0&$1/4$\\\midrule
+$p_{\cdot j}$&$1/4$&$1/2$&$1/4$&1\\\bottomrule
+\end{tabular}\end{center}
+例如 $(2,2)$ 对应两个实体球的两种顺序，概率为 $2/12$。同理 $P(X<Y)=1/6+1/12+1/6=5/12$。
+\example{产品有一、二、三等品各 $80,10,10$ 件，随机取一件，$X_i$ 为“取到第 $i$ 等品”的示性变量。求 $(X_1,X_2)$ 的分布及 $P(X_1=X_2)$。}
+\solution $(X_1,X_2)$ 仅取 $(1,0),(0,1),(0,0)$，概率分别为 $0.8,0.1,0.1$；不能取 $(1,1)$。所以 $P(X_1=X_2)=0.1$，$P(X_1+X_2=1)=0.9$，$P(X_1+X_2<1)=0.1$。另外
+\[
+P(X_1=1\mid X_3=0)=\frac{0.8}{0.9}=\frac89.
+\]
+\subsection{二维连续型密度、区域积分与边缘密度}
+\begin{infobox}{定义：联合概率密度}
+若存在非负函数 $f(x,y)$ 使
+\[
+F(x,y)=\int_{-\infty}^x\int_{-\infty}^y f(u,v)\,dv\,du,
+\]
+则称 $(X,Y)$ 为\term{二维连续型随机变量}，$f$ 为\term{联合概率密度}。它满足
+\[
+f(x,y)\ge0,\qquad\int_{-\infty}^{\infty}\int_{-\infty}^{\infty}f(x,y)\,dy\,dx=1.
+\]
+对可测区域 $D$，$P((X,Y)\in D)=\iint_D f(x,y)\,dx\,dy$。
+\end{infobox}
+在密度连续处，$f(x,y)=\partial^2 F(x,y)/(\partial x\partial y)$。联合连续密度下，单点和直线事件的概率为零；所求概率是平面区域上的密度积分。
+
+由全平面上对另一个变量积分，得到
+\[
+f_X(x)=\int_{-\infty}^{\infty}f(x,y)\,dy,\qquad
+f_Y(y)=\int_{-\infty}^{\infty}f(x,y)\,dx.
+\]
+例如 $F_X(x)=\int_{-\infty}^x[\int_{-\infty}^{\infty}f(u,v)\,dv]\,du$，因此括号内函数是 $X$ 的密度。
+\begin{infobox}{方法：确定二重积分限}
+先画出联合密度非零区域，再与所求事件区域求交。若按 $y$ 先积分，对固定 $x$ 取竖直截线，找出 $y$ 的上下界；按 $x$ 先积分则取水平截线。截线边界发生变化时，必须分段积分。求边缘密度后还要注明该边缘变量的取值范围。
+\end{infobox}
+\example{设 $f(x,y)=c$ 在 $0<y<x<1$ 内成立，其余为 $0$。求 $c$、两个边缘密度和 $P(X+Y<1)$。}
+\solution 支持集是直角三角形，面积为 $1/2$，故 $c=2$。竖截线给出 $0<y<x$，横截线给出 $y<x<1$，从而
+\[
+f_X(x)=2x\ (0<x<1),\qquad f_Y(y)=2(1-y)\ (0<y<1),
+\]
+各自区间之外均为 $0$。求概率时，竖截线上界为 $\min(x,1-x)$，在 $x=1/2$ 处变化：
+\begin{align*}
+P(X+Y<1)
+&=\int_0^{1/2}\int_0^x2\,dy\,dx
++\int_{1/2}^{1}\int_0^{1-x}2\,dy\,dx\\
+&=\frac14+\frac14=\frac12.
+\end{align*}
+联合分布函数可统一写成
+\[
+F(x,y)=\int_0^{\min(x,1)}2\max\{0,\min(u,y)\}\,du\quad(x>0),
+\]
+$x\le0$ 时为 $0$。特别地，当 $0<y<x<1$，
+\[
+F(x,y)=\int_0^y2u\,du+\int_y^x2y\,du=2xy-y^2;
+\]
+当 $0<x\le y$ 且 $x<1$ 时，$F(x,y)=x^2$。这个补充例子同时展示非矩形支持和分段积分。
+\subsection{二维均匀分布与二维正态分布}
+若平面区域 $G$ 有限且面积 $|G|>0$，密度
+\[
+f(x,y)=\begin{cases}1/|G|,&(x,y)\in G,\\0,&(x,y)\notin G\end{cases}
+\]
+定义了 $G$ 上的\term{二维均匀分布}。对区域 $D$，概率为 $|D\cap G|/|G|$。联合均匀不表示两个边缘均匀；上一例的三角形均匀分布边缘为斜线形密度。
+
+\term{二维正态分布}的参数为 $\mu_1,\mu_2\in\mathbb R$，$\sigma_1,\sigma_2>0$，$-1<\rho<1$。令标准化坐标 $u=(x-\mu_1)/\sigma_1$、$v=(y-\mu_2)/\sigma_2$，其密度为
+\[
+f(x,y)=\frac1{2\pi\sigma_1\sigma_2\sqrt{1-\rho^2}}
+\exp\left[-\frac{u^2-2\rho uv+v^2}{2(1-\rho^2)}\right].
+\]
+$\rho$ 为相关参数。将二次型配方：
+\[
+u^2-2\rho uv+v^2=(v-\rho u)^2+(1-\rho^2)u^2.
+\]
+于是固定 $x$ 对 $y$ 积分，令 $t=(v-\rho u)/\sqrt{1-\rho^2}$，有 $dy=\sigma_2\sqrt{1-\rho^2}\,dt$，得到
+\[
+f_X(x)=\frac{e^{-u^2/2}}{\sqrt{2\pi}\sigma_1}
+\underbrace{\int_{-\infty}^{\infty}\frac{e^{-t^2/2}}{\sqrt{2\pi}}\,dt}_{=1}.
+\]
+因此 $X\sim N(\mu_1,\sigma_1^2)$，同理 $Y\sim N(\mu_2,\sigma_2^2)$。二维正态的边缘都是正态；两个边缘为正态一般不能反推联合为二维正态。$\rho=\pm1$ 对应退化情形，不适用上述二维密度。
+\subsection{随机变量的独立性与判定}
+\begin{infobox}{定义与判据：随机变量独立}
+$X,Y$ 独立指对任意实数 $x,y$，
+\[
+F(x,y)=F_X(x)F_Y(y).
+\]
+等价地，对任意适当的取值集合 $D_1,D_2$，事件 $\{X\in D_1\}$ 与 $\{Y\in D_2\}$ 独立。
+
+离散型的判据是对所有 $i,j$，$p_{ij}=p_{i\cdot}p_{\cdot j}$；连续型的判据是 $f(x,y)=f_X(x)f_Y(y)$ 几乎处处成立。
+\end{infobox}
+离散情形必须检查所有取值组合，包括联合概率为零的位置；只需一个组合不满足，就可判定不独立。连续情形必须把支持范围纳入公式，不能只看区域内部的代数式能否分解。
+
+四球抽样例中 $P(X=1,Y=1)=0$，而 $P(X=1)P(Y=1)=1/16$，故不独立。三角形均匀例的 $x<y$ 区域联合密度为 $0$，但该区域内的 $f_X(x)f_Y(y)$ 可以为正，故不独立。相反，在矩形 $(a,b)\times(c,d)$ 上均匀分布时，联合密度等于两个均匀边缘密度之积，故独立。
+
+二维正态中，$\rho=0$ 时密度直接分解为两个正态密度之积，故独立；$\rho\ne0$ 时不独立。该结论依赖联合正态假设，不能推广为任意分布的“不相关即独立”。
+
+若 $X,Y$ 独立，则可测函数 $g(X),h(Y)$ 也独立，因为这些函数的取值事件分别对应 $X,Y$ 的取值集合。该结论允许按不相交的独立变量组构成独立子系统。
+\example{$X\sim U[0,1]$，$Y\sim E(1)$ 且相互独立，求 $P(X+Y\le1)$。}
+\solution 联合密度为 $f(x,y)=e^{-y}$（$0<x<1,y>0$），所以
+\begin{align*}
+P(X+Y\le1)&=\int_0^1\int_0^{1-x}e^{-y}\,dy\,dx\\
+&=\int_0^1[1-e^{-(1-x)}]\,dx=e^{-1}.
+\end{align*}
+\subsection{多维分布与相互独立}
+$n$ 维联合分布函数为
+\[
+F(x_1,\ldots,x_n)=P(X_1\le x_1,\ldots,X_n\le x_n).
+\]
+有联合密度时，对左下方无限长方体积分得到 $F$；对某些坐标积分到整个实数轴，得到其余坐标的边缘密度。离散型则对被消去的指标求和。
+
+随机变量 $X_1,\ldots,X_n$ 相互独立的判据为对所有坐标值，
+\[
+F(x_1,\ldots,x_n)=\prod_{i=1}^n F_{X_i}(x_i).
+\]
+离散型等价于联合点概率为各边缘点概率之积；有密度时等价于联合密度几乎处处为边缘密度之积。多维两两独立仍弱于相互独立。
+\subsection{二维离散随机变量函数的分布}
+若 $Z=g(X,Y)$，则
+\[
+P(Z=z)=\sum_{(i,j):g(x_i,y_j)=z}p_{ij}.
+\]
+求两个函数 $U=g(X,Y),V=h(X,Y)$ 的联合分布时，应同时按变换后的数值对合并概率：
+\[
+P(U=u,V=v)=\sum_{g(x_i,y_j)=u,\ h(x_i,y_j)=v}p_{ij}.
+\]
+\example{用四球抽样例的联合分布，求 $Z=X+Y$、$W=XY$ 以及 $U=\max(X,Y),V=\min(X,Y)$ 的分布。}
+\solution 联合表中非零位置按函数值合并，得到
+\begin{center}\begin{tabular}{c|cccc}\toprule
+$z$&3&4&5&\\\midrule
+$P(Z=z)$&$1/3$&$1/3$&$1/3$&\\\midrule
+$w$&2&3&4&6\\\midrule
+$P(W=w)$&$1/3$&$1/6$&$1/6$&$1/3$\\\bottomrule
+\end{tabular}\end{center}
+$Z=4$ 对应 $(1,3),(2,2),(3,1)$；$W=4$ 只对应 $(2,2)$。变换为最值对后，$(U,V)$ 的非零概率为
+\[
+P(2,1)=\frac13,\quad P(3,1)=\frac16,\quad
+P(2,2)=\frac16,\quad P(3,2)=\frac13,
+\]
+这里 $P(u,v)$ 简写 $P(U=u,V=v)$，总和仍为 $1$。
+\subsection{连续型函数的分布与和的密度}
+对 $Z=g(X,Y)$，\term{分布函数法}给出
+\[
+F_Z(z)=\iint_{g(x,y)\le z}f(x,y)\,dx\,dy.
+\]
+实际积分区域还必须与联合支持求交。若 $F_Z$ 绝对连续，求导可得密度；函数映射可能产生点质量，因此不能预先断定变换后的变量必为连续型。
+\begin{infobox}{定理：和的密度与卷积公式}
+若 $(X,Y)$ 有联合密度，$Z=X+Y$ 的密度可写为
+\[
+f_Z(z)=\int_{-\infty}^{\infty}f(x,z-x)\,dx
+=\int_{-\infty}^{\infty}f(z-y,y)\,dy.
+\]
+若进一步 $X,Y$ 独立，则得到\term{卷积公式}：
+\[
+f_Z(z)=\int_{-\infty}^{\infty}f_X(x)f_Y(z-x)\,dx.
+\]
+\end{infobox}
+\proof 由 $X+Y\le z$，
+\[
+F_Z(z)=\int_{-\infty}^{\infty}\int_{-\infty}^{z-x}f(x,y)\,dy\,dx.
+\]
+令 $t=x+y$，内积分变为 $\int_{-\infty}^z f(x,t-x)\,dt$。交换非负积分次序后，
+\[
+F_Z(z)=\int_{-\infty}^z\left[\int_{-\infty}^{\infty}f(x,t-x)\,dx\right]dt,
+\]
+故括号内函数是密度。独立时代入 $f(x,y)=f_X(x)f_Y(y)$。
+\example{$X,Y$ 独立且都服从 $U(0,1)$，求 $Z=X+Y$ 的密度。}
+\solution 被积函数为 $1$ 的条件是 $0<x<1$ 且 $0<z-x<1$，即
+\[
+\max(0,z-1)<x<\min(1,z).
+\]
+积分区间长度给出
+\[
+f_Z(z)=\begin{cases}z,&0<z\le1,\\2-z,&1<z<2,\\0,&\text{其他}.\end{cases}
+\]
+不能对整个 $(0,1)$ 积分而忽略 $z-x$ 的限制。
+\subsection{独立变量之和：泊松、二项与正态}
+\begin{infobox}{定理：独立泊松变量的可加性}
+若 $X\sim P(\lambda_1)$、$Y\sim P(\lambda_2)$ 且独立，则 $X+Y\sim P(\lambda_1+\lambda_2)$。
+\end{infobox}
+\proof 对 $k\ge0$，事件 $\{X+Y=k\}$ 按 $X=j$ 互斥分解，故
+\begin{align*}
+P(X+Y=k)
+&=\sum_{j=0}^k e^{-\lambda_1}\frac{\lambda_1^j}{j!}
+ e^{-\lambda_2}\frac{\lambda_2^{k-j}}{(k-j)!}\\
+&=\frac{e^{-(\lambda_1+\lambda_2)}}{k!}
+\sum_{j=0}^k\com kj\lambda_1^j\lambda_2^{k-j}\\
+&=e^{-(\lambda_1+\lambda_2)}\frac{(\lambda_1+\lambda_2)^k}{k!}.
+\end{align*}
+最后一步使用二项式定理。可归纳推广到有限个独立泊松变量。
+
+若 $X\sim B(m,p)$、$Y\sim B(n,p)$ 且独立，则 $X+Y\sim B(m+n,p)$：将两组独立且成功概率相同的伯努利试验合为一组即可。成功概率不同通常不能这样合并为一个二项分布。
+\begin{infobox}{定理：独立正态变量的线性组合}
+若 $X_i\sim N(\mu_i,\sigma_i^2)$（$i=1,\ldots,n$）相互独立，$a_i$ 为实常数，则
+\[
+\sum_{i=1}^n a_iX_i\sim
+N\left(\sum_{i=1}^n a_i\mu_i,\ \sum_{i=1}^n a_i^2\sigma_i^2\right),
+\]
+只要至少一个 $a_i\ne0$。全为零时为常数 $0$ 的退化分布。
+\end{infobox}
+对两个变量之和，可用卷积和配方证明。令 $s_i=\sigma_i^2$、$w=z-\mu_1-\mu_2$，将积分变量移为 $t=x-\mu_1$，指数中的二次型满足
+\[
+\frac{t^2}{s_1}+\frac{(w-t)^2}{s_2}
+=\frac{s_1+s_2}{s_1s_2}\left(t-\frac{s_1w}{s_1+s_2}\right)^2
++\frac{w^2}{s_1+s_2}.
+\]
+对第一个平方项按高斯积分积分，结果为 $\sqrt{2\pi s_1s_2/(s_1+s_2)}$；与卷积常数 $1/(2\pi\sqrt{s_1s_2})$ 相乘，得到
+\[
+f_{X+Y}(z)=\frac1{\sqrt{2\pi(s_1+s_2)}}
+\exp\left[-\frac{w^2}{2(s_1+s_2)}\right].
+\]
+单个非零倍数 $aX$ 通过一维变换得到 $N(a\mu,a^2\sigma^2)$，再归纳得到线性组合公式。仅各边缘正态且缺少独立或联合正态条件时，不能直接断定线性组合正态。
+
+若 $X$ 离散，$P(X=x_i)=p_i$，$Y$ 连续且与 $X$ 独立，则通过对 $X$ 全概率分解，
+\[
+F_{X+Y}(z)=\sum_i p_iF_Y(z-x_i),\qquad
+f_{X+Y}(z)=\sum_i p_if_Y(z-x_i)
+\]
+（密度等式按几乎处处理解）。例如 $P(X=1)=0.3,P(X=2)=0.7$ 时，密度为 $0.3f_Y(z-1)+0.7f_Y(z-2)$。
+\subsection{最大值、最小值与系统寿命}
+\begin{infobox}{定理：独立变量的最值分布}
+若 $X,Y$ 独立，令 $M=\max(X,Y)$、$N=\min(X,Y)$，则
+\[
+F_M(z)=F_X(z)F_Y(z),\qquad
+F_N(z)=1-[1-F_X(z)][1-F_Y(z)].
+\]
+若 $X_1,\ldots,X_n$ 相互独立，则
+\[
+F_{\max_iX_i}(z)=\prod_i F_{X_i}(z),\quad
+F_{\min_iX_i}(z)=1-\prod_i[1-F_{X_i}(z)].
+\]
+独立同分布且公共分布函数为 $F$ 时，分别化为 $F(z)^n$ 和 $1-[1-F(z)]^n$。
+\end{infobox}
+\proof $\{M\le z\}=\{X\le z,Y\le z\}$；$\{N>z\}=\{X>z,Y>z\}$。对交事件用独立性，后者再取补集。该推导对离散和连续变量均成立。
+
+若有密度，则乘积求导给出
+\begin{align*}
+f_M(z)&=f_X(z)F_Y(z)+F_X(z)f_Y(z),\\
+f_N(z)&=f_X(z)[1-F_Y(z)]+[1-F_X(z)]f_Y(z).
+\end{align*}
+\example{两个独立装置寿命分别为 $X\sim E(\lambda_1)$、$Y\sim E(\lambda_2)$。求串联与并联系统的寿命分布。}
+\solution 串联任一坏即失效，寿命为 $N=\min(X,Y)$，故对 $t\ge0$，
+\[
+P(N>t)=e^{-(\lambda_1+\lambda_2)t},\quad
+N\sim E(\lambda_1+\lambda_2).
+\]
+并联全部坏才失效，寿命为 $M=\max(X,Y)$，故
+\[
+F_M(t)=(1-e^{-\lambda_1t})(1-e^{-\lambda_2t}),\quad t\ge0,
+\]
+求导得对 $t>0$，
+\[
+f_M(t)=\lambda_1e^{-\lambda_1t}+\lambda_2e^{-\lambda_2t}
+-(\lambda_1+\lambda_2)e^{-(\lambda_1+\lambda_2)t}.
+\]
+$t<0$ 时两个分布函数均为 $0$，密度也为 $0$。并联寿命一般不是指数分布。
+\subsection{离散型条件分布}
+\begin{infobox}{定义：条件分布列}
+若 $p_{\cdot j}=P(Y=y_j)>0$，则给定 $Y=y_j$ 时 $X$ 的\term{条件分布列}为
+\[
+P(X=x_i\mid Y=y_j)=\frac{p_{ij}}{p_{\cdot j}}.
+\]
+同理，若 $p_{i\cdot}>0$，则 $P(Y=y_j\mid X=x_i)=p_{ij}/p_{i\cdot}$。固定条件值后，所得概率非负且和为 $1$。
+\end{infobox}
+在联合表中，给定 $Y=y_j$ 即选定一列，以该列和归一化；给定 $X=x_i$ 即选定一行，以该行和归一化。
+\example{$10$ 件产品中有 $2$ 件一级品、$7$ 件二级品、$1$ 件次品，不放回取 $3$ 件。$X,Y$ 分别表示一级品、二级品的数量，求联合分布及给定 $X=0$ 时 $Y$ 的分布。}
+\solution 按三个类别选取：
+\[
+P(X=x,Y=y)=\frac{\com2x\com7y\com1{3-x-y}}{\com{10}3}.
+\]
+有效整数范围为 $0\le x\le2$、$0\le y\le3$、$0\le3-x-y\le1$，其余概率为零。$X=0$ 时只能从余下 $8$ 件中取 $3$ 件，因次品只有一件，$Y$ 仅可取 $2,3$，且
+\[
+P(Y=2\mid X=0)=\frac{\com72\com11}{\com83}=\frac38,
+\quad P(Y=3\mid X=0)=\frac{\com73}{\com83}=\frac58.
+\]
+离散型 $X,Y$ 独立等价于对所有正概率条件值 $y_j$，$X$ 的条件分布等于其边缘分布。零概率列不需要、也不能直接用比值定义条件分布。
+\subsection{连续型条件分布与条件密度}
+连续型变量有 $P(Y=y)=0$，故不能把 $P(X\le x,Y=y)/P(Y=y)$ 当作条件概率。条件密度通过邻域条件的极限或密度分解定义。
+\begin{infobox}{定义：条件概率密度}
+若 $(X,Y)$ 有联合密度 $f$，对 $0<f_Y(y)<\infty$ 的条件值，定义一个条件密度版本为
+\[
+f_{X\mid Y}(x\mid y)=\frac{f(x,y)}{f_Y(y)},\qquad
+F_{X\mid Y}(x\mid y)=\int_{-\infty}^x f_{X\mid Y}(u\mid y)\,du.
+\]
+同理 $f_{Y\mid X}(y\mid x)=f(x,y)/f_X(x)$。这些定义在几乎所有有效条件值上成立；零边缘密度处不由该比值确定。
+\end{infobox}
+在相关密度具备相应连续性且 $f_Y(y)>0$ 的点，可以由邻域条件说明：
+\[
+P(X\le x\mid y<Y\le y+h)
+=\frac{\int_y^{y+h}\int_{-\infty}^x f(u,v)\,du\,dv}
+{\int_y^{y+h}f_Y(v)\,dv}
+\ \xrightarrow[h\downarrow0]{}\
+\frac{\int_{-\infty}^x f(u,y)\,du}{f_Y(y)}.
+\]
+这不是直接以零概率事件作分母。对 $X,Y$ 独立，条件密度与边缘密度相同；反之，若对几乎所有有效 $y$ 均有 $f_{X\mid Y}(x\mid y)=f_X(x)$ 几乎处处，则联合密度分解，得到独立。
+\example{$(X,Y)$ 在单位圆 $x^2+y^2<1$ 上均匀分布，求给定 $X=x$ 时 $Y$ 的条件密度。}
+\solution 联合密度在圆内为 $1/\pi$。固定 $|x|<1$，竖截线为 $-\sqrt{1-x^2}<y<\sqrt{1-x^2}$，所以
+\[
+f_X(x)=\frac{2\sqrt{1-x^2}}{\pi},
+\]
+\[
+f_{Y\mid X}(y\mid x)=\begin{cases}
+\dfrac1{2\sqrt{1-x^2}},&|y|<\sqrt{1-x^2},\\0,&\text{其他}.
+\end{cases}
+\]
+条件分布是截线区间上的均匀分布。区间随 $x$ 改变，故 $X,Y$ 不独立。
+\subsection{二维正态的条件分布}
+对前述二维正态密度，利用配方与边缘密度相除，得到
+\begin{infobox}{定理：二维正态条件分布}
+若 $(X,Y)$ 为非退化二维正态随机向量，则
+\[
+Y\mid X=x\sim
+N\left(\mu_2+\rho\frac{\sigma_2}{\sigma_1}(x-\mu_1),\ 
+\sigma_2^2(1-\rho^2)\right),
+\]
+\[
+X\mid Y=y\sim
+N\left(\mu_1+\rho\frac{\sigma_1}{\sigma_2}(y-\mu_2),\ 
+\sigma_1^2(1-\rho^2)\right).
+\]
+\end{infobox}
+\proof 前述配方把联合密度写为 $f_X(x)$ 乘以关于 $y$ 的正态密度，其中心为 $\mu_2+\rho\sigma_2u$，尺度为 $\sigma_2\sqrt{1-\rho^2}$。除去 $f_X(x)$ 即得第一式；交换变量得第二式。
+
+$\rho=0$ 时条件分布不随条件值改变，且等于边缘分布；$\rho\ne0$ 时条件均值随给定值线性变化，条件方差小于边缘方差。联合分布、边缘分布、条件分布之间的基本联系为
+\[
+f(x,y)=f_X(x)f_{Y\mid X}(y\mid x)
+=f_Y(y)f_{X\mid Y}(x\mid y)
+\]
+（在相应定义成立处）；离散型对应 $p_{ij}=p_{i\cdot}P(Y=y_j\mid X=x_i)$。
+
+\chapterpage{要点与符号}
+\renewcommand{\arraystretch}{1.15}
+\subsection{主要符号}
+\begin{center}\begin{tabularx}{\linewidth}{l Y}\toprule
+符号&含义\\\midrule
+$S,e,A,B$&样本空间、样本点、事件\\
+$AB,\ A\cup B,\ \overline A$&交事件、并事件、对立事件\\
+$P(A),\ P(A\mid B)$&事件概率、给定 $B$ 的条件概率（要求 $P(B)>0$）\\
+$A_n^k,C_n^k=\com nk$&无重复排列数、组合数\\
+$X,x,\ I_A$&随机变量、数值取值、事件示性变量\\
+$F_X(x),\ F_X(x-)$&分布函数 $P(X\le x)$、左极限 $P(X<x)$\\
+$f_X(x)$&一维密度，区间概率由积分得到\\
+$p_{ij},p_{i\cdot},p_{\cdot j}$&联合点概率及两种边缘点概率\\
+$F(x,y),f(x,y)$&二维联合分布函数、联合密度\\
+$f_{X\mid Y}(x\mid y)$&给定 $Y=y$ 时 $X$ 的条件密度\\
+$\varphi,\Phi$&标准正态密度、标准正态分布函数\\
+$\mu,\sigma^2,\rho$&正态位置参数、方差参数、二维正态相关参数\\\bottomrule
+\end{tabularx}\end{center}
+\subsection{常用分布与模型条件}
+\begin{longtable}{p{0.19\linewidth}p{0.37\linewidth}p{0.35\linewidth}}
+\toprule 分布&概率或密度&模型与参数\\\midrule\endhead
+两点 $B(1,p)$&$P(X=1)=p$，$P(X=0)=1-p$&一次成功、失败；$0<p<1$\\
+二项 $B(n,p)$&$\com nkp^k(1-p)^{n-k}$&固定 $n$ 次、相互独立、同一 $p$；$0\le k\le n$\\
+泊松 $P(\lambda)$&$e^{-\lambda}\lambda^k/k!$&非负整数计数；$\lambda>0$\\
+几何 $G(p)$&$(1-p)^{k-1}p$&首次成功的试验次数；$k\ge1$\\
+超几何&$\com Mk\com{N-M}{n-k}/\com Nn$&有限总体均匀无放回抽样\\
+均匀 $U[a,b]$&$1/(b-a)$（$a<x<b$）&有限区间上均匀；$a<b$\\
+指数 $E(\lambda)$&$\lambda e^{-\lambda x}$（$x>0$）&非负等待时间；率参数 $\lambda>0$\\
+正态 $N(\mu,\sigma^2)$&$e^{-(x-\mu)^2/(2\sigma^2)}/(\sqrt{2\pi}\sigma)$&$x\in\mathbb R$；$\sigma>0$\\\bottomrule
+\end{longtable}
+\subsection{核心公式与知识联系}
+\begin{infobox}{主要结论}
+\[
+\begin{aligned}
+P(A\cup B)&=P(A)+P(B)-P(AB),\\
+P(AB)&=P(B)P(A\mid B)\quad(P(B)>0),\\
+P(B)&=\sum_iP(A_i)P(B\mid A_i),\\
+P(A_j\mid B)&=\frac{P(A_j)P(B\mid A_j)}{P(B)}.
+\end{aligned}
+\]
+
+最后两式使用正概率划分；后验式进一步要求 $P(B)>0$。独立时交概率为乘积，至少一次发生可用“全部不发生”的对立事件计算。
+\end{infobox}
+事件及其概率是基础；随机变量把事件转为数值条件；分布列、分布函数与密度分别从点概率、累计概率和局部积分描述分布。联合分布包含变量间的依赖结构，边缘分布通过求和或积分消去另一变量，条件分布通过对固定条件归一化得到。
+
+解题时先判断模型与取值范围，再选择计数、条件分解、求和或积分。变换问题优先从事件 $\{g(X,Y)\le z\}$ 出发；和用卷积，最值用交事件或对立事件；独立性必须依据联合与边缘的乘积关系，不能只凭直觉。
+\subsection{易混概念辨析}
+\begin{center}\begin{tabularx}{\linewidth}{l Y}\toprule
+比较&区别\\\midrule
+互斥与对立&对立还要求并为 $S$\\
+互斥与独立&前者是集合关系，后者是概率乘积关系\\
+两两与相互独立&多事件或多变量时，相互独立要求所有子组关系\\
+频率与概率&频率是试验统计结果，概率是模型中的固定数值\\
+$P(A\mid B)$ 与 $P(B\mid A)$&条件方向不同，分母分别为 $P(B)$ 与 $P(A)$\\
+密度与概率&密度可大于 $1$；概率由积分求得并在 $[0,1]$ 内\\
+联合与边缘分布&边缘一般不足以恢复联合依赖结构\\
+指数率与尺度&本讲义用率 $\lambda$；尺度为 $1/\lambda$\\
+几何分布两种计数&本讲义从 $1$ 起计试验次数；失败次数从 $0$ 起计\\\bottomrule
+\end{tabularx}\end{center}
+\subsection{参考资料与范围}
+本讲义依据《概率一1》至《概率一4》四份课程课件整理，参照周永春等编《大学数学：概率论与数理统计》第三版（高等教育出版社，2020年）核对定义与记号。原题条件明确时重新计算，另设的补充例题用于展示方法。
+\end{document}
