@@ -1,0 +1,10 @@
+test_bad_csv (__main__.ProjectTests.test_bad_csv) ... ok
+test_dataset_values (__main__.ProjectTests.test_dataset_values) ... ok
+test_hand_calculation (__main__.ProjectTests.test_hand_calculation) ... ok
+test_invalid_metrics (__main__.ProjectTests.test_invalid_metrics) ... ok
+test_model_state_and_copy (__main__.ProjectTests.test_model_state_and_copy) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.002s
+
+OK

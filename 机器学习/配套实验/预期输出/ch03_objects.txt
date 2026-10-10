@@ -1,0 +1,9 @@
+rows: [[1, 99], [2, 8], [3, 10]]
+shallow: [[1, 99], [2, 8]]
+deep: [[1, 6], [2, 8]]
+identity: True False True False
+fresh: [1] [2]
+captured: [10, 11, 12]
+round trip: 3 教学数据
+caught: ValueError
+all checks passed

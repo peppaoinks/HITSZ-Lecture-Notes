@@ -1,0 +1,8 @@
+counts: {'train': 4, 'validation': 4, 'test': 4}
+validation mean: 1.800000
+validation nearest: 0.400000
+selected: nearest
+test predictions: [6.0, 10.0, 10.0, 12.0]
+test MAE: 0.850000
+test baseline MAE: 2.050000
+saved: results/summary.json, results/predictions.csv

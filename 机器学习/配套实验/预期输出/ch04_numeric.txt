@@ -1,0 +1,12 @@
+mean: [[1.5, 15.0, 1.0]]
+scale: [[1.118033988749895, 5.0, 1.0]]
+validation k=1: 0.400000
+validation k=3: 1.466667
+selected k: 1
+test predictions: [4.0, 8.0, 8.0, 10.0]
+test MAE: 0.850000
+test baseline MAE: 2.050000
+loop/vector max difference: 5.329e-15
+median seconds: loop=0.032538 vector=0.000117
+saved: ch04_results/summary.json, ch04_results/arrays.npz
+all checks passed

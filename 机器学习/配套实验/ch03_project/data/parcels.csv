@@ -1,0 +1,13 @@
+id,split,weight,cost
+tr01,train,1.0,6.0
+tr02,train,2.0,8.0
+tr03,train,3.0,10.0
+tr04,train,4.0,12.0
+va01,validation,1.2,6.4
+va02,validation,2.2,8.4
+va03,validation,3.2,10.4
+va04,validation,3.8,11.6
+te01,test,1.4,6.8
+te02,test,2.6,9.2
+te03,test,3.4,10.8
+te04,test,4.5,13.0

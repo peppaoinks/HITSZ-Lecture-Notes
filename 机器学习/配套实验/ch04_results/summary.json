@@ -1,0 +1,40 @@
+{
+  "python": "3.12.14",
+  "numpy": "2.3.5",
+  "seed": 2026,
+  "mean": [
+    [
+      1.5,
+      15.0,
+      1.0
+    ]
+  ],
+  "scale": [
+    [
+      1.118033988749895,
+      5.0,
+      1.0
+    ]
+  ],
+  "validation_mae": {
+    "1": 0.40000000000000036,
+    "3": 1.4666666666666666
+  },
+  "selected_k": 1,
+  "test_predictions": [
+    4.0,
+    8.0,
+    8.0,
+    10.0
+  ],
+  "test_mae": 0.8500000000000001,
+  "test_baseline_mae": 2.0500000000000003,
+  "linear_max_abs_difference": 5.329070518200751e-15,
+  "benchmark_shape": [
+    12000,
+    12
+  ],
+  "timing_repeats": 3,
+  "median_loop_seconds": 0.03253833300550468,
+  "median_vector_seconds": 0.00011712498962879181
+}

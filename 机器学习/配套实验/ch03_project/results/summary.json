@@ -1,0 +1,22 @@
+{
+  "python": "3.12.14",
+  "data_sha256": "bb0d80602c1b55fdfa925be981970619ef0e8c1209bbe9daa8137ad99ebd0153",
+  "split_counts": {
+    "train": 4,
+    "validation": 4,
+    "test": 4
+  },
+  "candidate_order": [
+    "mean",
+    "nearest"
+  ],
+  "selection_rule": "minimum validation MAE; first candidate wins ties",
+  "refit_on_train_validation": false,
+  "validation_mae": {
+    "mean": 1.7999999999999998,
+    "nearest": 0.40000000000000036
+  },
+  "selected": "nearest",
+  "test_mae": 0.8500000000000003,
+  "test_baseline_mae": 2.05
+}

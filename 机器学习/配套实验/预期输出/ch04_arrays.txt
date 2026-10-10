@@ -1,0 +1,20 @@
+shape ndim size: (2, 3) 2 6
+column shapes: (2,) (2, 1)
+sum axis=0: [5. 7. 9.]
+sum axis=1: [ 6. 15.]
+centered:
+ [[-1.5 -1.5 -1.5]
+ [ 1.5  1.5  1.5]]
+after view and advanced-index writes:
+ [[99.  2.  3.]
+ [ 4.  5.  6.]]
+shares: True False
+wrong residual shape: (3, 3)
+wrong MSE: 1.3333333333333333
+correct MSE: 0.0
+stable row probabilities:
+ [[0.090031 0.244728 0.665241]
+ [0.333333 0.333333 0.333333]]
+row sums: [1. 1.]
+same seed same draws: True
+all checks passed
