@@ -27,5 +27,6 @@ for threshold in [0.5, 0.7]:
     result = evaluate(labels, scores, threshold)
     print("threshold:", threshold)
     print("TP FP TN FN:", *result[:4])
-    print("accuracy={:.6f} precision={:.6f} recall={:.6f}".format(
-        *result[4:]))
+    shown = ["undefined" if value is None else f"{value:.6f}"
+             for value in result[4:]]
+    print("accuracy={} precision={} recall={}".format(*shown))

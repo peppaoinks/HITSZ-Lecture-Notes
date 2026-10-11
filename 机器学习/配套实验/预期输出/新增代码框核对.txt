@@ -1,3 +1,5 @@
+前四章审查版：以下72个原代码框按上下文重跑；新增as_float_array代码框另行直接执行并核对uint8转换。合计73个第三、四章代码框。
+
 block 01: executed; 4 lines
 block 02: executed; 4 lines
 block 03: executed; 5 lines
@@ -67,7 +69,10 @@ block 66: executed; 2 lines
 block 67: executed; 5 lines
 block 68: executed; 5 lines
 block 69: executed; 6 lines
-block 70: executed; 6 lines
+block 70: executed; 7 lines
 block 71: executed; 4 lines
-block 72: executed; 10 lines
+block 72: executed; 11 lines
 all 72 new Python blocks parsed and executed with stated context; deliberate overflow confirmed
+
+new helper: executed; uint8 conversion checked
+all 73 current Chapter 3/4 frames passed

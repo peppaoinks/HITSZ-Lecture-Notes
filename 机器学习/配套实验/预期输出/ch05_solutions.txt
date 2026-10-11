@@ -1,0 +1,2 @@
+fences: -3, 11; flag t08; training median: 4
+all checks passed

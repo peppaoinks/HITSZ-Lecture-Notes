@@ -37,6 +37,9 @@ for row in rejected:
     print(row)
 summary = describe(clean)
 print("summary:")
-for key, value in summary.items():
-    print(key, "=", value)
+if summary is None:
+    print("no valid scores")
+else:
+    for key, value in summary.items():
+        print(key, "=", value)
 print("empty input:", describe([]))

@@ -14,7 +14,8 @@ def read_records(path):
         reader = csv.DictReader(stream)
         if reader.fieldnames != FIELDS:
             raise ValueError(f"expected header {FIELDS}")
-        for line, row in enumerate(reader, start=2):
+        for row in reader:
+            line = reader.line_num
             if None in row or any(v is None for v in row.values()):
                 raise ValueError(f"row {line}: wrong field count")
             ident = row["id"].strip()

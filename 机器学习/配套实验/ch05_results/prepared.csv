@@ -1,0 +1,13 @@
+id,split,area,weight_kg,distance_km,late,fee_yuan,area_name,weight_missing
+t01,train,A,1.0,10.0,0.0,6.0,urban,0
+t02,train,A,2.0,20.0,0.0,8.0,urban,0
+t03,train,B,3.0,10.0,1.0,10.0,suburban,0
+t04,train,B,4.0,20.0,1.0,12.0,suburban,1
+t05,train,A,5.0,10.0,0.0,14.0,urban,0
+t06,train,B,6.0,20.0,0.0,16.0,suburban,0
+t07,train,A,4.0,10.0,1.0,18.0,urban,1
+t08,train,B,20.0,20.0,1.0,44.0,suburban,0
+v01,val,A,7.0,10.0,1.0,18.0,urban,0
+v02,val,B,8.0,20.0,0.0,20.0,suburban,0
+s01,test,A,9.0,10.0,0.0,22.0,urban,0
+s02,test,B,10.0,20.0,1.0,24.0,suburban,0

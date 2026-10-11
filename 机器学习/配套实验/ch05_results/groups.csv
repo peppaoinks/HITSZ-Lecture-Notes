@@ -1,0 +1,3 @@
+area,rows,weights,mean_fee,late_rate
+A,4,3,11.5,0.25
+B,4,3,20.5,0.75

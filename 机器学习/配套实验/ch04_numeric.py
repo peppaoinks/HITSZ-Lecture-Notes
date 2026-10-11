@@ -7,54 +7,78 @@ from time import perf_counter
 import numpy as np
 
 
+def as_float_array(values, name):
+    array = np.asarray(values)
+    if array.dtype.kind not in "iuf":
+        raise ValueError(f"{name}: expected real numeric values")
+    with np.errstate(over="raise", invalid="raise"):
+        array = array.astype(np.float64)
+    if not np.isfinite(array).all():
+        raise ValueError(f"{name}: expected finite values")
+    return array
+
+
 def check_matrix(x, name):
-    if x.ndim != 2 or 0 in x.shape or not np.isfinite(x).all():
+    x = as_float_array(x, name)
+    if x.ndim != 2 or 0 in x.shape:
         raise ValueError(f"{name}: expected nonempty finite 2D array")
+    return x
 
 
 def fit_scaler(x):
-    check_matrix(x, "x")
-    mean = x.mean(axis=0, keepdims=True)
-    std = x.std(axis=0, ddof=0, keepdims=True)
+    x = check_matrix(x, "x")
+    with np.errstate(over="raise", invalid="raise", divide="raise"):
+        mean = x.mean(axis=0, keepdims=True)
+        std = x.std(axis=0, ddof=0, keepdims=True)
     scale = np.where(std == 0, 1.0, std)
     return mean, scale
 
 
+def check_neighbors(train, target, query, k):
+    train = check_matrix(train, "train")
+    query = check_matrix(query, "query")
+    target = as_float_array(target, "target")
+    if query.shape[1] != train.shape[1]:
+        raise ValueError("feature counts differ")
+    if target.shape != (train.shape[0],):
+        raise ValueError("target shape invalid")
+    if not isinstance(k, int) or isinstance(k, bool) or not 1 <= k <= len(train):
+        raise ValueError("invalid k")
+    return train, target, query
+
+
 def predict_loop(train, target, query, k):
-    predictions = []
-    for row in query:
-        distances = []
-        for i, sample in enumerate(train):
-            distance = 0.0
-            for a, b in zip(row, sample):
-                distance += (a - b) ** 2
-            distances.append((distance, i))
-        order = sorted(distances, key=lambda item: item[0])
-        predictions.append(sum(target[i] for _, i in order[:k]) / k)
-    return np.array(predictions)
+    train, target, query = check_neighbors(train, target, query, k)
+    with np.errstate(over="raise", invalid="raise", divide="raise"):
+        predictions = []
+        for row in query:
+            distances = []
+            for i, sample in enumerate(train):
+                distance = 0.0
+                for a, b in zip(row, sample):
+                    distance += (a - b) ** 2
+                distances.append((distance, i))
+            order = sorted(distances, key=lambda item: item[0])
+            predictions.append(sum(target[i] for _, i in order[:k]) / k)
+        return np.array(predictions)
 
 
 def predict_vectorized(train, target, query, k):
-    check_matrix(train, "train")
-    check_matrix(query, "query")
-    if query.shape[1] != train.shape[1]:
-        raise ValueError("feature counts differ")
-    if target.shape != (train.shape[0],) or not np.isfinite(target).all():
-        raise ValueError("target shape or values invalid")
-    if not isinstance(k, int) or isinstance(k, bool) or not 1 <= k <= len(train):
-        raise ValueError("invalid k")
-    delta = query[:, None, :] - train[None, :, :]
-    distance2 = np.sum(delta ** 2, axis=2)
-    order = np.argsort(distance2, axis=1, kind="stable")[:, :k]
-    return target[order].mean(axis=1)
+    train, target, query = check_neighbors(train, target, query, k)
+    with np.errstate(over="raise", invalid="raise", divide="raise"):
+        delta = query[:, None, :] - train[None, :, :]
+        distance2 = np.sum(delta ** 2, axis=2)
+        order = np.argsort(distance2, axis=1, kind="stable")[:, :k]
+        return target[order].mean(axis=1)
 
 
 def checked_mae(y, p):
+    y = as_float_array(y, "y")
+    p = as_float_array(p, "p")
     if y.ndim != 1 or y.size == 0 or p.shape != y.shape:
         raise ValueError("expected paired nonempty 1D arrays")
-    if not np.isfinite(y).all() or not np.isfinite(p).all():
-        raise ValueError("nonfinite metric input")
-    return float(np.mean(np.abs(p - y)))
+    with np.errstate(over="raise", invalid="raise", divide="raise"):
+        return float(np.mean(np.abs(p - y)))
 
 
 def linear_loop(x, w, b):
@@ -85,7 +109,8 @@ def main():
     y_test = np.array([4.8, 7.2, 8.8, 11.])
     original = train.copy()
     mean, scale = fit_scaler(train)
-    z_train, z_val, z_test = [(x - mean) / scale for x in (train, val, test)]
+    with np.errstate(over="raise", invalid="raise", divide="raise"):
+        z_train, z_val, z_test = [(x - mean) / scale for x in (train, val, test)]
     candidates = [1, 3]
     scores = {}
     for k in candidates:

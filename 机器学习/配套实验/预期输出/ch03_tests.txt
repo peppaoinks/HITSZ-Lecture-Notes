@@ -5,6 +5,6 @@ test_invalid_metrics (__main__.ProjectTests.test_invalid_metrics) ... ok
 test_model_state_and_copy (__main__.ProjectTests.test_model_state_and_copy) ... ok
 
 ----------------------------------------------------------------------
-Ran 5 tests in 0.002s
+Ran 5 tests in 0.003s
 
 OK

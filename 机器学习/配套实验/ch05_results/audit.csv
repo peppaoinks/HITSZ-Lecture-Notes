@@ -1,0 +1,3 @@
+id,column,raw,reason
+t04,weight_kg,,missing
+t07,weight_kg,bad,invalid

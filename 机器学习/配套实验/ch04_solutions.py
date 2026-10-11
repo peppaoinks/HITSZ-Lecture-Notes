@@ -1,10 +1,11 @@
 """Executable checks for Chapter 4 shape, arithmetic and block experiments."""
 import numpy as np
-from ch04_numeric import checked_mae, fit_scaler, predict_vectorized
+from ch04_numeric import checked_mae, fit_scaler, predict_loop, predict_vectorized
 
 
 def predict_blocked(train, target, query, k, block_size=2):
-    if not isinstance(block_size, int) or block_size < 1:
+    if (not isinstance(block_size, int) or isinstance(block_size, bool)
+            or block_size < 1):
         raise ValueError("block_size must be positive")
     if len(query) == 0:
         raise ValueError("empty query")
@@ -50,6 +51,33 @@ def main():
             pass
         else:
             raise AssertionError("bad k not rejected")
+    for size in [0, -1, 1.5, True]:
+        try:
+            predict_blocked(train, targets, query, 1, size)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("bad block size not rejected")
+    # Integer arithmetic must be converted before subtraction or squaring.
+    assert checked_mae(np.array([255], dtype=np.uint8),
+                       np.array([0], dtype=np.uint8)) == 255.0
+    integer_train = np.array([[0], [200]], dtype=np.uint8)
+    integer_query = np.array([[190]], dtype=np.uint8)
+    for predict in [predict_loop, predict_vectorized]:
+        np.testing.assert_array_equal(
+            predict(integer_train, np.array([0, 1]), integer_query, 1), [1.])
+    # Finite inputs do not guarantee finite intermediate computations.
+    huge = np.array([[1e200], [2e200]])
+    for call in [lambda: fit_scaler(huge),
+                 lambda: predict_vectorized(huge, np.array([0., 1.]),
+                                             np.array([[1.9e200]]), 1),
+                 lambda: checked_mae(np.array([-1e308]), np.array([1e308]))]:
+        try:
+            call()
+        except FloatingPointError:
+            pass
+        else:
+            raise AssertionError("overflow was silently accepted")
     print("all checks passed")
 
 

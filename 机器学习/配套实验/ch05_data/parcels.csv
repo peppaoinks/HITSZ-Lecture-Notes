@@ -1,0 +1,14 @@
+id,split,area,weight_kg,distance_km,late,fee_yuan
+t01,train,A,1,10,0,6
+t02,train,A,2,20,0,8
+t03,train,B,3,10,1,10
+t04,train,B,,20,1,12
+t05,train,A,5,10,0,14
+t06,train,B,6,20,0,16
+t07,train,A,bad,10,1,18
+t08,train,B,20,20,1,44
+t03,train,B,3,10,1,10
+v01,val,A,7,10,1,18
+v02,val,B,8,20,0,20
+s01,test,A,9,10,0,22
+s02,test,B,10,20,1,24

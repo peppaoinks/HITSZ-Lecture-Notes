@@ -16,7 +16,10 @@ class MeanRegressor:
         validate_values(y)
         if len(x) != len(y):
             raise ValueError("lengths differ")
-        self.mean_ = sum(y) / len(y)
+        mean = sum(y) / len(y)
+        if not isfinite(mean):
+            raise ValueError("training mean overflowed; check data scale")
+        self.mean_ = mean
         return self
 
     def predict(self, x):
@@ -44,5 +47,12 @@ class NearestRegressor:
             raise RuntimeError("fit must be called before predict")
         if not all(isfinite(v) for v in x):
             raise ValueError("inputs must be finite")
-        return [min(self.records_, key=lambda row: abs(row[0] - q))[1]
-                for q in x]
+        predicted = []
+        for q in x:
+            def distance(row):
+                value = abs(row[0] - q)
+                if not isfinite(value):
+                    raise ValueError("distance overflowed; check data scale")
+                return value
+            predicted.append(min(self.records_, key=distance)[1])
+        return predicted

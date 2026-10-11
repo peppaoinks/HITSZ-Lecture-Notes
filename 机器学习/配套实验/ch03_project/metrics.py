@@ -7,4 +7,7 @@ def mae(actual, predicted):
         raise ValueError("expected equal, nonempty sequences")
     if not all(isfinite(v) for v in list(actual) + list(predicted)):
         raise ValueError("values must be finite")
-    return sum(abs(p - y) for y, p in zip(actual, predicted)) / len(actual)
+    result = sum(abs(p - y) for y, p in zip(actual, predicted)) / len(actual)
+    if not isfinite(result):
+        raise ValueError("metric overflowed; check data scale")
+    return result

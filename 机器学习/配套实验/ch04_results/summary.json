@@ -35,6 +35,6 @@
     12
   ],
   "timing_repeats": 3,
-  "median_loop_seconds": 0.03253833300550468,
-  "median_vector_seconds": 0.00011712498962879181
+  "median_loop_seconds": 0.035484874999383464,
+  "median_vector_seconds": 0.00014370800636243075
 }

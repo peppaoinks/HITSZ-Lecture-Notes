@@ -1,0 +1,18 @@
+PASS entry: ch01_regression.py
+PASS entry: ch01_classification.py
+PASS entry: ch02_basics.py
+PASS entry: ch02_metrics.py
+PASS entry: ch02_solutions.py
+PASS entry: ch03_objects.py
+PASS entry: ch03_project/main.py
+PASS entry: ch03_project/test_project.py
+PASS entry: ch03_solutions.py
+PASS entry: ch04_arrays.py
+PASS entry: ch04_numeric.py
+PASS entry: ch04_solutions.py
+PASS dtype, overflow, shapes, ties and independent distance checks
+PASS boundary modification tasks
+PASS syntax of all 139 Python code frames
+PASS all 73 Chapter 3/4 frames executed in stated context
+PASS hand results and pairwise-error variance identity
+AUDIT CHECKS PASSED

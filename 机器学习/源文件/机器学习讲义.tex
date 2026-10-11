@@ -1,5 +1,5 @@
 % 机器学习讲义：累计、单文件源文档。
-% 累计完成第1--4章。后续完整章节在文末资料说明前增补。
+% 累计完成第1--6章。后续完整章节在文末资料说明前增补。
 % 计划范围见工作目录的机器学习讲义大纲.md；不生成未完成章节目录。
 \documentclass[UTF8,fontset=none,zihao=-4,a4paper]{ctexart}
 \usepackage[left=26mm,right=26mm,top=25mm,bottom=25mm,headheight=15pt]{geometry}
@@ -27,7 +27,7 @@
 \usetikzlibrary{arrows.meta,positioning,calc}
 \usepackage{fvextra}
 \usepackage[hidelinks]{hyperref}
-\hypersetup{pdftitle={机器学习},pdfsubject={第1--4章：人工智能与机器学习全景、Python基础、程序组织与调试、NumPy与向量化},bookmarksdepth=2}
+\hypersetup{pdftitle={机器学习},pdfsubject={第1--6章：编程、数据探索与线性代数准备},bookmarksdepth=2}
 \definecolor{ThemeMain}{HTML}{35566E}
 \definecolor{ThemeBack}{HTML}{F2F6F8}
 \definecolor{ThemeBorder}{HTML}{B8C8D3}
@@ -273,7 +273,7 @@ $x$ 的单位是千克，$\widehat y,b$ 的单位是元，$a$ 的单位是元每
 \[
  \ell(\widehat y,y)=(\widehat y-y)^2.
 \]
-误差 $\widehat y-y$ 的正负分别表示高估和低估，平方后两种方向都产生非负代价，大误差增长更快。若费用用元计，平方损失的单位为元的平方，不能直接把它解释为平均多收了多少元。
+本书将 $\widehat y-y$ 称为\term{有符号预测误差}，正值表示高估，负值表示低估。统计学中\term{残差}（residual）通常采用相反方向 $y-\widehat y$；读取其他资料时应先核对约定。二者取绝对值或平方后的结果相同，因而不影响本书的MAE与MSE。平方后两种方向都产生非负代价，大误差增长更快。若费用用元计，平方损失的单位为元的平方，不能直接把它解释为平均多收了多少元。
 
 把损失在训练样本上平均，得到\term{经验风险}（empirical risk）
 \begin{equation}
@@ -313,7 +313,7 @@ $x$ 的单位是千克，$\widehat y,b$ 的单位是元，$a$ 的单位是元每
 \bottomrule
 \end{tabularx}
 \end{center}
-“把指标作为训练目标”在某些任务中可行，但二者角色仍不同。训练目标强调可优化性，评价指标强调任务用途。分类中的某些平滑损失有利于训练，最终却可能以准确率、召回率或其他指标比较模型。
+表中的\term{正则化}（regularization）是通过惩罚或限制模型复杂性约束拟合的方法；强度控制这种约束的程度，第9章和第11章再给出具体目标与推导。“把指标作为训练目标”在某些任务中可行，但二者角色仍不同。训练目标强调可优化性，评价指标强调任务用途。分类中的某些平滑损失有利于训练，最终却可能以准确率、召回率或其他指标比较模型。
 
 \subsection{怎样从实际需求定义学习问题}
 \subsubsection{任务说明的六个要素}
@@ -627,7 +627,7 @@ accuracy=0.625000 precision=0.500000 recall=0.333333
 \subsubsection{修改任务}
 假设一次误报成本为1，一次漏检成本为5，定义总错误成本为 $C=\mathrm{FP}+5\mathrm{FN}$。阈值0.5的成本为7，阈值0.7的成本为11。成本单位是人为定义的统一代价，不能在没有实际业务估计时当成真实金额。
 
-将下标4的分数由0.4改成0.6，其标签仍为1。先不运行程序，分别预测两个阈值下四个计数怎样变化，再运行核对。还可将阈值设为1.1，检查“没有预测正类”的情形：精确率返回\code{None}，召回率为0。完整脚本的固定格式打印为两个正常阈值设计；扩展到未定义精确率时，应先判断\code{None}再决定显示字符串，不能直接套用小数格式。
+将下标4的分数由0.4改成0.6，其标签仍为1。先不运行程序，分别预测两个阈值下四个计数怎样变化，再运行核对。还可将阈值设为1.1，检查“没有预测正类”的情形：精确率返回\code{None}，召回率为0。配套脚本已先判断指标是否为\code{None}，未定义值显示为\code{undefined}，因此阈值1.1的修改也可直接运行。不能直接对\code{None}套用小数格式；显示标记表示缺少定义，并不把它当成0分。
 
 \subsection{知识联系、常见误区与自检}
 从问题到结果可用一条因果关系清楚的工作链描述：任务决定可用信息与目标；目标和错误成本决定评价；数据采集与划分决定评价条件；模型和训练算法决定候选预测规则；验证决定选择；测试提供在该协议下的结果。这条链中任何一环出现偏差，都可能使精确计算得到的分数失去原本含义。
@@ -644,7 +644,7 @@ accuracy=0.625000 precision=0.500000 recall=0.333333
 \item \textbf{概念。}固定规则判断银行卡号格式、从标注图片学习识别缺陷、对文本预测下一个词元、在网格中根据奖励学习移动，分别对应什么方法或学习方式？能否把固定规则排除出所有人工智能系统？
 \item \textbf{任务定义。}“预测学生成绩”过于含糊。以学期开始时预测期末分数为目标，写出样本单位、预测时点、三个候选输入、一个不能使用的字段和一个评价指标。说明标签单位。
 \item \textbf{数据表示。}200张图像已被表示为每张64个数值，标签有5类。写出 $X$ 的形状；类别标签必须表示为 $200\times5$ 矩阵吗？若采用整数类别编号，怎样解释编号？
-\item \textbf{计算。}真实值为 $(2,4,6)$，预测为 $(3,4,4)$。计算残差、MAE、MSE与RMSE，并说明目标单位为元时各指标的单位。
+\item \textbf{计算。}真实值为 $(2,4,6)$，预测为 $(3,4,4)$。计算有符号误差、MAE、MSE与RMSE，并说明目标单位为元时各指标的单位。
 \item \textbf{训练目标。}标签为 $(2,2,8)$。求平方损失下最佳常数预测与相应MSE；再比较常数2与常数4的MAE。解释为什么均值基线不一定是MAE最优基线。
 \item \textbf{模型选择。}候选A、B、C的训练MAE分别为0.2、0.5、0.8，验证MAE分别为1.5、0.7、0.9。按最小验证MAE规则选哪个？能否从这些分数确定A一定发生了过拟合？
 \item \textbf{泄漏判断。}预测订单最终费用时，分别讨论使用最终付款状态、在全部数据上拟合填补均值、同一订单复制记录跨入训练和测试。写出每种情况的修正措施。
@@ -664,13 +664,13 @@ accuracy=0.625000 precision=0.500000 recall=0.333333
 \textbf{1.3}\quad $X\in\mathbb R^{200\times64}$。标签可以是长度200的整数序列，每项属于 $\{0,1,2,3,4\}$；也可以根据算法需要使用其他编码，并非必须为 $200\times5$。整数是类别代号，不意味着类别4是类别2的两倍，也不宜对代号直接计算回归误差。
 
 \subsubsection*{1.4--1.6：损失与选择}
-\textbf{1.4}\quad 以预测减真实定义残差，得到 $(1,0,-2)$。绝对值为 $(1,0,2)$，平方为 $(1,0,4)$，所以
+\textbf{1.4}\quad 以预测减真实定义有符号误差，得到 $(1,0,-2)$。绝对值为 $(1,0,2)$，平方为 $(1,0,4)$，所以
 \[
  \mathrm{MAE}=1,
  \qquad\mathrm{MSE}=\frac53,
  \qquad\mathrm{RMSE}=\sqrt{\frac53}\approx1.2910.
 \]
-MAE与RMSE单位为元，MSE单位为元$^2$。残差平均为 $-1/3$，它不能代替MAE，因为正负错误可能抵消。
+MAE与RMSE单位为元，MSE单位为元$^2$。有符号误差平均为 $-1/3$，它不能代替MAE，因为正负错误可能抵消。
 
 \textbf{1.5}\quad 训练均值为 $(2+2+8)/3=4$。平方误差为 $(4,4,16)$，MSE为8。常数2的MAE为 $(0+0+6)/3=2$，常数4的MAE为 $(2+2+4)/3=8/3$。均值优化平方损失，中位数2在本例中给出更小的绝对损失。两种目标对偏离较大的8赋予不同权重。
 
@@ -778,7 +778,7 @@ python3 ch02_basics.py
 
 \subsection{虚拟环境、标准库与依赖}
 \subsubsection{为什么区分环境}
-\term{标准库}随Python提供，包含数学、随机数、文件路径等许多功能。\term{第三方包}是另外安装的代码，例如后续使用的NumPy、pandas和PyTorch。程序所依赖的包及其版本称为\term{依赖}（dependency）。本章四个实验无需安装第三方包。
+\term{标准库}随Python提供，包含数学、随机数、文件路径等许多功能。\term{第三方包}是另外安装的代码，例如后续使用的NumPy、pandas和PyTorch。程序所依赖的包及其版本称为\term{依赖}（dependency）。本章两个实验以及第1章的两个实验均无需安装第三方包。
 
 不同项目可能要求不同包版本。如果把所有包混装在一个环境中，一次升级可能影响另一项目。\term{虚拟环境}（virtual environment）为一个项目隔离包安装位置，并提供与该环境关联的解释器入口。它不是虚拟机，不会另建一套完整操作系统。
 
@@ -1140,7 +1140,7 @@ print(sorted(overlap))
 \end{pycode}
 输出\code{['u3']}。用\code{sorted}将集合变成稳定排序的列表，便于显示。不要用集合存放需要与标签位置一一对应的特征序列，去重和无位置语义会破坏配对。
 
-列表、元组和字典等某些可变对象不能直接作为集合元素或字典键，因为它们不具备所需的可哈希性。字符串、整数以及由合适不可变元素构成的元组通常可以。哈希的机制在后续算法中再说明，本章只需选择清楚、合法的键类型。
+列表、字典和集合等可变容器不能直接作为集合元素或字典键，因为它们不具备所需的\term{可哈希性}（hashability）。字符串、整数通常可以；元组本身不可变，但只有所有元素都可哈希时，元组才可哈希。例如\code{(1, 2)}可以作键，\code{([1], 2)}却不可以，因为其中含有不可哈希的列表。可哈希性不能仅按外层是否可变判断。哈希的机制在后续算法中再说明，本章先据此选择合法键类型。
 
 \begin{center}
 \begin{tabularx}{\linewidth}{l Y Y}
@@ -1506,7 +1506,7 @@ print(total)
 
 读报错时先找到最后的异常类型和说明，再看指向的文件与行号，并检查该行使用的变量。一个错误行可能由前面不正确赋值引起，例如\code{scores = scores.append(88)}本身可执行，直到后面对\code{scores}求长度才失败。需要追踪数据如何来到错误行，而不是只修改报错处。
 
-对逻辑错误，应使用能揭示差异的小输入。检查MAE时，不只用全正残差，因为忘写绝对值可能偶然同样正确；应包含高估和低估。检查循环边界时，要包含恰好等于阈值的输入。检查分母时，要让被筛选数量与原数量不同。这样的核对比大量随机打印更能回答具体疑问。
+对逻辑错误，应使用能揭示差异的小输入。检查MAE时，不只用全正有符号误差，因为忘写绝对值可能偶然同样正确；应包含高估和低估。检查循环边界时，要包含恰好等于阈值的输入。检查分母时，要让被筛选数量与原数量不同。这样的核对比大量随机打印更能回答具体疑问。
 
 \subsubsection{接口约定与有限输入检查}
 函数先说明接受什么输入、返回什么结果、怎样处理不合法输入。对于MAE函数，本章采用约定：两个数值序列长度相同且非空；错误输入主动报\code{ValueError}；不修改输入。主动报错的语法为\code{raise ValueError("说明")}，它会结束正常执行并传播错误。第3章讨论调用者怎样捕获与处理。
@@ -1609,7 +1609,7 @@ empty input: None
 \subsubsection{修改任务}
 将\code{"105"}改成\code{"100"}，应新增一个有效值，数量6，和437，均值 $437/6\approx72.833333$，及格比例 $5/6$，最大值100。再将\code{"absent"}改成\code{"59"}，应在原实验基础上得到数量6、和396、均值66.0、及格比例 $4/6$。两项修改应分别从原始输入开始，避免混淆对照条件。
 
-将原始列表改成全空串，确认统计返回\code{None}。此时没有统计字典，不能继续遍历其字段。完整脚本针对当前非空示例打印字段；扩展到全无效输入时，应先判断\code{summary is None}，再决定怎样输出。这说明函数正确处理边界后，调用程序也必须遵守它的接口。
+将原始列表改成全空串，确认统计返回\code{None}。此时没有统计字典，不能继续遍历其字段。完整脚本先判断\code{summary is None}，全无效输入时打印\code{no valid scores}；只有获得统计字典后才遍历字段。这说明函数正确处理边界后，调用程序也必须遵守它的接口。
 
 最后把清理逻辑整理成\code{clean_scores(raw)}函数，返回\code{clean, rejected}，保留原输入不变。习题2.15提供核对方案。不要只返回有效值而丢弃拒绝原因，否则报告难以追踪数据变化。
 
@@ -1636,6 +1636,7 @@ def mean_squared_error(actual, predicted):
 predictions = {"A": [5.0, 9.0, 10.0, 14.0],
                "B": [6.0, 8.0, 10.0, 16.0]}
 for name, predicted in predictions.items():
+    validate_pairs(actual, predicted)
     errors = [p - y for y, p in zip(actual, predicted)]
     absolute = [abs(error) for error in errors]
     worst_index = absolute.index(max(absolute))
@@ -1659,9 +1660,9 @@ worst index: 3
 脚本还核对完全正确预测、单样本预测，并确认空输入和长度不同输入被拒绝。错误路径的捕获使用\code{try/except}，完整语义在第3章展开，此处只用于让脚本能继续报告“非法输入已拒绝”。
 
 \subsubsection{修改任务与比较限制}
-把B最后一项16.0改成14.0，则B误差变成 $(0,0,0,2)$，MAE为0.5，MSE为1，RMSE为1。再给两个模型加入同一条真实值20，A预测21，B预测24，分别手算新指标。注意分母由4变成5，不能只追加分子而忘记改变样本数。
+把B最后一项16.0改成14.0，则B误差变成 $(0,0,0,2)$，MAE为0.5，MSE为1，RMSE为1。随后恢复原始预测，再给两个模型加入同一条真实值20，A预测21，B预测24，分别手算新指标。注意分母由4变成5，不能只追加分子而忘记改变样本数。
 
-删除某个模型最后一项，程序应拒绝不等长输入。为报告所有并列最坏项，可把第6行改为先保存\code{maximum = max(absolute)}，再通过\code{enumerate}筛出所有误差等于最大值的下标。对复杂浮点计算是否采用近似并列，应另外明确容差，本例误差为简单整数无需扩大概念。
+删除某个模型最后一项，程序应拒绝不等长输入。为报告所有并列最坏项，可把\code{worst_index = absolute.index(max(absolute))}改为先保存\code{maximum = max(absolute)}，再通过\code{enumerate}筛出所有误差等于最大值的下标。对复杂浮点计算是否采用近似并列，应另外明确容差，本例误差为简单整数无需扩大概念。
 
 本实验中的固定预测不证明哪个算法普遍更好。指标比较只能在同一数据与评价协议下解释。若随后按本数据不断修改模型，这组数据就参与了选择；真实项目仍需保留未参与选择的评价数据。
 
@@ -1672,7 +1673,7 @@ worst index: 3
 
 本章没有引入数组广播、类继承、异步程序或大型框架。下一章处理文件、模块、异常和引用，随后NumPy把逐项数值运算改写为数组运算。语法越简洁，越需要知道输入形状和运算对象，不能仅凭代码行数判断自己已经理解算法。
 
-自检时应能够预测一个含分支循环程序的输出，指出终端命令与Python语句的区别，对空输入写出明确规则，并将一条数学求和式对应到循环中的累加项与分母。最后能在不改变数据的情况下运行四个配套实验，再逐项解释修改后的结果。
+自检时应能够预测一个含分支循环程序的输出，指出终端命令与Python语句的区别，对空输入写出明确规则，并将一条数学求和式对应到循环中的累加项与分母。最后能在不改变数据的情况下运行前两章合计四个配套实验，再逐项解释修改后的结果。
 
 \subsection{分层习题}
 \begin{enumerate}[label=\textbf{2.\arabic*}]
@@ -1795,7 +1796,7 @@ def mse(actual, predicted):
     check_pairs(actual, predicted)
     return sum((p - y) ** 2 for y, p in zip(actual, predicted)) / len(actual)
 \end{pycode}
-残差为 $(1,-2,0)$，MAE为1，MSE为 $5/3$。分别以\code{([], [])}和\code{([1], [1, 2])}调用应产生\code{ValueError}，而不是返回一个误导性的数。可与实验2.2相同的错误捕获方式核对；输入列表应在调用前后保持相同内容。
+有符号误差为 $(1,-2,0)$，MAE为1，MSE为 $5/3$。分别以\code{([], [])}和\code{([1], [1, 2])}调用应产生\code{ValueError}，而不是返回一个误导性的数。可与实验2.2相同的错误捕获方式核对；输入列表应在调用前后保持相同内容。
 
 \textbf{2.14}\quad
 \begin{pycode}
@@ -1944,7 +1945,7 @@ import metrics
 print(sys.executable)
 print(metrics.__file__)
 \end{pycode}
-第一行输出所用解释器的实际位置，第二行输出当前导入模块的来源。若目录里有自建\code{random.py}、\code{json.py}或\code{numpy.py}，它可能遮蔽同名库。报错中出现“部分初始化模块”或预期属性不存在时，应核对模块来源，再给自建文件取不冲突的名称。
+两个\code{print}依次输出所用解释器的实际位置和当前导入模块的来源。若目录里有自建\code{random.py}、\code{json.py}或\code{numpy.py}，它可能遮蔽同名库。报错中出现“部分初始化模块”或预期属性不存在时，应核对模块来源，再给自建文件取不冲突的名称。
 
 \term{包}（package）用于组织多个模块。例如一个目录中放置\code{__init__.py}，再包含\code{metrics.py}和\code{models.py}，就可以组成普通包。\code{import package_name.metrics}表示访问包内模块。Python还支持其他包形式，本章不展开。\code{pip}安装的\term{分发包}是安装单位，安装名与导入名不保证相同；不能仅凭安装名猜出所有导入语句。
 
@@ -2369,7 +2370,7 @@ from metrics import mae
 assert isclose(mae([5, 5], [7, 3]), 2.0, rel_tol=0, abs_tol=1e-12)
 assert mae([0], [0]) == 0
 \end{pycode}
-\code{isclose}使用浮点容差。第一个测试包含一正一负残差，能揭示遗漏绝对值的错误；只用\code{[1, 2]}与\code{[2, 3]}，错误的有符号平均也会偶然得到1。核对输入应针对要识别的错误，而非只追求测试数量。
+\code{isclose}使用浮点容差。第一个测试包含一正一负有符号误差，能揭示遗漏绝对值的错误；只用\code{[1, 2]}与\code{[2, 3]}，错误的有符号平均也会偶然得到1。核对输入应针对要识别的错误，而非只追求测试数量。
 
 \subsubsection{正常、边界和失败路径}
 对MAE，应包含等长正常输入、全零误差、空输入、长度不等和非有限数。对模型，应包含预测前未拟合、两次独立实例、距离同分和输入后来被修改。对文件，应包含错误表头、缺字段、多字段、重复标识和未知集合。每项检查都对应一个明确承诺。
@@ -2473,7 +2474,7 @@ ch03_project/
 候选为训练均值模型和单近邻模型；按最小验证MAE选择，同分时取声明顺序靠前者。单近邻距离同分时取训练记录中靠前者。选定后不把验证集合并重训，直接评价已选模型；这样能明确追踪每次拟合到底使用哪些标签。其他项目可以另定重训协议，但必须记录并保持一致。
 
 \subsubsection{严格读取与保持记录对齐}
-读取器先验证\code{reader.fieldnames}等于预期表头。每条记录转换前检查字段数、非空唯一标识和合法集合名。对\code{DictReader}，多出的字段可能对应键\code{None}，缺少的字段可能对应值\code{None}；因此完整读取器有如下检查：
+读取器先验证\code{reader.fieldnames}等于预期表头。每条记录转换前检查字段数、非空唯一标识和合法集合名。完整读取器用\code{reader.line_num}记录当前记录结束的物理行号。CSV字段可以含引用的换行，因此记录序号不总等于文件行号。对\code{DictReader}，多出的字段可能对应键\code{None}，缺少的字段可能对应值\code{None}；因此完整读取器有如下检查：
 \begin{pycode}
 if None in row or any(v is None for v in row.values()):
     raise ValueError(f"row {line}: wrong field count")
@@ -2494,7 +2495,7 @@ def columns(records):
 return [min(self.records_, key=lambda row: abs(row[0] - q))[1]
         for q in x]
 \end{pycode}
-这一片段位于完成拟合状态和输入检查后的方法内部。\code{min}在同分时选第一次遇到的记录；\code{[1]}取得费用。与第1章完整排序相比，单个近邻只需扫描找到最小值，无需把所有距离排序。对 $n$ 条训练记录、$m$ 个查询，时间为 $O(mn)$；保存训练记录需要 $O(n)$ 空间，保存输出需要 $O(m)$。这里 $O$ 表示随输入规模增长的量级，不表示实际秒数。
+这一片段展示方法内部的核心选择规则，假定已完成拟合与输入检查，且差值处于可表示范围。完整模块还会检查均值、距离和指标结果是否有限；输入各项有限，并不保证求和或相减后仍有限。若范围检查失败，程序停止并要求检查数据尺度，第4章将进一步讨论数值异常。\code{min}在同分时选第一次遇到的记录；\code{[1]}取得费用。与第1章完整排序相比，单个近邻只需扫描找到最小值，无需把所有距离排序。对 $n$ 条训练记录、$m$ 个查询，时间为 $O(mn)$；保存训练记录需要 $O(n)$ 空间，保存输出需要 $O(m)$。这里 $O$ 表示随输入规模增长的量级，不表示实际秒数。
 
 入口中每个候选都创建新实例：
 \begin{pycode}
@@ -2566,7 +2567,7 @@ JSON记录Python版本、数据文件的SHA-256摘要、集合数量、候选顺
 
 第2章函数的输入输出约定在本章扩展为模块接口和模型方法；列表切片的浅复制与本章的内部共享相连；第1章的训练、验证、测试在入口中表现为不同的数据传递。第4章增加数组以后，除这些要求外，还必须核对轴、形状和共享内存。
 
-自检时应能回答：为什么脚本可导入却读不到数据；为什么\code{b = a}不是模型快照；为什么捕获错误后填0会改变任务；为什么空输入应由显式检查拒绝；为什么一个测试应包含正负残差；为什么相同种子不能代替保存数据版本。回答应举出具体语句或输入，而非只复述术语。
+自检时应能回答：为什么脚本可导入却读不到数据；为什么\code{b = a}不是模型快照；为什么捕获错误后填0会改变任务；为什么空输入应由显式检查拒绝；为什么一个测试应包含正负有符号误差；为什么相同种子不能代替保存数据版本。回答应举出具体语句或输入，而非只复述术语。
 
 \subsection{分层习题}
 以下编号为3.1--3.14。代码题先写预期状态，再运行核对；文件题使用自己建立的临时数据，不修改原始教学数据。
@@ -2666,7 +2667,7 @@ with self.assertRaises(ValueError):
 
 学习后应能解释数组的类型、轴和形状；区分索引、切片、视图与复制；逐轴核对广播和矩阵乘法；用归约与向量化替代逐样本循环；控制随机数并检查浮点结果；从头完成一个无预处理泄漏的数值实验。
 \end{infobox}
-第2章用循环逐条计算预测、残差与平均误差，这种写法直接反映计算过程。数据量增加以后，可以把规则相同的操作交给专门的数值库一次完成。\term{NumPy}（Numerical Python）是Python科学计算中的基础数组库，提供多维数组及其运算。NumPy数组也会遇到逻辑错误：程序能运算，只说明类型与形状在规则上兼容，不说明每一行仍对应正确样本。
+第2章用循环逐条计算预测、有符号误差与平均误差，这种写法直接反映计算过程。数据量增加以后，可以把规则相同的操作交给专门的数值库一次完成。\term{NumPy}（Numerical Python）是Python科学计算中的基础数组库，提供多维数组及其运算。NumPy数组也会遇到逻辑错误：程序能运算，只说明类型与形状在规则上兼容，不说明每一行仍对应正确样本。
 
 本章把数组理解为带有形状与数据类型的数值容器。先逐项说明它与列表的不同，再建立逐元素运算、归约、广播和矩阵乘法的联系。所有维度推导都回到元素下标，避免只凭代码短或输出形状合理就判断正确。
 
@@ -2790,6 +2791,21 @@ print(a)
 
 Python整数可按需要扩大表示，但NumPy固定宽度整数可能溢出。例如两个\code{uint8}数组\code{[250]}和\code{[10]}相加，结果按其范围回绕为\code{[4]}。图像像素常见0--255整数，直接做差或平方可能在计算前就出错。应先把输入转换成浮点，再相减或平方；在错误计算以后才转浮点，不能恢复已经丢失的信息。
 
+配套数值接口先把实数输入转换为独立的\code{float64}数组，再执行差值与平方。以下辅助函数也会拒绝布尔、复数、字符串和一般对象数组；不能无说明地丢弃复数虚部或把文本解释为特征。
+\begin{pycode}
+def as_float_array(values, name):
+    array = np.asarray(values)
+    if array.dtype.kind not in "iuf":
+        raise ValueError(f"{name}: expected real numeric values")
+    with np.errstate(over="raise", invalid="raise"):
+        array = array.astype(np.float64)
+    if not np.isfinite(array).all():
+        raise ValueError(f"{name}: expected finite values")
+    return array
+\end{pycode}
+\code{dtype.kind}中的\code{i}、\code{u}、\code{f}分别表示有符号整数、无符号整数和浮点类型。\code{astype}在这里生成副本，转换不修改调用者数组。\code{np.errstate}的局部异常检查将在数值稳定性一节说明。\code{float64}也不能精确保存任意大的整数；本实验输入是小尺度实数，不用于需要精确保留超大整数标识的任务。
+
+
 \subsubsection{规则数组与对象数组}
 \code{np.array([[1, 2], [3, 4]])}有规则矩形结构；\code{[[1, 2], [3]]}各行长度不等，不能直接作为常规二维数值数组。混入字符串可能使数组转为字符串类型，后续加减不再具有原数值意义。
 
@@ -2868,12 +2884,12 @@ NumPy的许多数值函数属于\term{通用函数}（universal function，ufunc
 \begin{pycode}
 y = np.array([2., 4., 6.])
 predicted = np.array([3., 4., 4.])
-residual = predicted - y
-mae_value = np.mean(np.abs(residual))
-mse_value = np.mean(residual ** 2)
-print(residual, mae_value, mse_value)
+errors = predicted - y
+mae_value = np.mean(np.abs(errors))
+mse_value = np.mean(errors ** 2)
+print(errors, mae_value, mse_value)
 \end{pycode}
-残差为1、0、$-2$，MAE为1，MSE为 $5/3$，与第1章手算一致。若输入含非有限值，平均也可能成为NaN或无穷，因此指标入口仍需验证，不能只把循环替换为一行表达式。
+有符号误差为1、0、$-2$，MAE为1，MSE为 $5/3$，与第1章手算一致。若输入含非有限值，平均也可能成为NaN或无穷，因此指标入口仍需验证，不能只把循环替换为一行表达式。
 
 \subsubsection{sum、mean与axis的含义}
 \term{归约}（reduction）沿一个或多个轴汇总数值，从而消去相应轴。对 $X\in\mathbb R^{n\times d}$，沿轴0求和得到每个特征在所有样本上的总和：
@@ -2975,7 +2991,7 @@ print(np.mean((p - y) ** 2))
 \[
  p-y=\begin{pmatrix}0&-1&-2\\1&0&-1\\2&1&0\end{pmatrix}.
 \]
-九个平方的和为12，平均得到 $12/9=4/3$。想要的残差只对应主对角线上的三个0；其余六项比较了不同样本。
+九个平方的和为12，平均得到 $12/9=4/3$。想要的有符号误差只对应主对角线上的三个0；其余六项比较了不同样本。
 
 若接口规定一维标签和预测，应先检查\code{p.shape == y.shape}，本例有意转换为\code{p[:, 0]}后再计算。若接口采用二维列数组，则应将\code{y}转换成\code{y[:, None]}。无条件\code{reshape(-1)}可能把多输出预测也压成一条长向量，掩盖原结构，因此形状调整必须有语义依据。
 
@@ -3132,7 +3148,7 @@ print(p.sum(axis=1))
  \|\symbf x-\symbf q\|^2
  =\|\symbf x\|^2+\|\symbf q\|^2-2\symbf x^{\mathsf T}\symbf q
 \]
-计算距离，但右侧可能在大数之间发生抵消，得到微小负数，甚至丢失应有的小距离。将负值截到0能修正部分舍入表现，却不能恢复已经损失的精度。对规模小且近邻差异细的教学数据，本章完整实验优先直接计算差后平方。
+计算距离，但右侧可能在大数之间发生抵消，得到微小负数，甚至丢失应有的小距离。将负值截到0能修正部分舍入表现，却不能恢复已经损失的精度。对规模小且近邻差异细的教学数据，本章完整实验优先直接计算差后平方。这种形式减少抵消风险，却仍会在差值或平方过大时溢出，必须另外检查。
 
 求和顺序也影响浮点结果。数学加法满足结合律，浮点近似加法不保证严格满足。循环、向量化和底层矩阵库可能采用不同顺序，所以应比较合理误差，而不要求所有位完全相同。若差异远大于容差，应先检查类型、形状和公式，再讨论舍入。
 
@@ -3149,7 +3165,7 @@ np.testing.assert_allclose(
     loop_result, vector_result, rtol=1e-12, atol=1e-12
 )
 \end{pycode}
-\code{np.testing.assert_allclose}失败时会给出差异信息，便于实验核对。上述容差适用于本章小尺度\code{float64}计算，并非所有模型通用精度标准。\code{float32}、长求和或病态问题可能需要不同容差，容差也不能大到掩盖公式错误。含NaN的数据首先应按任务规则拒绝，不把“两个地方都NaN”当成正确一致。
+\code{np.testing.assert_allclose}失败时会给出差异信息，便于实验核对。上述容差适用于本章小尺度\code{float64}计算，并非所有模型通用精度标准。\code{float32}、长求和或病态问题可能需要不同容差，容差也不能大到掩盖公式错误。含NaN的数据首先应按任务规则拒绝，不把“两个地方都NaN”当成正确一致。\code{np.testing.assert_allclose}默认允许相同位置的NaN通过核对；需要明确拒绝时，可先检查\code{np.isfinite}或设置\code{equal_nan=False}。
 
 \subsection{从逐样本循环到向量化}
 \subsubsection{保留一个可手算的循环实现}
@@ -3337,23 +3353,24 @@ Z_test = (X_test - mean) / scale
 
 $k=1$预测4，对真实4.4的绝对误差0.4；$k=3$平均前三条标签 $(4+8+6)/3=6$，误差1.6。这里第二特征的尺度被缩到与第一特征较接近；若直接用原数值距离，第二特征差异会获得不同权重。
 
-训练常数列不产生当前样本间的距离差。但若预测时该列不再恒为1，程序按既定替代尺度计算仍可能得到非零差异；这反映训练统计量无法保证后续数据分布不变，应检查变化来源。第10章再讨论常数特征删除及完整预处理流程。
+训练常数列在当前各集合中均为1，因此距离贡献为0。若某个查询在该列变为 $q_j\ne1$，它到每条训练记录都会增加相同的 $(q_j-1)^2$：距离数值改变，但对这个查询的近邻排序不变。该变化仍应检查来源，不能从训练列恒定推断未来也必然恒定。第10章再讨论常数特征删除及完整预处理流程。
 
 \subsubsection{循环与向量化实现的对应}
 完整入口保留\code{predict_loop}和\code{predict_vectorized}。前者三层循环计算查询、训练样本和特征；后者用前节广播形成距离矩阵，再稳定排序取得 $k$个标签平均。两者采用同一缩放结果和同分规则，避免把算法条件差异误认为数值实现差异。
 
-向量化接口在计算前检查训练与查询均为非空有限二维数组，特征数相同，训练标签恰为\code{(n,)}且有限，$k$为1至 $n$的整数。布尔值虽然在Python中与整数有关系，本接口不将\code{True}当作合法 $k$。这些检查不能因底层矩阵运算可能报错就省略，因为有些错误会广播成功。
+向量化接口在计算前检查训练与查询均为非空有限二维数组，特征数相同，训练标签恰为\code{(n,)}且有限，$k$为1至 $n$的整数。布尔值虽然在Python中与整数有关系，本接口不将\code{True}当作合法 $k$。两个实现共用输入验证，先调用前面的\code{as_float_array}，避免整数差值回绕。缩放、距离、标签平均和指标计算均在局部\code{np.errstate}检查下执行；有限输入若使中间量溢出，会抛\code{FloatingPointError}，不会继续把全无穷距离按同分规则选为某个正常预测。遇到这类输入应检查尺度与算法，不能用全局关闭警告代替修复。这些检查不能因底层矩阵运算可能报错就省略，因为有些错误会广播成功。
 
 评价函数同样检查预测与标签均为等形一维非空有限数组：
 \begin{pycode}
 def checked_mae(y, p):
+    y = as_float_array(y, "y")
+    p = as_float_array(p, "p")
     if y.ndim != 1 or y.size == 0 or p.shape != y.shape:
         raise ValueError("expected paired nonempty 1D arrays")
-    if not np.isfinite(y).all() or not np.isfinite(p).all():
-        raise ValueError("nonfinite metric input")
-    return float(np.mean(np.abs(p - y)))
+    with np.errstate(over="raise", invalid="raise", divide="raise"):
+        return float(np.mean(np.abs(p - y)))
 \end{pycode}
-返回\code{float}把NumPy数值转换为普通Python浮点，便于JSON保存。转换不会提高精度；它只明确接口返回类型。
+输入先转浮点，才能避免无符号整数减法回绕；例如\code{uint8}真实值255、预测0的绝对误差应为255，直接在原类型中相减却可能得到1。末尾的\code{float}只把NumPy数值转换为普通Python浮点，便于JSON保存，不会提高精度。
 
 \subsubsection{运行与预期结果}
 在配套实验目录运行：
@@ -3478,7 +3495,8 @@ NumPy程序常见问题可以按信息缺失的位置定位。类型错误要先
 \textbf{4.15}\quad 复用完整的\code{predict_vectorized}，按查询切片处理。核心答案为：
 \begin{pycode}
 def predict_blocked(train, target, query, k, block_size=2):
-    if not isinstance(block_size, int) or block_size < 1:
+    if (not isinstance(block_size, int) or isinstance(block_size, bool)
+            or block_size < 1):
         raise ValueError("block_size must be positive")
     if len(query) == 0:
         raise ValueError("empty query")
@@ -3488,7 +3506,7 @@ def predict_blocked(train, target, query, k, block_size=2):
         blocks.append(predict_vectorized(train, target, part, k))
     return np.concatenate(blocks)
 \end{pycode}
-本答案接口假定\code{query}已经是数组；组内函数继续验证二维、有限、特征数与标签。若需要严格排除布尔批大小，可像 $k$检查一样另加\code{isinstance(block_size, bool)}。答案脚本用训练点 $(0,1),(2,1),(4,1)$、标签0、4、8与查询 $(1,1),(3,1),(5,1)$，同分取靠前，预测0、4、8；三个批大小应完全一致。分块降低峰值中间内存，不降低全部距离计算的 $O(mnd)$量级。
+本答案接口假定\code{query}已经是数组；组内函数继续验证二维、有限、特征数与标签。批大小与 $k$一样拒绝布尔值，不把\code{True}当成1。答案脚本用训练点 $(0,1),(2,1),(4,1)$、标签0、4、8与查询 $(1,1),(3,1),(5,1)$，同分取靠前，预测0、4、8；三个批大小应完全一致。分块降低峰值中间内存，不降低全部距离计算的 $O(mnd)$量级。
 
 \textbf{4.16}\quad 正确结果先满足形状一致、无非有限数以及指定容差，再比较耗时。环境中的数值库、线程数、硬件、后台负载与计时噪声都可能改变速度。公平比较应使用相同数值输入与类型、同一预测规则和同分约定、相同计时范围；先预运行、重复测量，并排除读取和打印。若改了预处理或 $k$，就已在比较不同算法条件，需重新解释评价协议。
 
@@ -3496,11 +3514,1162 @@ def predict_blocked(train, target, query, k, block_size=2):
 NumPy把数值内容、类型和形状放在同一数组结构中。逐元素运算描述位置上的变换，归约消去指定轴，广播在兼容轴间复用输入，矩阵乘法执行内侧下标上的乘积求和。理解每个轴的意义，是判断这些规则是否实现正确计算的前提。
 
 向量化提高执行效率的同时，也可能建立很大的中间结果。可靠的数值程序还要管理共享内存、随机状态和浮点误差；完整实验则继续遵守训练统计量只从训练数据估计、验证负责选择、测试负责最终评价的流程。
+\chapterpage{pandas、数据探索与可视化}\label{ch:pandas}
+\begin{infobox}{先修知识、学习目标与本章位置}
+本章使用第2章的容器、函数与条件，第3章的文件路径、CSV与异常，以及第4章的数组、布尔筛选和轴。统计部分从均值与排序开始，补充方差、分位数和相关系数的含义，不要求已经学完概率统计。
+
+学习后应能读取带字段名的表格，区分位置与标签，检查类型、缺失和重复；完成筛选、分组和受约束合并；用统计量与图形回答具体问题；形成说明数据范围、处理规则、证据与局限的数据探索报告。第10章会把这里的处理规则纳入训练流程，第41章再用于完整项目。
+\end{infobox}
+同一列里出现数字、空白和文字，两个文件中的记录顺序不一致，某个区域的平均费用明显较高，这些现象都发生在训练模型以前。若直接把表格转成数组，程序可能成功执行，却已经把缺失理解成零、把两条不同记录拼在一起，或者把重复记录计数两次。数据处理首先要明确每行代表什么、每列怎样测得，以及哪些记录可以互相配对。
+
+\term{pandas}是处理带标签表格的Python库。它适合读取、整理、汇总与检查结构化数据；第4章的NumPy更侧重规则形状上的数值运算。\term{探索性数据分析}（exploratory data analysis，EDA）指通过数据质量检查、描述统计和可视化认识数据，提出或修正问题。EDA可以发现值得进一步检验的关系，但图形中的规律不自动成为因果解释或可靠预测结果。
+
+本章使用人为构造的包裹记录。连续目标是费用，二元字段是是否延迟。数据故意包含空白、非法文本、一条完全重复记录与一条大重量记录。其规模足以手算，却不能代表真实配送业务。
+
+\subsection{从CSV到带标签的表格}
+\subsubsection{安装、入口与数据字典}
+按第2章建立虚拟环境后，在终端安装本章依赖：
+\begin{console}
+python3 -m pip install pandas matplotlib numpy
+python3 -c "import pandas as pd; print(pd.__version__)"
+\end{console}
+pandas负责表格，\term{Matplotlib}负责绘图；惯用导入别名分别为\code{pd}与\code{plt}。别名不属于Python关键字。配套依赖文件记录本批实际运行版本，安装命令本身不保证以后安装的是相同版本。
+
+第3章已经说明\term{CSV}（comma-separated values，逗号分隔值）是一种文本表格格式。文件保存字段文本，不保存可靠的“这一列一定是整数”约束。首行一般是字段名，之后每行是记录；含逗号或换行的字段需要正确引用，不能用简单字符串切分替代CSV读取器。
+
+\term{数据字典}说明字段的业务含义、单位、允许值和使用时点。先写字典，再判断类型与处理规则。
+\begin{center}
+\begin{tabularx}{\linewidth}{l Y Y}
+\toprule
+字段 & 含义与单位 & 约束及用途\\\midrule
+\code{id} & 包裹标识，文本 & 非空、唯一；不是数值特征\\
+\code{split} & 预先固定的划分 & train、val、test\\
+\code{area} & 区域代码，文本 & A或B，合并区域说明\\
+\code{weight_kg} & 重量，kg & 有限非负；允许缺失待处理\\
+\code{distance_km} & 距离，km & 有限非负\\
+\code{late} & 是否延迟，0或1 & 分类任务的示例标签\\
+\code{fee_yuan} & 最终费用，元 & 连续目标；有限非负\\\bottomrule
+\end{tabularx}
+\end{center}
+本章不把\code{late}用于预测费用的输入：是否延迟往往要在配送后才知道。一个字段是否可用，取决于实际预测时点，不取决于它在CSV中是否已经存在。第10章会进一步讨论这种时间上的数据泄漏。
+
+实验文件位于\code{配套实验/ch05_data/}。\code{parcels.csv}共13条原始记录，其中\code{t03}被完全重复一次；去重后训练8条、验证2条、测试2条。\code{areas.csv}为区域代码与区域名称的一一对应表。
+\begin{pycode}
+from pathlib import Path
+import numpy as np
+import pandas as pd
+
+root = Path(__file__).resolve().parent
+raw = pd.read_csv(root / "ch05_data" / "parcels.csv",
+                  dtype="string", keep_default_na=False)
+print(raw.shape)
+print(raw.head(3))
+print(raw.dtypes)
+\end{pycode}
+本框在配套脚本中执行；交互环境没有\code{__file__}时，应显式设置实际的数据目录。\code{head(3)}只查看前三行，不证明其余行也合法。\code{dtype="string"}让各字段先保留文本含义，\code{keep_default_na=False}关闭默认缺失文本识别，空字段暂为\code{""}，随后按数据字典转换。否则文本“NA”可能被默认识别成缺失，而它也可能恰是一个合法区域代码。
+
+\subsubsection{Series、DataFrame与索引}
+\term{Series}是一维带标签的数据序列；\term{DataFrame}是二维带行索引和列名的表格，各列可以有不同类型。\term{索引}（index）是用于标识轴位置的标签集合。默认行索引常为0、1、2，但这不意味着索引永远等于当前位置，也不意味着索引自动具有唯一业务含义。
+\begin{pycode}
+df = pd.DataFrame({"id": ["p1", "p2", "p3"],
+                   "weight": [1.0, 2.0, 4.0],
+                   "area": ["A", "B", "A"]},
+                  index=[10, 20, 30])
+print(df["weight"].shape)
+print(df[["weight"]].shape)
+print(df.columns.tolist())
+\end{pycode}
+单个列名得到\code{Series}，形状\code{(3,)}；列名列表得到\code{DataFrame}，形状\code{(3, 1)}。与第4章的一维数组、列数组区别相似，但表格还携带标签。读取\code{shape}只得到轴长，不能代替读取字段名称与顺序。
+
+标识“0012”不能仅因含数字而转换成整数12，否则会丢失前导零。区域代码1、2、3也不必是可计算距离的数值：代码之差不表示区域之间的物理距离。\term{数值变量}、\term{类别变量}与\term{标识字段}由含义区分，不能完全由文件中的字符或自动推断类型决定。
+
+\subsection{按标签、位置与条件选择记录}
+\subsubsection{loc与iloc回答不同问题}
+\code{loc}按标签选行列，\code{iloc}按从零开始的位置选行列。
+\begin{pycode}
+print(df.loc[20, "weight"])
+print(df.iloc[1, 1])
+print(df.loc[10:20, ["id", "weight"]])
+print(df.iloc[0:2, [0, 1]])
+\end{pycode}
+前两项都为2.0，但依据不同。当前有序唯一整数索引下，\code{loc[10:20]}包含结束标签20；\code{iloc[0:2]}遵守Python半开位置区间，不含位置2。不要把标签切片的此例推广成任意无序或重复索引都能无歧义切片。
+
+条件筛选先为每行生成一个布尔值，再取满足条件的记录。多个逐元素条件用\code{&}、\code{|}与\code{~}组合，并给每个比较加括号：
+\begin{pycode}
+mask = (df["weight"] >= 2) & (df["area"] == "A")
+selected = df.loc[mask, ["id", "weight"]].copy()
+print(selected)
+df.loc[df["id"] == "p2", "weight"] = 2.5
+\end{pycode}
+筛选得到\code{p3}与重量4。最后一行在原表上明确赋值。\code{and}要判断整个对象的真假，不能替代Series逐行逻辑。连续写\code{df[mask]["weight"] = 0}会使赋值对象与原表的关系不清楚；本书统一用一次\code{loc}定位原表赋值。独立处理子表时用\code{copy()}表达意图，避免依赖不同pandas版本的复制细节。
+
+\subsubsection{标签对齐：有用的规则也可能掩盖错配}
+pandas中的许多运算先按索引标签对齐，再逐位置计算；NumPy主要按形状和位置计算。下面的两条Series顺序不同：
+\begin{pycode}
+a = pd.Series([10, 20], index=["a", "b"])
+b = pd.Series([1, 2], index=["b", "a"])
+print(a + b)
+print(a.to_numpy() + b.to_numpy())
+\end{pycode}
+Series相加得到标签a为12、b为21；去掉标签后的位置相加为11、22。对齐并不是重新按数值排序，而是找相同标签。“a”处取10与2，“b”处取20与1。若标签只出现在一边，许多对齐运算会产生缺失值，不会自动认为缺失的一项是0。
+
+\begin{infobox}{例题5.1：排序后直接拼接标签}
+特征表按重量排序后，标识顺序为\code{p2,p1,p3}；标签表仍为\code{p1,p2,p3}，目标为8、6、12。直接把目标数组按位置赋给特征表，会得到什么对应？如何正确配对？
+\end{infobox}
+\sol 错误对应为\code{p2:8,p1:6,p3:12}，前两条目标交换。正确对应应为\code{p2:6,p1:8,p3:12}。若双方仍保留可信的同一唯一索引，可以按标签对齐；若索引已经重置，应按显式\code{id}合并，并检查唯一性与未匹配记录。给两个表分别\code{reset_index(drop=True)}只能制造相同的位置编号，不能恢复原样本关系。
+
+最终向NumPy转换时，要显式固定字段顺序并检查有限值：
+\begin{pycode}
+feature_names = ["weight", "distance"]
+example = pd.DataFrame({"distance": [10., 20.],
+                        "weight": [1., 2.]})
+X = example[feature_names].to_numpy(dtype=np.float64)
+if X.ndim != 2 or not np.isfinite(X).all():
+    raise ValueError("invalid feature matrix")
+print(X)
+\end{pycode}
+结果为两行\code{[1,10]}、\code{[2,20]}。选择列表规定了特征顺序，而不是沿用原表偶然的列顺序。训练和预测使用相同名称、单位与顺序，才对应第4章的同一个数值输入空间。
+
+\subsection{类型转换与缺失值：保留失败原因}
+\subsubsection{缺失、非法、零与无穷不同}
+\term{缺失值}表示本应存在的信息未获得或未记录；数值零表示确实测得零；非法文本表示字段不符合约定；正负无穷表示超出有限数范围或某些计算的极限结果。它们不能混为一种“空数据”。
+
+pandas可能用\code{np.nan}、\code{pd.NA}或日期缺失值表示不同类型的缺失。判断应使用\code{isna()}和\code{notna()}，不要用\code{x == np.nan}。采用可空整数类型\code{"Int64"}可以在整数列中保留缺失，和NumPy普通\code{int64}不同；本章重量、距离与费用最终采用浮点类型。
+\begin{pycode}
+text = pd.Series(["1", "", "bad", "0"], dtype="string")
+original_missing = text.eq("")
+number = pd.to_numeric(text.mask(original_missing),
+                       errors="coerce")
+invalid = number.isna() & ~original_missing
+print(original_missing.tolist())
+print(invalid.tolist())
+\end{pycode}
+原缺失位置为第二项，转换失败位置为第三项。\code{mask}把条件成立的位置替换为缺失；\code{errors="coerce"}把不能转换的内容转成缺失。若只在转换后统计\code{isna()}，两种原因都会显示为缺失，无法判断是采集遗漏还是文件中写入了“bad”。完整脚本还用\code{np.isfinite}拒绝非有限文本数值，并在审计表中保存标识、字段、原文本与原因。
+
+\term{审计记录}在这里指足以追踪数据变化的处理记录，不是复杂的管理系统。原文件保持不改，派生表记录转换结果，另一张表列出异常原因。这样在发现错误处理时，可以回到原文本重做，而不是继续在已丢失信息的表上猜测。
+
+\subsubsection{统计函数通常跳过缺失}
+\begin{pycode}
+s = pd.Series([1.0, np.nan, 3.0])
+print(s.mean(), s.count(), s.size)
+print(s.isna().mean())
+print(s.sum(min_count=1))
+\end{pycode}
+均值2.0来自两个有效值，\code{count()}为2，\code{size}为3，缺失比例为 $1/3$。均值的分母不能默认为原始行数。全缺失序列的默认求和可能得到0，\code{sum(min_count=1)}要求至少一个有效值，否则返回缺失；全缺失均值也不能作为有效训练参数。
+
+删除所有带缺失的行会改变样本范围。若重量缺失主要发生在某类包裹，删除后剩余数据可能更少包含这一类。\code{dropna(subset=[...])}可以只要求当前分析所需字段有效；相关分析只删除两个参与字段不完整的行，不必因无关字段缺失而删除整行。
+
+\begin{infobox}{例题5.2：均值填补并没有补回观测}
+一列观测为1、缺失、3。用有效值均值2填补，比较填补前后的均值、样本方差和有效观测数量。
+\end{infobox}
+\sol 两个有效观测的均值为2，样本方差为 $[(1-2)^2+(3-2)^2]/(2-1)=2$。填补后数值列为1、2、3，均值仍为2，若机械地按三条计算样本方差则为1。填入的2由原数据计算而来，并非新增独立测量；有效原始观测仍只有2条。均值未变不说明分布、相关性或不确定性未变。
+
+本章只演示一种透明规则：从训练集有效重量计算中位数，填补各集合，同时保留缺失指示列。是否适合实际问题要通过训练与验证流程判断。不能为使图形好看而提前把所有缺失改成零，也不能用全部集合的中位数再声称测试集完全隔离。
+\begin{pycode}
+train = clean.loc[clean["split"] == "train"].copy()
+median = train["weight_kg"].median()
+if pd.isna(median):
+    raise ValueError("no valid training weight")
+prepared = clean.copy()
+prepared["weight_missing"] = prepared["weight_kg"].isna().astype(int)
+prepared["weight_kg"] = prepared["weight_kg"].fillna(median)
+\end{pycode}
+本框的\code{clean}来自实验5.1的\code{load_tables()}。缺失指示为1表示该数原来缺失或转换后无效；原因仍由审计表分别保存。第10章会讨论如何让这种“拟合参数，再复用参数”的过程嵌入模型评价。
+
+\subsection{重复记录与关键约束}
+\subsubsection{完全重复和标识冲突}
+\code{duplicated()}检查参与比较的列值是否与已有记录重复；\code{drop_duplicates()}默认保留第一条。完全重复行可能来自重复导出，也可能恰好是合法的两次独立观测，去重前必须结合标识与采集含义。
+
+本章数据字典规定一条\code{id}只对应一个包裹；完全相同的\code{t03}是重复导出，删除一条合理。若同一\code{id}出现费用10与11，则是标识冲突。仅按\code{id}去重并留第一条会任意决定“真值”，应报告冲突并中止，等待核对来源。
+\begin{pycode}
+duplicate_count = int(raw.duplicated().sum())
+clean = raw.drop_duplicates().copy()
+if clean["id"].eq("").any() or clean["id"].duplicated().any():
+    raise ValueError("empty or conflicting id")
+if not clean["split"].isin(["train", "val", "test"]).all():
+    raise ValueError("unknown split")
+\end{pycode}
+检查放在数值转换前，便于辨认原文本冲突。本章先对字段去首尾空白；这是一项明确的规范化规则，并非任意文本都能随意删除空格。重复记录若分别进入训练与测试，会使评价样本不再独立于训练过程；不能等到训练后才检查这一问题。
+
+\subsubsection{从局部合法到整体一致}
+字段合法还不足以保证表格可信。应检查行数变化、必需字段、标识唯一性、允许类别、取值范围和样本配对；跨表还要检查关系是否满足一对一或多对一。每一步记录输入行数、输出行数和变化原因，才有机会发现无意丢行或扩行。
+
+对于大型文件，全量读取可能超过内存。\code{read_csv(chunksize=...)}可以逐块读入；但“各块内无重复”不能推出全文件无重复，跨块标识需要另外维护。分组均值也不能直接平均各块均值，应同时累计总和与有效数量。本章使用小数据，目标是先把完整规则说明清楚。
+
+\subsection{分组、聚合与合并}
+\subsubsection{分组是先拆开，再汇总}
+\term{分组}（grouping）按一个或多个字段把记录分成若干组，\term{聚合}（aggregation）把每组的多条记录归纳为一个或几个统计量。区域平均费用、每类标签数量、每日记录数都属于这类问题。
+\begin{pycode}
+train = clean.loc[clean["split"] == "train"].copy()
+grouped = train.groupby("area", dropna=False, sort=True).agg(
+    rows=("id", "size"), weights=("weight_kg", "count"),
+    mean_fee=("fee_yuan", "mean"), late_rate=("late", "mean"))
+print(grouped)
+\end{pycode}
+\code{agg}采用命名聚合：输出列名后给出“输入列、汇总规则”。\code{size}数记录，\code{count}数该字段的非缺失值。\code{dropna=False}保留分组键缺失的组，避免无意忽略；完整实验仍通过数据字典约束区域。\code{sort=True}明确规定输出组顺序，不依赖默认显示顺序。
+
+二元标签均值等于正类比例：若组内 $m$条有效0/1标签中有 $k$条为1，则均值为 $k/m$。标签若包含2或非法值，这一解释立即失效。写出组内记录数与有效值数，有助于判断均值来自多少证据。
+
+\begin{infobox}{例题5.3：组均值怎样合成总体均值}
+区域A有4条费用，均值11.5；区域B也有4条，均值20.5。求整体均值。若A只剩1条且均值仍为11.5，B仍有4条，整体均值又是多少？
+\end{infobox}
+\sol 第一种为 $(4\times11.5+4\times20.5)/8=16$。第二种为 $(1\times11.5+4\times20.5)/5=18.7$，不是两组均值的简单平均16。一般有
+\[
+ \bar x=\frac{\sum_g n_g\bar x_g}{\sum_g n_g},
+\]
+其中 $n_g$必须是该统计量实际使用的有效值数。若汇总的是重量，而某组有缺失，不能把总行数误作有效重量数。
+
+\subsubsection{按键合并，核对关系与未匹配项}
+\term{键}（key）是连接两张表时用于确定对应关系的字段。包裹表有多条A区域记录，区域表中A只应出现一次，关系为\term{多对一}（many-to-one）。左连接保留左表记录，并查找右表对应说明。
+\begin{pycode}
+joined = clean.merge(lookup, on="area", how="left",
+                     validate="many_to_one", indicator=True)
+if not joined["_merge"].eq("both").all():
+    raise ValueError("unmatched area")
+joined = joined.drop(columns="_merge")
+\end{pycode}
+\code{validate}检查右表键唯一性；\code{indicator}增加\code{_merge}列，指出记录只在左侧、只在右侧或两侧均有。内连接\code{how="inner"}只保留两边都匹配的键，可能悄悄丢失未知区域；因此本章先左连接，再显式拒绝未匹配项。
+
+\begin{infobox}{例题5.4：重复键为什么使行数增加}
+左表有两条键A的包裹，右表有两条键A的区域说明。对键A进行普通合并，会产生多少行？这会怎样影响统计？
+\end{infobox}
+\sol 左侧每条A都与右侧两条A配对，共 $2\times2=4$行。这是多对多连接的组合结果，不能理解为新增了两条独立包裹。若A被重复而B没有，A在整体均值中的权重会无意增加。\code{validate="many_to_one"}会拒绝右侧重复键，避免把异常扩行继续送入训练。
+
+合并前还应拒绝缺失键；pandas的合并可能让两侧缺失键互相匹配，不能照搬其他数据库对空值的直觉。若时间变化的区域表每区有多个生效日期，就需要“区域加日期”等复合规则，不能简单去掉重复键来强行满足多对一。
+
+上下追加同结构记录可以使用拼接函数：
+\begin{pycode}
+combined = pd.concat([part1, part2], ignore_index=True)
+\end{pycode}
+其中两个输入是已读取的同结构表。它与按键补充字段的\code{merge}不同，拼接时仍需检查字段集合、类型、单位与跨文件重复标识。
+
+\subsection{描述统计：中心、离散与分位数}
+\subsubsection{描述的对象与分母}
+\term{描述统计}归纳已观测数据的数量、中心位置、离散程度与分布形态。它首先回答“这批数据是什么样”，不直接回答更大总体是否也如此。\code{describe()}可以提供计数、均值、标准差、分位数和极值，但其输出仍需结合单位、有效数量与缺失规则解释。
+
+对 $m$个有效实数 $x_1,\ldots,x_m$，均值为
+\[
+ \bar x=\frac1m\sum_{i=1}^m x_i.
+\]
+均值与原变量单位相同，所有数值都参与计算，因此极端值会影响它。\term{中位数}（median）为排序后居中的值；有效数量为偶数时，本章取中间两值的平均。中位数更关注次序，不能反映尾部大数到底有多大。
+
+描述离散程度可用\term{方差}与\term{标准差}。本章明确区分两种分母：
+\begin{align*}
+ v_0&=\frac1m\sum_i(x_i-\bar x)^2,\\
+ s^2&=\frac1{m-1}\sum_i(x_i-\bar x)^2,\qquad m\ge2.
+\end{align*}
+$v_0$描述这批数的平均平方离差；$s^2$是常见的样本方差，作为总体方差估计的条件在第8章讨论。方差单位是原单位的平方，标准差为方差平方根，回到原单位。pandas的\code{std()}通常默认\code{ddof=1}，NumPy的\code{std()}默认\code{ddof=0}；同一列得到不同结果时，应先核对分母，不立即归因于浮点误差。
+
+\subsubsection{分位数需要约定插值方法}
+\term{分位数}（quantile）描述排序数据中某个比例位置上的值。不同有限样本定义可能给出不同结果，本章采用pandas的线性插值约定。对升序 $x_{(1)},\ldots,x_{(m)}$与比例 $p\in[0,1]$，先用零起点位置
+\[
+ h=(m-1)p,\qquad j=\lfloor h\rfloor,\qquad \alpha=h-j.
+\]
+若 $j<m-1$，取 $q_p=(1-\alpha)x_{(j+1)}+\alpha x_{(j+2)}$；若 $j=m-1$，取最后一项。第一四分位数 $Q_1=q_{0.25}$、中位数 $Q_2=q_{0.5}$、第三四分位数 $Q_3=q_{0.75}$。
+
+\begin{infobox}{例题5.5：大重量记录怎样影响统计}
+训练集中有效重量按升序为1、2、3、5、6、20 kg。按上述约定计算均值、中位数、样本方差、四分位数和四分位距，并给出基于四分位距的异常标记。
+\end{infobox}
+\sol 总和37，均值 $37/6\approx6.166667$ kg；中位数 $(3+5)/2=4$ kg。平方和475，因此平方离差和为
+\[
+ \sum_i(x_i-\bar x)^2=475-6(37/6)^2=\frac{1481}{6}.
+\]
+样本方差为 $1481/30\approx49.366667\ \mathrm{kg}^2$，分母6的方差为 $1481/36\approx41.138889\ \mathrm{kg}^2$。
+
+四分位位置分别为1.25和3.75，故 $Q_1=2+0.25(3-2)=2.25$ kg，$Q_3=5+0.75(6-5)=5.75$ kg。\term{四分位距}（interquartile range，IQR）为 $Q_3-Q_1=3.5$ kg。常见探索规则将
+\[
+ [Q_1-1.5\operatorname{IQR},\;Q_3+1.5\operatorname{IQR}]=[-3,11]\ \mathrm{kg}
+\]
+作为围栏，20 kg超出上围栏，被标记为待检查记录。下围栏为负数不允许真实重量为负，它只是统计规则计算出的界限；物理合法性仍按数据字典检查。
+
+\term{异常值}（outlier）指相对某种参考分布或规则显得特殊的记录，不一定是错误值。20 kg可能是合法重包裹，不能仅凭围栏就删除；若真实任务要处理重包裹，删掉它反而会掩盖模型最需要面对的情况。本章保留\code{t08}，在报告中单独说明。
+
+\begin{pycode}
+weight = train["weight_kg"].dropna()
+q1, median, q3 = weight.quantile([.25, .5, .75]).tolist()
+iqr = q3 - q1
+flag = (train["weight_kg"] < q1 - 1.5 * iqr) | (
+        train["weight_kg"] > q3 + 1.5 * iqr)
+print(train.loc[flag, ["id", "weight_kg"]])
+print(weight.mean(), weight.std(ddof=1))
+\end{pycode}
+缺失值不参与围栏估计，也不会因“没有被标记”就成为正常观测。报告中要同时列有效数量、缺失数量和被标记数量。IQR为0时围栏可能退化，离散或极小样本不能机械套用连续大样本的解释。
+
+\subsection{相关性、标签分布与比较边界}
+\subsubsection{相关系数测量线性共同变化}
+对同一批 $m$个完整配对 $(x_i,y_i)$，\term{Pearson相关系数}定义为
+\[
+ r=\frac{\sum_i(x_i-\bar x)(y_i-\bar y)}
+ {\sqrt{\sum_i(x_i-\bar x)^2}\sqrt{\sum_i(y_i-\bar y)^2}}.
+\]
+本式要求两列均不是常数，并按相同样本配对。分子为同向偏离的乘积总和，分母把两列离差尺度消去，使 $r$无量纲。两列在均值同侧时乘积为正，反侧时为负。第6章会把它解释为两个中心化向量夹角的余弦，从而说明 $-1\le r\le1$。
+
+训练集中重量有效的6条记录费用为6、8、10、14、16、44，满足 $y=2x+4$。故 $y_i-\bar y=2(x_i-\bar x)$，代入分子分母得到 $r=1$。这个结果反映教学构造中的精确线性关系，不反映真实业务必然达到的预测精度。
+\begin{pycode}
+pairs = train[["weight_kg", "fee_yuan"]].dropna()
+r = pairs["weight_kg"].corr(pairs["fee_yuan"])
+print(len(pairs), r)
+print(train["late"].value_counts(dropna=False))
+print(train["late"].value_counts(normalize=True, dropna=False))
+\end{pycode}
+输出有效配对数6与接近1的相关系数。二元标签0、1各4条，比例各0.5。\code{normalize=True}把频数除以相应总数；若允许缺失标签，应明确分母是否包含缺失，不能把“已标注样本中的比例”称为全部样本比例。
+
+\begin{infobox}{例题5.6：零相关不等于没有关系}
+令 $x=(-2,-1,0,1,2)$，$y=(4,1,0,1,4)$。计算相关系数的分子，并说明散点图能补充什么信息。
+\end{infobox}
+\sol $\bar x=0$、$\bar y=2$，乘积和为 $(-2)2+(-1)(-1)+0(-2)+1(-1)+2\cdot2=0$。两列方差非零，因此 $r=0$；但每个点严格满足 $y=x^2$。散点图能显示U形关系，线性相关系数无法概括这一非线性结构。
+
+相关还可能来自共同原因、选择过程、分组构成或少数极端值。区域A/B的平均费用不同，但两组重量构成也不同；只有8条构造数据，不能把区域差解释为区域造成的费用差。可以提出进一步核对重量、距离和业务规则的需求，不能从这张表直接给出因果结论。
+
+分类任务需要检查各类数量与比例。若1000条标签中990条为0，始终预测0也有99\%准确率；“高准确率”可能只来自类别构成。标签缺失、标注规则变化与重复样本都可能使分布失真。第14章会进一步讨论适合不平衡任务的评价指标。
+
+\subsection{Matplotlib：图形对象与四种基本图}
+\subsubsection{Figure和Axes各负责什么}
+\code{Figure}是整张画布，\code{Axes}是画布中带坐标轴的一块绘图区。\code{plt.subplots()}同时创建它们。一个Figure可以包含多个Axes，多个图应分别添加轴标、单位和标题。
+\begin{pycode}
+import matplotlib.pyplot as plt
+fig, ax = plt.subplots(figsize=(5, 3.5), layout="constrained")
+ax.scatter([1, 2, 3], [6, 8, 10], color="#35566E")
+ax.set(xlabel="Weight (kg)", ylabel="Fee (yuan)",
+       title="Three teaching observations")
+fig.savefig("scatter.png", dpi=180)
+plt.close(fig)
+\end{pycode}
+\code{figsize}单位为英寸，\code{dpi}为每英寸像素数；增大DPI提高栅格输出像素数量，不增加数据证据。\code{layout="constrained"}为轴标与标题留出空间；仍应打开输出检查，不能把自动布局当作不裁切的保证。\code{close}释放画布，避免批量绘图时不断积累。
+
+本章配套图使用英文轴标以减少不同系统中文字体差异，含义与单位在正文说明；主讲义中的示意图仍用既有宋体和主题色。需要中文图时应设置可用中文字体并核对缺字，不能仅改变字符串而忽略渲染警告。
+
+\subsubsection{散点图、直方图、柱形图与曲线}
+\term{散点图}（scatter plot）把每个配对样本画成一个点，适合查看两列关系、聚集、非线性与特殊点。它不连接样本，不暗示时间连续性。点重叠时可调整透明度，但不能因为看见一个点就断言只有一条记录。
+
+\term{直方图}（histogram）把数值轴划分成区间，统计落入各区间的数量。分箱边界会影响外观；应记录边界，不能通过反复调箱宽只展示最符合预期的形状。训练重量按0、5、10、15、20、25 kg分箱，半开区间依次为 $[0,5)$、$[5,10)$、$[10,15)$、$[15,20)$，最后一箱 $[20,25]$包含右端点，频数为3、2、0、0、1。
+
+\term{柱形图}（bar chart）比较离散类别或已汇总统计量，横轴A/B不是连续数值区间。费用均值柱形图应同时报告各组数量。本章两组各4条，均值分别11.5与20.5元；它只描述这8条数据。
+
+\term{曲线图}（line plot）按给定顺序连接点，适合显示时间或有意义的有序变化。\code{plot}不会自动替数据排序。按重量排序后连接费用点，可以辅助观察随重量的变化，但不能把横轴当作时间，也不能把连线当作已拟合模型。
+\begin{pycode}
+fig, axes = plt.subplots(2, 2, figsize=(9, 6.5),
+                          layout="constrained")
+axes[0, 0].scatter(pairs["weight_kg"], pairs["fee_yuan"])
+axes[0, 1].hist(weight, bins=[0, 5, 10, 15, 20, 25])
+axes[1, 0].bar(grouped.index, grouped["mean_fee"])
+ordered = pairs.sort_values("weight_kg")
+axes[1, 1].plot(ordered["weight_kg"], ordered["fee_yuan"], "o-")
+plt.close(fig)
+\end{pycode}
+此框只展示各图调用，对外保存前还要像完整脚本一样设置全部轴标与标题。\code{axes}形状为\code{(2, 2)}，位置由两维索引指定；只有一幅图时返回的对象结构可能不同，不能照抄二维下标。
+
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[width=.47\linewidth,height=4.5cm,at={(0,0)},anchor=south west,
+ title={完整配对：6条},xlabel={重量/kg},ylabel={费用/元},
+ tick label style={font=\small},label style={font=\small},title style={font=\small},
+ axis lines=left,xmin=0,xmax=22,ymin=0,ymax=48]
+\addplot[only marks,mark=*,ThemeMain] coordinates {(1,6)(2,8)(3,10)(5,14)(6,16)(20,44)};
+\end{axis}
+\begin{axis}[width=.47\linewidth,height=4.5cm,at={(7.3cm,0)},anchor=south west,
+ title={有效重量：6条},xlabel={重量/kg},ylabel={频数},
+ tick label style={font=\small},label style={font=\small},title style={font=\small},
+ axis lines=left,xmin=0,xmax=25,ymin=0,ymax=4,xtick={0,5,10,15,20,25},ytick={0,1,2,3},
+ clip=false]
+\addplot[fill=ThemeMain,draw=white] coordinates {(0,0)(0,3)(5,3)(5,0)} -- cycle;
+\addplot[fill=ThemeMain,draw=white] coordinates {(5,0)(5,2)(10,2)(10,0)} -- cycle;
+\addplot[fill=ThemeMain,draw=white] coordinates {(20,0)(20,1)(25,1)(25,0)} -- cycle;
+\end{axis}
+\begin{axis}[width=.47\linewidth,height=4.5cm,at={(0,-5.4cm)},anchor=south west,
+ title={每区域4条费用},xlabel={区域},ylabel={平均费用/元},
+ tick label style={font=\small},label style={font=\small},title style={font=\small},
+ axis lines=left,ymin=0,ymax=24,symbolic x coords={A,B},xtick=data,
+ enlarge x limits=.5,ybar,bar width=18pt,fill=ThemeMain,draw=ThemeMain]
+\addplot[ybar,fill=ThemeMain,draw=ThemeMain] coordinates {(A,11.5)(B,20.5)};
+\end{axis}
+\begin{axis}[width=.47\linewidth,height=4.5cm,at={(7.3cm,-5.4cm)},anchor=south west,
+ title={按重量排序的观测},xlabel={重量/kg},ylabel={费用/元},
+ tick label style={font=\small},label style={font=\small},title style={font=\small},
+ axis lines=left,xmin=0,xmax=22,ymin=0,ymax=48]
+\addplot[ThemeMain,mark=*,thick] coordinates {(1,6)(2,8)(3,10)(5,14)(6,16)(20,44)};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+四图仅使用训练集。散点和曲线含6个完整配对，直方图使用6个有效重量，区域柱图使用8条有效费用。曲线的连线按重量排序，横轴不是时间；它也不表示已经训练出一个可外推模型。两条重量缺失记录仍计入区域费用统计，所以各图样本数不能含混地统一写成8。
+
+\subsubsection{频数、密度与可比坐标}
+直方图的\code{density=True}把柱高换成概率密度估计，使柱形面积之和为1，而非柱高之和为1。若第 $j$箱宽 $h_j$、频数 $c_j$，共有 $m$条纳入分箱的记录，则密度高为 $c_j/(m h_j)$。单位为横轴单位的倒数。
+
+\begin{infobox}{例题5.7：密度图为什么不是概率柱高}
+6个重量按宽5 kg的箱分组，频数3、2、0、0、1。求第一箱和第二箱的密度高，以及第一箱的经验比例。
+\end{infobox}
+\sol 密度高分别为 $3/(6\times5)=1/10\ \mathrm{kg}^{-1}$与 $2/(6\times5)=1/15\ \mathrm{kg}^{-1}$。第一箱面积为 $(1/10)\times5=1/2$，等于该箱的样本比例。箱宽改变时高也会变，不能把密度高理解为箱内比例，第二箱并非占10\%。若指定箱边界没有覆盖全部数据，还要说明分母实际涵盖哪些记录。
+
+多图比较应尽量用相同分箱与坐标范围，图上标明样本数。柱形图一般从零起画，否则会夸大比例差异；散点图局部放大可以使用不同范围，但必须说明。对数坐标能展开数量级差异，却要求正数或另作变换，并改变距离的视觉含义。本章不以删除尾部、截轴或隐藏缺失来改善图形外观。
+
+\subsection{实验5.1：表格清理与可核对汇总}
+入口为\code{配套实验/ch05_tables.py}，使用NumPy和pandas，CPU可运行。程序从脚本位置读取两个CSV，按第3章的入口保护运行；普通导入不会启动实验或写结果。
+\begin{console}
+python3 ch05_tables.py
+\end{console}
+流程按如下顺序执行：核对字段与非空输入；保留文本并去首尾空白；删除完全重复行并拒绝标识冲突；转换数值并记录原缺失/转换失败；检查范围与标签；受约束地合并区域说明；仅取训练行作分组汇总。先审计再统计，避免把原始错误隐去。
+
+完整训练表如下，横线表示数值缺失。
+\begin{center}
+\begin{tabular}{c c r r r r}
+\toprule
+标识 & 区域 & 重量/kg & 距离/km & 延迟 & 费用/元\\\midrule
+t01&A&1&10&0&6\\t02&A&2&20&0&8\\
+t03&B&3&10&1&10\\t04&B&---&20&1&12\\
+t05&A&5&10&0&14\\t06&B&6&20&0&16\\
+t07&A&---&10&1&18\\t08&B&20&20&1&44\\\bottomrule
+\end{tabular}
+\end{center}
+验证标识\code{v01,v02}的重量为7、8，费用18、20；测试标识\code{s01,s02}的重量为9、10，费用22、24。它们只参与固定字段合法性检查；本章不使用其目标值选择清理、填补或删点规则。
+
+关键输出应满足：原始13行、唯一12行、完全重复1行；训练/验证/测试数量8/2/2；审计表含\code{t04:missing}与\code{t07:invalid}；A/B各4条，各有3个有效重量，费用均值11.5/20.5，延迟比例0.25/0.75。标签对齐演示为\code{a:12,b:21}。
+
+修改任务每次从原版独立开始：把重复\code{t03}的费用改11，应触发冲突错误；把区域表的B重复一次，应触发合并关系错误；把\code{s01}区域改C，应触发未匹配错误；把延迟值改2，应触发标签范围错误。不要捕获异常后继续打印旧报告。配套答案在临时目录做冲突核对，不修改原始数据。
+
+\subsection{实验5.2：统计、图形与数据探索报告}
+\subsubsection{问题与输出}
+入口为\code{配套实验/ch05_eda.py}，在实验5.1基础上增加Matplotlib。它选择无需窗口的\code{Agg}后端并保存图片，适合在终端或自动运行环境使用。
+\begin{console}
+python3 ch05_eda.py
+python3 ch05_solutions.py
+\end{console}
+脚本在\code{ch05_results/}生成审计表、分组表、填补演示表、\code{summary.json}、\code{overview.png}与\code{report.md}。摘要保存依赖版本与输入文件SHA-256，便于辨认所分析的文件字节；摘要不能证明数据真实或质量充分。
+
+本实验回答两个预先提出的问题：有效重量与费用如何共同变化？区域平均费用差是否足以解释为区域作用？统计先使用未填补的训练表，报告原始缺失情况；填补演示另存派生表，避免把合成数值冒充观测。
+
+应得到训练重量有效6条、均值 $37/6$、中位数4、四分位数2.25与5.75、围栏 $[-3,11]$；只标记\code{t08}。重量费用完整配对6条，相关系数在浮点容差内为1。直方频数3、2、0、0、1；延迟标签各4条。离散计数与标识应完全一致，浮点统计允许约 $10^{-9}$绝对差异。
+
+\subsubsection{报告从问题走向证据与局限}
+一份数据探索报告至少说明：问题与分析单位、数据来源与范围、质量问题及处理、统计与图形证据、能够支持的结论、不能支持的结论和下一步核对需求。仅贴\code{describe()}和几张图，读者无法判断样本为何变少，也无法知道结论基于原始值还是填补值。
+
+\begin{infobox}{报告示例：本教学数据能够支持什么}
+原始表13行，去除1条完全重复后12行，其中训练8行。训练重量有6个有效值；\code{t04}原缺失、\code{t07}为非法文本，分别保留审计原因。有效重量均值6.166667 kg、中位数4 kg；20 kg超出IQR围栏，但无录入错误证据，保留并注明。
+
+6个完整配对呈精确正线性关系，这是教学构造的性质。区域A/B费用均值为11.5/20.5元，每组4条；两组重量组成不同，不能把均值差解释为区域因果效应。训练标签两类各4条，不能据此推断真实业务也平衡。
+
+填补演示只用训练中位数4 kg，并保留缺失指示。数据少、缺失原因未知、尾部仅1条，不能据此证明预测泛化、识别缺失机制或估计真实业务风险。后续需要核对采集流程并扩充数据。
+\end{infobox}
+报告中“相关系数为1”要同时列配对数；“有异常”要指出采用何规则；“已清理”要列出删改数量；“区域差异”要指出可能混杂因素。解释的力度应与证据相称，不把描述性结果自动写成模型选择依据。
+
+修改任务：只改变测试费用为999，训练统计与四幅训练图应不变；把\code{t08}重量由20改8，重新计算分位数、围栏和相关系数，费用44仍保留，原线性关系不再成立；在原版上只比较\code{ddof=0}与1，说明有效分母为何分别为6与5；另画相同数据的两种分箱，记录外观变化但不改变原始记录。
+
+\subsection{流程成本、常见误区与知识联系}
+对 $n$行、$d$字段的表格，读取与逐字段检查至少要接触 $O(nd)$个单元。均值和计数可单遍累计；排序型分位数的直接做法需要 $O(n\log n)$排序。分组与合并常用哈希或排序，实际成本取决于实现、键类型与输出规模；多对多连接的输出本身可能接近乘积规模。不能只因一行\code{merge}就认为成本恒定。
+
+EDA容易出错的地方包括：把自动类型推断当作数据字典；把零当缺失；把转换失败与原缺失混在一起；把\code{count}当总行数；先分别排序再按位置配对；按键去重时隐去冲突；让重复键扩行；看全部测试标签后反复调处理规则；从少量散点推断因果关系。
+
+本章把第3章的文件读写与审计衔接起来，把第4章的布尔筛选扩展到带标签表格。相关系数中的离差乘积将在第6章变成内积；方差、协方差与抽样波动将在第8章系统解释。第10章会区分一次固定的数据合法性核对和从数据估计的预处理参数，第14章会解释为何频繁依据测试结果作选择会损害最终评价。
+
+自检时应能说明：一行数据对应什么实体；标签与位置何时不同；每个统计量有多少有效记录；每次删改为何合理；合并行数为何变化；图的横纵轴、单位、分箱与样本范围是什么；哪些结论只是对本批样本的描述。
+
+\subsection{分层习题}
+以下编号为5.1--5.12；统计题使用本章线性分位数约定，实验题从原版独立修改。
+\begin{enumerate}[label=\textbf{5.\arabic*}]
+\item \textbf{概念。}区分CSV、Series、DataFrame、行索引与业务标识。为什么“0012”不宜自动转成整数？
+\item \textbf{索引。}给定索引10、20、30，比较\code{loc[10:20]}与\code{iloc[0:2]}。两条索引分别为a/b与b/a的Series相加为何不等于转数组后相加？
+\item \textbf{筛选。}写出选择区域A且重量至少2 kg的代码；明确是在原表赋值还是独立子表处理，解释为何不用Python的\code{and}。
+\item \textbf{缺失。}文本列为“1”、空白、“bad”、“0”。分别标出原缺失、非法文本与有效零，写出保留失败原因的转换顺序。
+\item \textbf{统计。}对1、2、3、5、6、20计算均值、中位数、两种分母的方差及四分位数。删除20后重算均值与中位数，说明信息变化。
+\item \textbf{分组。}区域A有4行，其中3个有效重量；B也如此。\code{size}与重量\code{count}分别是多少？若A/B费用均值11.5/20.5，组数变为1/4，总均值是多少？
+\item \textbf{合并。}左表键A出现2次、B出现1次，右表A出现2次、B出现1次。普通内连接有多少行？若右表漏B，左连接与内连接分别留下什么？
+\item \textbf{相关。}完成例题5.6，解释为何零相关不能推出独立。常数列的相关系数为什么不能按普通公式计算？
+\item \textbf{图形。}6条重量的分箱频数为3、2、0、0、1，箱宽5 kg。写出各箱密度与面积；解释柱形图和直方图的区别。
+\item \textbf{边界。}为什么不能直接删除全部缺失行或所有超出IQR围栏的行？列出还需核对的三类信息。
+\item \textbf{编程。}运行两个实验及答案脚本；改变测试标签，核对训练汇总不变；构造右表重复键与冲突标识，确认主动失败。
+\item \textbf{综合报告。}用本章数据写一份含问题、范围、质量、两项证据、结论与局限的报告。不得把相关性或区域均值差改写成因果结论。
+\end{enumerate}
+
+\subsection{习题参考答案}
+\subsubsection*{5.1--5.4：结构、选择与转换}
+\textbf{5.1}\quad CSV是文本文件格式；Series是一维带标签序列；DataFrame是带行列标签的二维表；行索引用于定位，不自动等于包裹身份；业务标识由数据字典规定唯一性。“0012”作为标识时前导零属于信息，转成12会改变表示，并可能与另一条“12”发生冲突。
+
+\textbf{5.2}\quad 在给定有序唯一索引下，二者都取前两行，但前者按标签且包含20，后者按位置且不含位置2。设数值分别10/20与1/2，按标签得到a为12、b为21；去标签按位置为11、22。排序或重置索引后应重新核对对应依据。
+
+\textbf{5.3}\quad 先分别比较，再逐行取交集；独立子表用复制明确用途。
+\begin{pycode}
+mask = (df["area"] == "A") & (df["weight"] >= 2)
+selected = df.loc[mask, ["id", "weight"]].copy()
+# 若目的改为修改原表，则用下面的明确定位赋值：
+df.loc[mask, "weight"] = 0
+\end{pycode}
+Series真假不是一个整体标量，逐行组合需要\code{&}。
+
+\textbf{5.4}\quad 先保留文本，再规范化本例首尾空白，记录\code{text.eq("")}；随后按规则转换，原非空但转换失败的是非法文本。零为有效数值，不是缺失。对文本无穷还应检查有限性。转换后同时保存原文本与原因，避免用一个NaN丢掉来源。
+
+\subsubsection*{5.5--5.8：统计、合并与相关}
+\textbf{5.5}\quad 均值 $37/6$，中位数4，平方离差和 $1481/6$，方差分母6时 $1481/36$，分母5时 $1481/30$。$Q_1=2.25$、$Q_3=5.75$。删除20后剩1、2、3、5、6，均值 $17/5=3.4$，中位数3。变化说明尾部影响很大，却不能证明尾部本应删除；样本范围已改变。
+
+\textbf{5.6}\quad 每组\code{size}=4、重量\code{count}=3。费用都有效时，组数1/4对应总均值 $(11.5+4\times20.5)/5=18.7$；重量均值合成时要用重量有效数量。不能把不同字段的有效分母混用。
+
+\textbf{5.7}\quad A贡献 $2\times2=4$行，B贡献1行，总5行。漏B时，左连接仍保留左表的B行，右侧说明缺失；内连接只剩4条A配对。约束多对一会拒绝A重复；未匹配B另由\code{indicator}检查，两个检查职责不同。
+
+\textbf{5.8}\quad 离差乘积和0，两列离差平方和均非零，故 $r=0$；但 $y=x^2$由x确定，存在明确非线性关系。独立是概率分布关系，在第8章定义，不能由一个线性统计量为零推出。常数列离差范数为0，分母为0，相关未定义；不应自动填成0。
+
+\subsubsection*{5.9--5.12：图形、程序与解释}
+\textbf{5.9}\quad 密度依次为 $1/10,1/15,0,0,1/30\ \mathrm{kg}^{-1}$，面积依次为 $1/2,1/3,0,0,1/6$，和为1。直方图的横轴是数值区间，柱宽具有含义；柱形图横轴是离散类别，通常通过柱高比较某项汇总。
+
+\textbf{5.10}\quad 需核对缺失发生的采集过程与群体差异，极端记录的原始凭据、单位与业务合理性，以及处理后样本范围是否仍符合预测目标。缺失可能不是随机发生，合法尾部也可能正是任务重点。处理规则应可追溯，并在后续训练流程中验证。
+
+\textbf{5.11}\quad 参考\code{ch05_solutions.py}。先从\code{load_tables()}取得清理表，再复制表并只改\code{split=="test"}行的费用；两次训练分组结果使用pandas的表格相等核对函数比较。重复键应为\code{MergeError}，冲突标识应为\code{ValueError}，不能只比较最终均值是否碰巧相同。
+
+\textbf{5.12}\quad 参考实验生成的\code{report.md}。至少列出13到12行的去重变化、训练8行与重量有效6条、缺失两种原因；证据可选相关系数1及6个配对、A/B均值11.5/20.5且各4条。结论限于构造训练样本；局限包含小样本、缺失原因未知与尾部不足，不以测试标签调探索规则。
+
+\subsection{本章小结}
+表格处理同时管理数值、类型、标签与记录关系。合理流程先明确数据字典，再保留原始信息、核对字段、追踪缺失与重复、约束合并关系，最后进行统计与图形解释。每个统计量都应能回到对应记录、有效分母与处理规则。
+
+探索报告把问题、证据和解释连接起来。描述性关系可以指导后续调查与建模，但因果判断、泛化评价和预处理参数选择需要各自的条件。图形清晰与代码运行成功，都不能替代这些条件。
+
+\chapterpage{线性代数复习}\label{ch:linearalgebra}
+\begin{infobox}{先修知识、学习目标与本章位置}
+本章复习已学过的线性代数，使用第4章的数组、矩阵乘法和形状检查。推导只要求基本代数、平方和与一元导数；矩阵微分从分量展开说明，第7章再系统讨论梯度和链式法则。
+
+学习后应能解释内积、范数、距离与余弦；把矩阵理解为线性变换；用秩、列空间和零空间判断解的存在与唯一性；从投影推导最小二乘；辨认特征值、正定性、SVD和条件数；推导平方损失的梯度并核对维度。本章为第11章线性回归、第21章PCA、第23章反向传播与第34章低秩适配准备共同语言。
+\end{infobox}
+第4章说明了\code{X @ w}怎样计算，第5章说明了怎样把字段转成数值列。现在需要解释：矩阵的列代表哪些可组合的方向？当目标不在这些方向张成的空间中，拟合实际上在做什么？两列非常接近时，为什么预测可能稳定，参数却剧烈变化？这些问题需要把代数式、几何图像与数值计算放在一起。
+
+本章只讨论有限维实向量与实矩阵。复数情况下内积需要共轭转置，本章不沿用实数公式直接处理复数。除说明数组实现外，向量均约定为列向量；数学上的转置不等同于NumPy一维数组的\code{.T}。
+
+\subsection{向量、坐标与统一维度约定}
+\subsubsection{向量不仅是一列数字}
+\term{向量}（vector）可以表示带方向的几何量，也可以表示多个特征、模型参数或一批预测。坐标依赖所选基与字段顺序。包裹的重量和距离构成 $\symbf x=(x_1,x_2)^{\mathsf T}\in\mathbb R^2$；两个分量单位不同，不应仅因放在同一向量中就认为其大小可直接比较。
+
+$\mathbb R^d$表示由 $d$个实数坐标组成的向量空间，$d$为该空间的维数。若有 $n$个样本、每样本 $d$特征，则约定
+\[
+ X=\begin{pmatrix}\symbf x_1^{\mathsf T}\\\vdots\\\symbf x_n^{\mathsf T}\end{pmatrix}
+ \in\mathbb R^{n\times d},\qquad
+ \symbf w\in\mathbb R^d,\quad \symbf y\in\mathbb R^n.
+\]
+$X$的行是样本，列是特征；$\symbf w$为每个特征的系数；$X\symbf w$为每个样本的线性得分或预测。本章用大写字母表示矩阵，粗体小写表示向量，普通小写表示标量。
+
+\term{线性组合}是若干向量按系数缩放后求和，例如 $a_1\symbf v_1+a_2\symbf v_2$。系数可正可负，可为零。\term{张成空间}（span）是所有这类组合组成的集合；它包含零向量，并对加法与数乘封闭。
+
+\subsubsection{基与坐标变化}
+\term{线性无关}表示只有所有系数都为0时，线性组合才等于零；若存在非全零系数组合为零，则线性相关。一组能张成空间的线性无关向量称为\term{基}（basis）。基的数量等于空间维数。
+
+例如 $\symbf e_1=(1,0)^{\mathsf T}$、$\symbf e_2=(0,1)^{\mathsf T}$是 $\mathbb R^2$标准基。向量 $(3,2)^{\mathsf T}=3\symbf e_1+2\symbf e_2$。换用 $\symbf b_1=(1,1)^{\mathsf T}$、$\symbf b_2=(1,-1)^{\mathsf T}$，同一向量为 $(5/2)\symbf b_1+(1/2)\symbf b_2$。物体未变，坐标变了；不能拿不同基下的两组坐标直接相减。
+
+第5章的列顺序是坐标约定的一部分。若训练时 $X$列为重量、距离，预测时换成距离、重量，仍然可能得到同样形状的乘积，却已经把系数配给了错误特征。维度检查是必要条件，字段语义检查同样必要。
+
+\subsection{内积、范数、距离与余弦相似度}
+\subsubsection{内积描述同向程度}
+两个 $d$维实向量的\term{内积}（inner product，点积）定义为
+\[
+ \langle\symbf a,\symbf b\rangle=\symbf a^{\mathsf T}\symbf b
+ =\sum_{j=1}^d a_jb_j\in\mathbb R.
+\]
+内积对两个输入分别线性，交换输入不改变结果。对非零向量，它还满足几何关系
+\[
+ \symbf a^{\mathsf T}\symbf b=\|\symbf a\|_2\|\symbf b\|_2\cos\theta,
+\]
+其中 $\theta$为夹角。内积为0的向量称为\term{正交}（orthogonal）；零向量与所有向量内积都为0，但零向量没有确定方向或夹角。
+
+平方和为何能产生距离和角度约束？对 $\symbf b\ne0$，任意实数 $t$都有 $\|\symbf a-t\symbf b\|_2^2\ge0$。取 $t=(\symbf a^{\mathsf T}\symbf b)/\|\symbf b\|_2^2$，展开得到
+\[
+ \|\symbf a\|_2^2-\frac{(\symbf a^{\mathsf T}\symbf b)^2}{\|\symbf b\|_2^2}\ge0.
+\]
+于是
+\[
+ |\symbf a^{\mathsf T}\symbf b|\le\|\symbf a\|_2\|\symbf b\|_2,
+\]
+这就是实向量的\term{Cauchy--Schwarz不等式}。它保证余弦落在 $[-1,1]$内；等号对应向量共线，包括相反方向。
+
+\subsubsection{范数测量大小，距离测量差}
+\term{范数}（norm）是符合非负性、零向量判别、绝对齐次性与三角不等式的大小度量；范数为0当且仅当向量为零。常见的 $L_1$、$L_2$与 $L_\infty$范数为
+\[
+ \|\symbf x\|_1=\sum_j|x_j|,\qquad
+ \|\symbf x\|_2=\sqrt{\sum_jx_j^2},\qquad
+ \|\symbf x\|_\infty=\max_j|x_j|.
+\]
+齐次性指 $\|c\symbf x\|=|c|\|\symbf x\|$；三角不等式指 $\|\symbf a+\symbf b\|\le\|\symbf a\|+\|\symbf b\|$。由范数得到距离 $d(\symbf a,\symbf b)=\|\symbf a-\symbf b\|$。平方欧氏距离 $\|\symbf a-\symbf b\|_2^2$便于优化和排序，但一般不满足距离的三角不等式，例如0、1、2之间有 $4>1+1$。
+
+\term{余弦相似度}（cosine similarity）在两向量都非零时定义为
+\[
+ \operatorname{cos}(\symbf a,\symbf b)=
+ \frac{\symbf a^{\mathsf T}\symbf b}{\|\symbf a\|_2\|\symbf b\|_2}.
+\]
+它关注方向，正比例缩放不改变结果，但负比例会翻转方向。对零向量应约定拒绝、单独处理或按应用定义特殊结果；随意给分母加小量会改变数学定义，也可能改变近零向量之间的排序。
+
+\begin{infobox}{例题6.1：三种比较标准}
+取 $\symbf a=(1,2)^{\mathsf T}$、$\symbf b=(2,0)^{\mathsf T}$。求内积、两向量的三种范数、欧氏距离和余弦。比较 $\symbf a$与 $10\symbf a$的方向和距离。
+\end{infobox}
+\sol 内积为2。$\symbf a$的范数依次为3、$\sqrt5$、2；$\symbf b$的范数均为2。差向量 $(-1,2)^{\mathsf T}$的欧氏范数为 $\sqrt5$，余弦为 $2/(2\sqrt5)=1/\sqrt5$。$\symbf a$与 $10\symbf a$余弦为1，欧氏距离为 $9\sqrt5$；方向相同不代表大小接近。
+
+单位化 $\widetilde{\symbf a}=\symbf a/\|\symbf a\|_2$后，对两个非零向量有
+\[
+ \|\widetilde{\symbf a}-\widetilde{\symbf b}\|_2^2
+ =2-2\operatorname{cos}(\symbf a,\symbf b).
+\]
+这是展开平方、利用单位范数得到的关系。仅在同样单位化条件下，按余弦从大到小与按欧氏距离从小到大排序一致；原向量直接比较时不保证一致。
+
+第5章Pearson相关系数就是两个中心化数据向量的余弦。先减各自均值，再单位化，能消去平移与正尺度变化。原始向量余弦不减均值，因此两者不能互换。特征尺度变化也会改变原始欧氏距离，这正是第4章标准化需要明确的几何影响。
+
+\subsection{矩阵与线性变换}
+\subsubsection{按行看得分，按列看组合}
+矩阵 $A\in\mathbb R^{m\times d}$定义映射 $T(\symbf x)=A\symbf x\in\mathbb R^m$。\term{线性变换}满足
+\[
+ T(\alpha\symbf x+\beta\symbf z)=\alpha T(\symbf x)+\beta T(\symbf z).
+\]
+因此必有 $T(\symbf0)=\symbf0$。$A\symbf x+\symbf b$若 $\symbf b\ne0$，称为\term{仿射变换}（affine transformation），包含平移，不严格属于线性变换。
+
+记 $A$的第 $j$列为 $\symbf a_j$，第 $i$行为 $\symbf r_i^{\mathsf T}$，同一乘积可解释为
+\[
+ A\symbf x=\sum_{j=1}^d x_j\symbf a_j,
+ \qquad (A\symbf x)_i=\symbf r_i^{\mathsf T}\symbf x.
+\]
+前者按列解释输出由哪些方向组合，后者按行解释每个输出怎样求得分。对数据矩阵 $X$与系数 $\symbf w$，前者说明预测在特征列张成的空间中，后者说明每样本预测是特征与参数的内积。
+
+\begin{infobox}{例题6.2：基向量决定变换}
+令 $A=\bigl(\begin{smallmatrix}2&1\\0&1\end{smallmatrix}\bigr)$。求 $A\symbf e_1$、$A\symbf e_2$与 $A(1,2)^{\mathsf T}$，并解释矩阵两列的作用。
+\end{infobox}
+\sol $A\symbf e_1=(2,0)^{\mathsf T}$、$A\symbf e_2=(1,1)^{\mathsf T}$，分别是两列。输出为 $1(2,0)^{\mathsf T}+2(1,1)^{\mathsf T}=(4,2)^{\mathsf T}$。知道每个基向量变到哪里，就能由线性性确定任意输入的结果。
+\begin{center}
+\begin{tikzpicture}[>=Stealth,scale=.85,font=\small]
+\draw[->,gray] (-.4,0)--(5,0) node[right] {$x_1$};
+\draw[->,gray] (0,-.4)--(0,3) node[above] {$x_2$};
+\draw[->,thick,ThemeBorder] (0,0)--(1,0) node[below] {$\symbf e_1$};
+\draw[->,thick,ThemeBorder] (0,0)--(0,1) node[left] {$\symbf e_2$};
+\draw[->,thick,ThemeMain] (0,0)--(2,0) node[below] {$A\symbf e_1$};
+\draw[->,thick,ThemeMain] (0,0)--(1,1) node[above left] {$A\symbf e_2$};
+\draw[->,thick,ThemeMain] (0,0)--(4,2) node[above right] {$A(1,2)^{\mathsf T}$};
+\draw[dashed,ThemeBorder] (2,0)--(4,2);
+\end{tikzpicture}
+\end{center}
+图中使用同一平面坐标展示输入基与变换后向量，虚线表示第二列方向的两倍。一般矩阵也可以在不同维度空间之间映射，不能都画成平面内拉伸。
+
+\subsubsection{矩阵乘法是变换的复合}
+若 $B:\mathbb R^d\to\mathbb R^k$，$A:\mathbb R^k\to\mathbb R^m$，则先B后A为 $AB:\mathbb R^d\to\mathbb R^m$。维度为 $(m\times k)(k\times d)=(m\times d)$。乘法通常不交换，因为顺序改变后变换不同，甚至无法相乘。
+
+\term{转置}把行列交换，满足 $(AB)^{\mathsf T}=B^{\mathsf T}A^{\mathsf T}$。一个检验是考察元素：$(AB)_{ij}=\sum_kA_{ik}B_{kj}$；交换i、j后与右侧相符。\term{单位矩阵} $I$保留向量不变；方阵 $A$若有逆 $A^{-1}$，则 $A^{-1}A=AA^{-1}=I$，逆变换恢复原输入。长方形矩阵通常没有这种双侧逆。
+
+\subsection{秩、列空间、零空间与线性方程}
+\subsubsection{秩表示独立方向的数量}
+$A$的\term{列空间} $\mathcal C(A)=\{A\symbf x:\symbf x\in\mathbb R^d\}$是所有可能输出。\term{秩}（rank）为列空间维数，也等于行空间维数，满足 $\operatorname{rank}(A)\le\min(m,d)$。列数是存储的方向数量，秩是其中独立方向数量，两者可能不同。
+
+\term{零空间}（null space）$\mathcal N(A)=\{\symbf x:A\symbf x=\symbf0\}$表示在变换中消失的输入方向。若 $A\symbf x_0=\symbf b$，那么任意 $\symbf z\in\mathcal N(A)$都有 $A(\symbf x_0+\symbf z)=\symbf b$。因此
+\begin{itemize}
+\item $A\symbf x=\symbf b$可解，当且仅当 $\symbf b\in\mathcal C(A)$；
+\item 在可解前提下，解唯一，当且仅当 $\mathcal N(A)=\{\symbf0\}$，即满列秩；
+\item 输入维数满足 $d=\operatorname{rank}(A)+\dim\mathcal N(A)$。
+\end{itemize}
+最后一式称为秩与零度关系。直观上，输入空间被分成可辨认方向与被压掉方向；并不意味着任意给出的原始坐标列可以直接一一分开。
+
+\Needspace{11\baselineskip}
+\begin{infobox}{例题6.3：重复特征造成不唯一}
+令
+\[
+ X=\begin{pmatrix}1&0&0\\1&1&1\\1&2&2\end{pmatrix}.
+\]
+求秩与一个非零零空间向量。若预测为截距加斜率乘 $x$，第二、三项系数分别能否唯一确定？
+\end{infobox}
+\sol 第一列常数方向与第二列不成比例，独立；第三列等于第二列，故秩为2。$\symbf z=(0,1,-1)^{\mathsf T}$满足 $X\symbf z=\symbf0$。预测只依赖第一项系数和后两项系数之和。对任何 $t$，把后两项改成 $w_2+t,w_3-t$，预测均不变，参数不能唯一识别。
+
+方阵满秩时可逆；有零特征值时不可逆。长方形满列秩 $m\ge d$保证不同参数产生不同输出，但任意目标未必在列空间。满行秩 $m\le d$保证任意输出可达到，却通常存在多组输入。存在解、解唯一与拟合误差为零，是三个需要分别回答的问题。
+
+\subsubsection{数值秩还依赖容差}
+精确代数中的秩不需要阈值；浮点程序从数值上判断独立方向时，需要把很小的奇异值与误差尺度比较。\code{np.linalg.matrix_rank}采用数值容差；\code{lstsq}中的\code{rcond}也影响哪些方向视为可辨认。把0改成 $10^{-16}$可能改变精确秩，却未必增加可可靠求解的信息。
+
+因此报告数值秩时应同时记录形状、奇异值、尺度和容差规则。“程序报告秩为2”不能直接推出原始测量系统严格只有两种独立变化。SVD与阈值将在后文统一说明。
+
+\subsection{正交基与投影}
+\subsubsection{投影到一条直线}
+给定非零方向 $\symbf a\in\mathbb R^n$，寻找直线 $\{c\symbf a:c\in\mathbb R\}$中离目标 $\symbf y$最近的点。平方距离为
+\[
+ f(c)=\|\symbf y-c\symbf a\|_2^2
+ =\symbf y^{\mathsf T}\symbf y-2c\symbf a^{\mathsf T}\symbf y+c^2\symbf a^{\mathsf T}\symbf a.
+\]
+配方得
+\[
+ f(c)=\|\symbf a\|_2^2\left(c-\frac{\symbf a^{\mathsf T}\symbf y}{\|\symbf a\|_2^2}\right)^2
+ +\|\symbf y\|_2^2-\frac{(\symbf a^{\mathsf T}\symbf y)^2}{\|\symbf a\|_2^2}.
+\]
+第一项非负，最小时
+\[
+ c_* =\frac{\symbf a^{\mathsf T}\symbf y}{\symbf a^{\mathsf T}\symbf a},\qquad
+ \widehat{\symbf y}=\symbf a c_*,\qquad
+ \symbf a^{\mathsf T}(\symbf y-\widehat{\symbf y})=0.
+\]
+最后一式说明误差垂直于允许移动的方向。若仍有该方向上的误差分量，就可以沿直线移动以进一步缩短距离。
+
+\subsubsection{投影到正交子空间}
+若 $Q\in\mathbb R^{n\times r}$的列正交且均为单位向量，则 $Q^{\mathsf T}Q=I_r$。这是\term{标准正交列}，$Q$不一定是方阵。投影为
+\begin{equation}\label{eq:projection}
+ \widehat{\symbf y}=QQ^{\mathsf T}\symbf y,
+ \qquad P=QQ^{\mathsf T}\in\mathbb R^{n\times n}.
+\end{equation}
+每项 $\symbf q_j^{\mathsf T}\symbf y$是沿第j个单位方向的坐标，再乘 $\symbf q_j$并求和，得到子空间内部分。投影矩阵满足
+\[
+ P^{\mathsf T}=P,\qquad P^2=Q(Q^{\mathsf T}Q)Q^{\mathsf T}=P.
+\]
+后者称为\term{幂等}：已在子空间中的投影再次投影不变。残差 $\symbf r=(I-P)\symbf y$满足 $Q^{\mathsf T}\symbf r=0$。若 $r<n$，$QQ^{\mathsf T}$是投影而不是 $I_n$；不能把 $Q^{\mathsf T}Q=I_r$颠倒为 $QQ^{\mathsf T}=I_n$。
+
+对任意子空间内向量 $\symbf z$，$\widehat{\symbf y}-\symbf z$与残差正交，故
+\[
+ \|\symbf y-\symbf z\|_2^2
+ =\|\symbf r\|_2^2+\|\widehat{\symbf y}-\symbf z\|_2^2.
+\]
+这给出最短距离与投影唯一性的证明，不依赖图形维数是否能画出来。
+
+
+\begin{center}
+\begin{tikzpicture}[>=Stealth,font=\small,scale=1.1]
+\draw[->,gray] (-.3,0)--(3.9,0) node[right] {$x_1$};
+\draw[->,gray] (0,-.3)--(0,3.6) node[above] {$x_2$};
+\draw[ThemeBorder,thick] (-.3,-.15)--(3.8,1.9) node[right,ThemeMain] {$\mathcal C(X)$};
+\draw[->,thick,ThemeMain] (0,0)--(1,3) node[above] {$\symbf y$};
+\draw[->,thick,ThemeMain] (0,0)--(2,1) node[below right] {$\widehat{\symbf y}$};
+\draw[->,dashed,thick,ThemeMain] (2,1)--(1,3) node[midway,right] {$\symbf r$};
+\draw[ThemeMain] (1.821,0.911)--(1.732,1.089)--(1.911,1.179);
+\end{tikzpicture}
+\end{center}
+图为二维几何示意：取目标 $(1,3)^{\mathsf T}$与沿 $(2,1)^{\mathsf T}$的子空间，投影为 $(2,1)^{\mathsf T}$，残差为 $(-1,2)^{\mathsf T}$。虚线误差与子空间正交；右角标记说明最短距离条件。实际拟合中目标在n维样本空间，几何条件仍相同。
+
+\begin{infobox}{例题6.4：在三维空间投影到一条线}
+令 $\symbf q=(1,1,0)^{\mathsf T}/\sqrt2$，$\symbf y=(2,0,3)^{\mathsf T}$。求投影、残差、投影矩阵，并核对正交分解。
+\end{infobox}
+\sol $\symbf q^{\mathsf T}\symbf y=\sqrt2$，投影为 $(1,1,0)^{\mathsf T}$，残差为 $(1,-1,3)^{\mathsf T}$。
+\[
+ P=\symbf q\symbf q^{\mathsf T}=\begin{pmatrix}1/2&1/2&0\\1/2&1/2&0\\0&0&0\end{pmatrix}.
+\]
+$\symbf q^{\mathsf T}\symbf r=0$，且 $\|\symbf y\|_2^2=13=2+11=\|\widehat{\symbf y}\|_2^2+\|\symbf r\|_2^2$。原始第三坐标3完全位于这条线的正交补中，不会被投影“解释”。
+
+\subsubsection{怎样获得正交列：QR的意义}
+\term{QR分解}把满列秩 $X\in\mathbb R^{n\times d}$（$n\ge d$）写成 $X=QR$，其中 $Q\in\mathbb R^{n\times d}$列标准正交，$R\in\mathbb R^{d\times d}$为可逆上三角矩阵。Q描述相同列空间的正交坐标，R描述从原系数到正交坐标的变换。
+
+逐列减去前面方向上的投影再归一化，是构造正交基的一种直观方法，称为Gram--Schmidt正交化。近相关列可能使朴素实现出现明显舍入误差；实际库通常使用更稳定的变换实现QR。这里理解分解的意义，数值求解采用库接口，不把短教学实现当作稳定性充分的工业实现。
+
+\subsection{最小二乘：从几何到正规方程}
+\subsubsection{目标可能不在列空间}
+设 $X\in\mathbb R^{n\times d}$、$\symbf y\in\mathbb R^n$，寻找 $\symbf w\in\mathbb R^d$使预测 $X\symbf w$接近目标。\term{最小二乘}（least squares）问题为
+\begin{equation}\label{eq:least-squares}
+ \min_{\symbf w}\|X\symbf w-\symbf y\|_2^2.
+\end{equation}
+“二乘”指误差平方；本章使用普通未加权欧氏距离，每样本贡献相同。若误差单位或可信度不同，需要另外说明权重或噪声假设，第11章再讨论回归建模。
+
+所有预测都在 $\mathcal C(X)$中，因此最优预测是 $\symbf y$在该子空间上的正交投影。设残差约定为 $\symbf r=\symbf y-X\symbf w$，最优条件是残差与每一列正交：
+\begin{equation}\label{eq:normal-equations}
+ X^{\mathsf T}\symbf r=\symbf0
+ \quad\Longleftrightarrow\quad
+ X^{\mathsf T}X\symbf w=X^{\mathsf T}\symbf y.
+\end{equation}
+这称为\term{正规方程}（normal equations）；normal在这里与几何垂直有关，不表示误差必须服从正态分布。要解释回归估计的统计性质，可以引入概率假设；定义和求解这个平方距离问题本身不需要正态假设。
+
+为什么正交条件足够？若 $\symbf w_*$满足它，对任意参数变化 $\symbf h$有
+\begin{align*}
+ \|\symbf y-X(\symbf w_*+\symbf h)\|_2^2
+ &=\|\symbf r_*-X\symbf h\|_2^2\\
+ &=\|\symbf r_*\|_2^2-2\symbf h^{\mathsf T}X^{\mathsf T}\symbf r_*+\|X\symbf h\|_2^2\\
+ &=\|\symbf r_*\|_2^2+\|X\symbf h\|_2^2\ge\|\symbf r_*\|_2^2.
+\end{align*}
+因此所有满足正规方程的参数都是全局最优解。若X满列秩，非零 $\symbf h$不会被X消去，解唯一；若秩亏，沿零空间方向移动不改变最优预测。
+
+\subsubsection{满列秩时的表达式与计算方法}
+对任意 $\symbf v$，有 $\symbf v^{\mathsf T}X^{\mathsf T}X\symbf v=\|X\symbf v\|_2^2$。满列秩时，非零向量对应严格正数，因此 $X^{\mathsf T}X$可逆。形式上
+\[
+ \symbf w_*=(X^{\mathsf T}X)^{-1}X^{\mathsf T}\symbf y,
+ \quad P=X(X^{\mathsf T}X)^{-1}X^{\mathsf T}.
+\]
+这是理论表达式，实际计算通常不显式求逆。即便使用正规方程，也应\code{solve(X.T @ X, X.T @ y)}求解线性系统；更一般地，优先\code{np.linalg.lstsq}，避免平方条件数带来的误差风险。
+
+用QR可把目标分解为
+\[
+ \|QR\symbf w-\symbf y\|_2^2
+ =\|R\symbf w-Q^{\mathsf T}\symbf y\|_2^2
+ +\|(I-QQ^{\mathsf T})\symbf y\|_2^2.
+\]
+第二项不依赖参数，第一项可通过上三角方程 $R\symbf w=Q^{\mathsf T}\symbf y$置零。这样不必形成 $X^{\mathsf T}X$。对稠密 $n\ge d$输入，常见分解求解约需 $O(nd^2)$量级计算，具体成本随算法与矩阵结构变化。
+
+\begin{infobox}{例题6.5：完整手算带截距的直线拟合}
+对输入 $x=0,1,2$与目标 $y=1,2,2$，拟合 $\widehat y=b+ax$。写出设计矩阵，解正规方程，计算预测、残差与平方和，并核对正交性。
+\end{infobox}
+\sol 把参数写成 $\symbf w=(b,a)^{\mathsf T}$，\term{设计矩阵}为
+\[
+ X=\begin{pmatrix}1&0\\1&1\\1&2\end{pmatrix},\qquad
+ \symbf y=\begin{pmatrix}1\\2\\2\end{pmatrix}.
+\]
+第一列常数1负责截距。于是
+\[
+ X^{\mathsf T}X=\begin{pmatrix}3&3\\3&5\end{pmatrix},\qquad
+ X^{\mathsf T}\symbf y=\begin{pmatrix}5\\6\end{pmatrix}.
+\]
+方程为 $3b+3a=5$、$3b+5a=6$，相减得 $a=1/2$，再得 $b=7/6$。预测与残差为
+\[
+ \widehat{\symbf y}=\begin{pmatrix}7/6\\5/3\\13/6\end{pmatrix},\qquad
+ \symbf r=\begin{pmatrix}-1/6\\1/3\\-1/6\end{pmatrix}.
+\]
+残差和为0，输入与残差的内积为 $0(-1/6)+1(1/3)+2(-1/6)=0$，故 $X^{\mathsf T}\symbf r=0$。平方和为 $1/36+1/9+1/36=1/6$，MSE为 $1/18$。残差不为零，因为这三个点不在一条直线上；参数唯一，因为两列线性无关。
+
+“带截距时残差和为零”来自设计矩阵含常数列与未加权最小二乘最优条件。去掉截距、改变权重、加入参数约束或只做尚未收敛的迭代时，不能直接沿用该结论。
+
+\subsubsection{秩亏解与最小范数选择}
+把例题6.5的第二列复制一遍，预测只依赖 $w_2+w_3$。最优参数满足 $w_1=7/6$、$w_2+w_3=1/2$，有无穷多组。预测向量仍唯一，因为它是同一子空间中的正交投影。
+
+如果额外要求参数欧氏范数最小，则后两项应均分为 $1/4,1/4$。证明是令 $w_2=t,w_3=1/2-t$，有
+\[
+ t^2+(1/2-t)^2=2(t-1/4)^2+1/8,
+\]
+最小值在 $t=1/4$。这种选择给出了唯一代表，但没有证明两列特征具有独立可解释的作用。伪逆将在SVD之后给出一般表达。
+
+\subsection{特征值、二次型与正定性}
+\subsubsection{特征方向保持方向不变}
+方阵 $A\in\mathbb R^{d\times d}$的\term{特征向量}（eigenvector）为满足
+\[
+ A\symbf v=\lambda\symbf v,\qquad \symbf v\ne\symbf0
+\]
+的向量，$\lambda$为对应\term{特征值}（eigenvalue）。在此方向，变换只作缩放或翻转。零向量被排除，否则任何数都能满足等式，定义失去辨别力。
+
+一般实方阵可能有复特征值，也可能缺少足够多的线性无关特征向量；不能对任意方阵直接写正交特征分解。\term{实对称矩阵} $H=H^{\mathsf T}$具有实特征值和一组标准正交特征向量，能写成
+\[
+ H=Q\Lambda Q^{\mathsf T},\quad Q^{\mathsf T}Q=QQ^{\mathsf T}=I,
+ \quad\Lambda=\operatorname{diag}(\lambda_1,\ldots,\lambda_d).
+\]
+$\operatorname{diag}$表示把数放在主对角线上。本节只对这类对称矩阵使用正交谱分解。数值上可用\code{np.linalg.eigh}或只求值的\code{eigvalsh}；它们利用对称结构，区别于一般\code{eig}。
+
+\subsubsection{二次型在各方向的符号}
+\term{二次型} $q(\symbf x)=\symbf x^{\mathsf T}H\symbf x$是标量。令 $\symbf z=Q^{\mathsf T}\symbf x$，则
+\[
+ q(\symbf x)=\symbf z^{\mathsf T}\Lambda\symbf z=\sum_j\lambda_jz_j^2.
+\]
+于是对实对称H，有如下对应：
+\begin{center}
+\begin{tabularx}{\linewidth}{l Y Y}
+\toprule
+性质 & 对非零向量的条件 & 特征值条件\\\midrule
+\term{正定} & $\symbf x^{\mathsf T}H\symbf x>0$ & 所有 $\lambda_j>0$\\
+\term{半正定} & $\symbf x^{\mathsf T}H\symbf x\ge0$ & 所有 $\lambda_j\ge0$\\
+\term{不定} & 有正值方向也有负值方向 & 至少一个正值、一个负值\\\bottomrule
+\end{tabularx}
+\end{center}
+半正定允许某些非零方向的二次型为0，因此不保证可逆。负定与半负定分别反转符号。只看矩阵元素是否为正不能判断正定；只看行列式为正也不充分。
+
+\begin{infobox}{例题6.6：二次型的主方向}
+令 $H=\bigl(\begin{smallmatrix}2&1\\1&2\end{smallmatrix}\bigr)$。求特征值、单位特征向量与二次型表达，说明是否正定。再判断 $\bigl(\begin{smallmatrix}1&2\\2&1\end{smallmatrix}\bigr)$。
+\end{infobox}
+\sol 第一矩阵作用于 $(1,1)^{\mathsf T}$得到3倍，作用于 $(1,-1)^{\mathsf T}$得到1倍；单位化后为 $\symbf q_1=(1,1)^{\mathsf T}/\sqrt2$与 $\symbf q_2=(1,-1)^{\mathsf T}/\sqrt2$。设 $z_1=(x_1+x_2)/\sqrt2,z_2=(x_1-x_2)/\sqrt2$，则
+\[
+ \symbf x^{\mathsf T}H\symbf x=3z_1^2+z_2^2>0\quad(\symbf x\ne0).
+\]
+第二矩阵沿同样两个方向的特征值为3和 $-1$，二次型为 $3z_1^2-z_2^2$，是不定矩阵。其所有元素均为正，仍有负二次型方向。
+
+$X^{\mathsf T}X$称为列向量的\term{Gram矩阵}，元素为列间内积。由平方范数恒非负可知它总半正定，满列秩时才正定。它在平方损失中描述参数变化引起的曲率；第7章会用Hessian把这一说法写成导数结论。
+
+\subsection{奇异值分解：长方形矩阵的方向与尺度}
+\subsubsection{定义与形状}
+\term{奇异值分解}（singular value decomposition，SVD）适用于任意实矩阵 $A\in\mathbb R^{m\times d}$。完整形式为
+\[
+ A=U\Sigma V^{\mathsf T},\quad U\in\mathbb R^{m\times m},\quad
+ V\in\mathbb R^{d\times d},\quad\Sigma\in\mathbb R^{m\times d}.
+\]
+U和V为方形正交矩阵，$\Sigma$只有主对角线可能非零，其 $k=\min(m,d)$个非负数 $\sigma_1\ge\cdots\ge\sigma_k\ge0$称为\term{奇异值}（singular values）。对长方形对角阵，主对角线之后的整行或整列为零。
+
+NumPy的\code{full_matrices=False}给出经济形状：
+\[
+ U_k:(m,k),\quad \Sigma_k:(k,k),\quad V_k^{\mathsf T}:(k,d).
+\]
+它保留k个方向，可能仍包含零奇异值；不等同于只保留r个非零方向的秩分解，也不等同于只保留更小q的近似。NumPy实际返回一维\code{s:(k,)}，不是对角矩阵。
+\begin{pycode}
+A = np.array([[3., 0.], [0., 1.], [0., 0.]])
+U, s, Vt = np.linalg.svd(A, full_matrices=False)
+reconstructed = (U * s) @ Vt
+print(U.shape, s.shape, Vt.shape)
+print(s)
+\end{pycode}
+形状为\code{(3,2)}、\code{(2,)}、\code{(2,2)}，奇异值3与1。\code{U * s}按列缩放U，等价于 $U\operatorname{diag}(\symbf s)$；如果写\code{s[:, None] * U}，一般缩放方向错误或广播失败。\code{Vt}已经是 $V^{\mathsf T}$，重建时不要再转置一次。
+
+\subsubsection{旋转坐标、缩放，再变到输出坐标}
+乘积 $A\symbf x=U\Sigma V^{\mathsf T}\symbf x$可分三步：V转置把输入表示到右奇异向量坐标；$\Sigma$沿这些方向缩放或消去；U把结果表示到输出空间。U/V中的正交变换保长度，可能包括反射，不能全称为严格的旋转。
+
+对第j个右奇异向量 $\symbf v_j$，有
+\[
+ A\symbf v_j=\sigma_j\symbf u_j,
+ \qquad A^{\mathsf T}A\symbf v_j=\sigma_j^2\symbf v_j.
+\]
+因此奇异值是Gram矩阵非负特征值的平方根。最大奇异值描述单位输入的最大输出长度，零奇异值对应被消去的方向。非零奇异值数量是精确秩；对应左奇异向量张成列空间。
+
+\subsubsection{伪逆与最小范数最小二乘}
+设r个奇异值非零，秩分解为 $A=U_r\Sigma_rV_r^{\mathsf T}$。\term{Moore--Penrose伪逆}为
+\[
+ A^+=V_r\Sigma_r^{-1}U_r^{\mathsf T}\in\mathbb R^{d\times m}.
+\]
+它只对非零奇异值取倒数，零方向保持为零；不是对矩阵每个元素取倒数。若 $\symbf b\in\mathbb R^m$，则
+\[
+ \symbf x_*=A^+\symbf b,\qquad A\symbf x_*=U_rU_r^{\mathsf T}\symbf b.
+\]
+后者正是到列空间的投影。任意最小二乘解可写成 $\symbf x_*+\symbf z$，其中 $\symbf z\in\mathcal N(A)$。$\symbf x_*$在右奇异向量的非零方向中，与零空间正交，因此
+\[
+ \|\symbf x_*+\symbf z\|_2^2=\|\symbf x_*\|_2^2+\|\symbf z\|_2^2,
+\]
+证明了它是最小范数解。
+
+实际计算对很小的奇异值使用阈值，避免对近零值取极大倒数。\code{np.linalg.lstsq}直接求最小范数最小二乘解；本章设置\code{rcond=None}，同时返回残差数组、数值秩与奇异值。返回残差数组为空可能是秩亏或形状条件不满足该返回形式，不能直接理解成拟合误差为零；应显式算\code{b - A @ x}。
+
+\subsubsection{低秩近似及误差含义}
+SVD还可写为若干秩一外积之和：
+\[
+ A=\sum_{j=1}^k\sigma_j\symbf u_j\symbf v_j^{\mathsf T}.
+\]
+内积 $\symbf u^{\mathsf T}\symbf v$是标量；\term{外积} $\symbf u\symbf v^{\mathsf T}$是矩阵，两者不能混淆。保留前q项得到 $A_q$，秩至多q。它在\term{Frobenius范数}下具有最优低秩近似性质：
+\[
+ \|A\|_F=\sqrt{\sum_{i,j}A_{ij}^2},\qquad
+ \|A-A_q\|_F^2=\sum_{j=q+1}^k\sigma_j^2.
+\]
+误差公式来自各外积在矩阵内积下标准正交。最优性质的完整证明不在本章要求内，但必须限定误差度量：它不保证任何下游分类指标或语义相似度最优。奇异值有并列时，最优近似表示可能不唯一。
+
+\begin{infobox}{例题6.7：SVD、伪逆与截断}
+对 $A=\bigl(\begin{smallmatrix}3&0\\0&1\\0&0\end{smallmatrix}\bigr)$，给出经济SVD、伪逆、对 $\symbf b=(3,2,4)^{\mathsf T}$的最小二乘解，以及秩一近似误差。
+\end{infobox}
+\sol 可取 $U_k$为三维前两个标准基组成的矩阵、$\Sigma_k=\operatorname{diag}(3,1)$、$V=I_2$。伪逆为
+\[
+ A^+=\begin{pmatrix}1/3&0&0\\0&1&0\end{pmatrix},
+ \quad\symbf x_*=(1,2)^{\mathsf T}.
+\]
+预测为 $(3,2,0)^{\mathsf T}$，第三项4不能由A的列表示，残差范数4。秩一近似仅保留3对应项，得到第一元素3、其余0的矩阵；Frobenius误差为1，平方误差为1。这里矩阵近似误差与拟合b的误差是两个不同对象。
+
+低秩近似为第21章PCA提供工具，第34章会用低秩矩阵表示参数更新；不能仅由“低秩”推出压缩后一定保留任务所需信息。实际库的奇异向量符号可能同时翻转，重建矩阵不变，核对时应比较重建、子空间与奇异值，不强制某一列符号固定。
+
+\subsection{条件数：问题的敏感性与算法的稳定性}
+\subsubsection{微小输入变化可能引起很大解变化}
+对可逆方阵A，采用欧氏范数对应的\term{谱范数} $\|A\|_2=\max_{\|\symbf x\|_2=1}\|A\symbf x\|_2=\sigma_{\max}$，\term{条件数}定义为
+\[
+ \kappa_2(A)=\|A\|_2\|A^{-1}\|_2=\frac{\sigma_{\max}}{\sigma_{\min}}\ge1.
+\]
+条件数大表示某些方向被强烈压缩，反向求解时误差可能被放大。奇异矩阵没有有限的可逆求解条件数。满列秩长方形矩阵也常用最大与最小奇异值之比描述数值条件，但本节扰动上界首先针对可逆方阵。
+
+若A固定，$A\symbf x=\symbf b$、$A(\symbf x+\delta\symbf x)=\symbf b+\delta\symbf b$，则 $\delta\symbf x=A^{-1}\delta\symbf b$。结合 $\|\symbf b\|\le\|A\|\|\symbf x\|$，得到在 $\symbf b\ne0$时
+\[
+ \frac{\|\delta\symbf x\|_2}{\|\symbf x\|_2}
+ \le\kappa_2(A)\frac{\|\delta\symbf b\|_2}{\|\symbf b\|_2}.
+\]
+这是最坏方向的上界，不是每次扰动必然放大这么多。若A本身也被扰动，还需要额外条件与误差项，不能直接把本式当作所有误差的完整界。
+
+\begin{infobox}{例题6.8：残差很小，解仍敏感}
+令 $A=\operatorname{diag}(1,10^{-8})$，$\symbf b=(1,0)^{\mathsf T}$。把右端改为 $\symbf b+\delta\symbf b=(1,10^{-8})^{\mathsf T}$，比较两次解、相对变化与条件数。
+\end{infobox}
+\sol 原解 $(1,0)^{\mathsf T}$，新解 $(1,1)^{\mathsf T}$。右端相对变化为 $10^{-8}$，解相对变化为1，放大倍数 $10^8$。奇异值1与 $10^{-8}$，条件数 $10^8$，此例达到上界。两次解都可对各自方程产生极小残差，却不代表原始问题对输入误差不敏感。
+
+\subsubsection{正规方程为什么放大条件数}
+若X满列秩，其奇异值为 $\sigma_1,\ldots,\sigma_d$，则 $X^{\mathsf T}X$特征值为 $\sigma_1^2,\ldots,\sigma_d^2$，故
+\[
+ \kappa_2(X^{\mathsf T}X)=\kappa_2(X)^2.
+\]
+当 $\kappa_2(X)=10^8$时，Gram矩阵条件数约 $10^{16}$，已接近\code{float64}舍入尺度的倒数。显式形成Gram矩阵可能丢失原先尚可辨认的小方向；再求逆不能恢复这些信息。
+
+\term{病态}（ill-conditioned）描述问题本身对扰动敏感；\term{数值稳定性}描述算法怎样传播舍入误差。稳定算法不能消除问题固有的敏感性，却能避免额外放大。QR或SVD一般优于直接形成正规方程，但仍应检查尺度、奇异值与残差。
+
+特征缩放可能改善仅由单位差异造成的条件问题；它不能自动消除近重复列。把全部A乘同一非零标量不会改变奇异值比，而逐列缩放会改变坐标度量。第11章的岭回归会用正则化抑制小奇异值方向，但同时改变优化目标，不是“免费修复”原最小二乘问题。
+
+\subsection{矩阵微分：从标量输出核对梯度}
+\subsubsection{微分与梯度的约定}
+本节只对标量函数 $f:\mathbb R^d\to\mathbb R$求导，梯度约定为列向量：
+\[
+ \nabla_{\symbf x}f=\begin{pmatrix}\partial f/\partial x_1\\\vdots\\\partial f/\partial x_d\end{pmatrix},
+ \qquad \mathrm df=(\nabla_{\symbf x}f)^{\mathsf T}\mathrm d\symbf x.
+\]
+$\mathrm df$是输入微小变化的线性部分；后式乘法维度为 $(1\times d)(d\times1)=1\times1$。不同教材可能把导数排成行向量，因此阅读公式时先核对约定，不仅看转置符号。
+
+若 $f(\symbf x)=\symbf a^{\mathsf T}\symbf x=\sum_j a_jx_j$，则 $\partial f/\partial x_j=a_j$，梯度为 $\symbf a$。若 $f=\symbf x^{\mathsf T}A\symbf x=\sum_{i,j}x_iA_{ij}x_j$，对第k项求导有两条来源：
+\begin{align*}
+ \frac{\partial f}{\partial x_k}
+ &=\sum_jA_{kj}x_j+\sum_i x_iA_{ik},\\
+ \nabla_{\symbf x}f&=(A+A^{\mathsf T})\symbf x.
+\end{align*}
+只有A对称时才可简化成 $2A\symbf x$。特别地，$\nabla\|\symbf x\|_2^2=2\symbf x$，而不是误用范数本身的导数。$\|\symbf x\|_2$在非零处梯度为 $\symbf x/\|\symbf x\|_2$，在零处不可微；平方范数处处可微。
+
+\subsubsection{平方损失的梯度保留每一步}
+定义 $n\ge1$，$X:(n,d)$、$\symbf w:(d,1)$、$\symbf y:(n,1)$，并令
+\[
+ L(\symbf w)=\frac1{2n}\|X\symbf w-\symbf y\|_2^2,
+ \quad\symbf e=X\symbf w-\symbf y.
+\]
+此处 $\symbf e$为预测减真实值，与前面的残差 $\symbf r$方向相反。按分量有
+\begin{align*}
+ e_i&=\sum_{j=1}^dX_{ij}w_j-y_i,\\
+ \frac{\partial L}{\partial w_k}
+ &=\frac1{2n}\sum_i2e_i\frac{\partial e_i}{\partial w_k}
+ =\frac1n\sum_i e_iX_{ik}.
+\end{align*}
+因此
+\begin{equation}\label{eq:linear-gradient}
+ \boxed{\nabla_{\symbf w}L=\frac1nX^{\mathsf T}(X\symbf w-\symbf y)}.
+\end{equation}
+外部 $X^{\mathsf T}$把n维样本误差汇总成d维参数导数。符号来自误差定义，系数 $1/n$来自所选损失归一化；若损失没有 $1/2$，梯度会多2，若用误差平方和而非均值，又会多n。
+
+矩阵微分可再次核对：$\mathrm d\symbf e=X\mathrm d\symbf w$，$\mathrm d(\symbf e^{\mathsf T}\symbf e)=2\symbf e^{\mathsf T}\mathrm d\symbf e$，于是
+\[
+ \mathrm dL=\frac1n\symbf e^{\mathsf T}X\mathrm d\symbf w
+ =\left(\frac1nX^{\mathsf T}\symbf e\right)^{\mathsf T}\mathrm d\symbf w.
+\]
+一次预测与梯度计算对稠密X约需 $O(nd)$运算，除输入矩阵外主要存储n维误差和d维梯度；不需要构造 $d\times d$的Gram矩阵。
+
+与梯度定义比较即得同一结果。令梯度为0，再次得到正规方程，几何正交条件与导数条件在这里一致。
+
+\begin{infobox}{例题6.9：手算梯度与形状}
+使用例题6.5的X与y，在 $\symbf w=(1/2,1)^{\mathsf T}$计算预测、误差、损失 $L$与梯度。分别说明两项梯度与哪些变化方向有关。
+\end{infobox}
+\sol 预测为 $(1/2,3/2,5/2)^{\mathsf T}$，误差为 $(-1/2,-1/2,1/2)^{\mathsf T}$，平方和 $3/4$，故 $L=(3/4)/6=1/8$。
+\[
+ X^{\mathsf T}\symbf e=\begin{pmatrix}-1/2\\1/2\end{pmatrix},\qquad
+ \nabla L=\begin{pmatrix}-1/6\\1/6\end{pmatrix}.
+\]
+第一项对应截距变化，沿负梯度会提高截距；第二项对应斜率变化，沿负梯度会减小斜率。梯度给局部变化方向，不能只根据一项误差正负决定最终参数。第7章会讨论步长及下降条件。
+
+\subsubsection{多输出参数与Frobenius内积}
+若 $W\in\mathbb R^{d\times k}$、$Y\in\mathbb R^{n\times k}$，预测为 $XW$，定义
+\[
+ L(W)=\frac1{2n}\|XW-Y\|_F^2.
+\]
+这里按样本数n归一化，未再除输出数k。对每个输出列应用同样推导，得到
+\[
+ \nabla_W L=\frac1nX^{\mathsf T}(XW-Y)\in\mathbb R^{d\times k}.
+\]
+梯度与参数同形状。若代码\code{np.mean((X @ W - Y)**2)/2}对所有 $nk$个元素求平均，则相应梯度分母应为 $nk$；不能在正文、代码和梯度中混用两个损失定义。
+
+矩阵微分中可用\term{迹}（trace）表示Frobenius内积：$\operatorname{tr}(A)=\sum_i A_{ii}$，$\langle G,\mathrm dW\rangle_F=\operatorname{tr}(G^{\mathsf T}\mathrm dW)$。只有乘法维度允许时才能循环移动迹中的因子，例如 $\operatorname{tr}(AB)=\operatorname{tr}(BA)$；不能从迹的等式推出 $AB=BA$。本章后续实验不要求掌握复杂迹运算，保留此入口用于阅读深度学习公式。
+
+\subsection{实验6.1：几何条件、QR与秩亏解}
+入口为\code{配套实验/ch06_geometry.py}，只依赖NumPy，数据在脚本中固定，无需下载。运行：
+\begin{console}
+python3 ch06_geometry.py
+\end{console}
+脚本先对例题6.5调用最小二乘求解，再显式计算残差和平方和；另外通过QR解上三角方程，与最小二乘结果比较；构造 $P=QQ^{\mathsf T}$，检查对称、幂等及 $P\symbf y=X\symbf w$。所有这些核对回答的是不同问题，单看参数打印值不足以验证投影关系。
+\begin{pycode}
+X = np.array([[1., 0.], [1., 1.], [1., 2.]])
+y = np.array([1., 2., 2.])
+w, residuals, rank, singular = np.linalg.lstsq(X, y, rcond=None)
+r = y - X @ w
+Q, R = np.linalg.qr(X, mode="reduced")
+w_qr = np.linalg.solve(R, Q.T @ y)
+P = Q @ Q.T
+np.testing.assert_allclose(X.T @ r, 0, atol=1e-12)
+np.testing.assert_allclose(w_qr, w, atol=1e-12)
+\end{pycode}
+NumPy的\code{y,w,r}在这里用一维数组实现数学列向量，形状为\code{(3,)}、\code{(2,)}、\code{(3,)}；结果约定要与第4章一致。若任意把y改为\code{(3,1)}，再减一维预测，会广播成错误的3乘3矩阵。
+
+预期参数 $(7/6,1/2)$，预测 $(7/6,5/3,13/6)$，残差 $(-1/6,1/3,-1/6)$，平方和 $1/6$，数值秩2；$X^{\mathsf T}\symbf r$两项约为0。数值比较允许 $10^{-12}$量级绝对误差，符号或最后几位舍入可变化。
+
+随后复制第二列，求解三参数问题。预期最小范数参数为 $(7/6,1/4,1/4)$，数值秩仍2；残差返回数组为空，但显式残差平方和仍 $1/6$。再加零空间向量 $(0,1,-1)$，得到 $(7/6,5/4,-3/4)$，预测不变、参数范数增加。原最小范数约1.219062，新范数约1.867113。
+
+修改任务：只把最后目标2改3，三个点变为直线 $y=1+x$，应得参数 $(1,1)$、误差接近0；去掉常数列，手算单参数斜率 $\sum_i x_iy_i/\sum_i x_i^2=6/5$，残差和不再为0；给重复列换一个非零比例，解释为何零空间方向随比例变化；不用P直接计算\code{Q @ (Q.T @ y)}，说明避免了哪些存储。
+
+完整P含 $n^2$元素，大数据中不应仅为做预测而显式构造它。$Q(Q^{\mathsf T}\symbf y)$只需分两次乘法，仍得到同一投影。数学上存在的矩阵表达，不一定是合适的程序存储结构。
+
+\subsection{实验6.2：SVD、敏感性与梯度核对}
+主入口为\code{配套实验/ch06_svd.py}，只用NumPy。\par
+答案核对入口为\code{ch06_solutions.py}。
+\begin{console}
+python3 ch06_svd.py
+python3 ch06_solutions.py
+\end{console}
+先对例题6.7的矩阵求经济SVD，检查重建与秩一近似误差；再运行例题6.8的扰动，记录A与Gram矩阵条件数；最后对例题6.9的损失核对解析梯度与数值梯度。
+
+\term{有限差分}通过很小的输入变化近似导数。对参数第j项，中心差分为
+\[
+ g_j^{\rm FD}=\frac{L(\symbf w+h\symbf e_j)-L(\symbf w-h\symbf e_j)}{2h}.
+\]
+本实验用 $h=10^{-6}$。它是核对公式的数值办法，不是每次训练都逐参数调用两遍损失的高效训练方法。步长太大引入近似误差，太小会出现相近数相减的舍入影响，第7章将进一步分析。
+\begin{pycode}
+h = 1e-6
+finite = np.empty_like(w)
+for j in range(w.size):
+    step = np.zeros_like(w)
+    step[j] = h
+    plus = loss_and_gradient(X, y, w + step)[0]
+    minus = loss_and_gradient(X, y, w - step)[0]
+    finite[j] = (plus - minus) / (2 * h)
+\end{pycode}
+本框的w为例题6.9的\code{np.array([0.5, 1.])}，\code{loss_and_gradient}由配套脚本定义。接口先验证实数类型、有限性、非空与形状，再转换成独立\code{float64}数组，拒绝布尔、复数、字符串以及不等形标签；计算溢出时主动失败，不把无穷损失当作有效结果。
+
+固定预期为：奇异值3、1；秩一Frobenius误差1；A条件数 $10^8$、Gram条件数约 $10^{16}$；解从 $(1,0)$变为 $(1,1)$；损失0.125，解析梯度 $(-1/6,1/6)$。梯度采用相对容差 $10^{-7}$、绝对容差 $10^{-9}$；差分最后几位与数值库有关，不能规定完全相等。
+
+输出存于\code{ch06_results/summary.json}与\code{svd.npz}，记录环境、奇异值、条件数、梯度误差与分解数组。加载NPZ时采用\code{allow_pickle=False}，沿用第4章普通数值数组的保存规则。
+
+修改任务：将 $10^{-8}$改成 $10^{-4}$并将右端扰动相应改成 $10^{-4}$，条件数应为 $10^4$，同样方向的解变化仍为1；把保留秩从1改2，重建误差应接近0；给U某列和V转置对应行同时乘 $-1$，重建应不变；对 $h=10^{-2},10^{-4},10^{-6},10^{-8}$逐一记录梯度误差。此处损失是二次函数，中心差分的截断误差有特殊抵消，不能据此推广任意函数的最佳步长。
+
+\subsection{公式维度表、常见错误与自检}
+\begin{center}
+\begin{tabularx}{\linewidth}{l l Y}
+\toprule
+表达式 & 数学形状 & 解释或条件\\\midrule
+$X\symbf w$ & $n\times1$ & n个预测\\
+$X^{\mathsf T}\symbf e$ & $d\times1$ & 参数方向的误差汇总\\
+$X^{\mathsf T}X$ & $d\times d$ & 特征列的Gram矩阵\\
+$XX^{\mathsf T}$ & $n\times n$ & 样本行的Gram矩阵\\
+$Q^{\mathsf T}\symbf y$ & $r\times1$ & 标准正交列上的坐标\\
+$QQ^{\mathsf T}\symbf y$ & $n\times1$ & r维子空间中的投影\\
+$A^+\symbf b$ & $d\times1$ & $A:(m,d),\ \symbf b:(m,1)$\\
+$X^{\mathsf T}(XW-Y)$ & $d\times k$ & 多输出参数梯度的未归一化部分\\\bottomrule
+\end{tabularx}
+\end{center}
+维度相符只能说明乘法有定义，不能证明公式正确。$X^{\mathsf T}X$与 $XX^{\mathsf T}$都可能是方阵，但分别处于参数空间与样本空间；当 $n=d$时形状甚至相同，含义仍不同。核对公式要同时说明每个轴代表样本、特征还是输出。
+
+常见误区包括：把相似度当距离；对零向量算余弦；把平方距离当满足三角不等式的距离；用元素全正判断正定；把满行秩当参数唯一；对长方形矩阵直接求普通逆；认为秩亏就没有最小二乘解；把空残差返回数组理解为零误差；把 $Q^{\mathsf T}Q=I$误反写；把特征分解套到任意实矩阵；直接显式求逆并忽略条件数。
+
+知识联系可以沿一条链理解：字段确定坐标，内积定义方向比较，列空间规定预测能到达哪里，投影确定最佳拟合，秩与零空间确定参数是否唯一，SVD刻画可辨认方向，条件数刻画求解敏感性，矩阵微分则把同一问题转换成可迭代优化的梯度公式。
+
+自检应能说明为什么X的列空间在 $\mathbb R^n$而非 $\mathbb R^d$；为什么残差正交于列而不必为零；为什么预测唯一不能推出系数唯一；为什么小奇异值在反向求解中危险；为什么数值稳定与统计泛化是不同问题。
+
+\subsection{分层习题}
+以下编号为6.1--6.14；默认实数、列向量与普通欧氏度量，数值实现注明数组形状。
+\begin{enumerate}[label=\textbf{6.\arabic*}]
+\item \textbf{基础。}计算例题6.1的内积、范数、距离与余弦；若b改成 $-2\symbf a$，余弦与欧氏距离分别是什么？
+\item \textbf{推导。}展开两个单位向量的平方距离，证明它与余弦的关系；用0、1、2说明平方距离不满足三角不等式。
+\item \textbf{坐标。}求 $(3,2)^{\mathsf T}$在 $(1,1)^{\mathsf T}$与 $(1,-1)^{\mathsf T}$下的坐标。$A\symbf x+\symbf b$什么时候是严格线性变换？
+\item \textbf{秩。}完成例题6.3；解释满列秩、满行秩分别对方程的可解性与唯一性意味着什么。
+\item \textbf{投影。}完成例题6.4，直接核对 $P^2=P$与 $P^{\mathsf T}=P$；为什么 $P\ne I_3$？
+\item \textbf{最小二乘。}完整重算例题6.5。若去掉截距，求斜率、残差与残差和；误差平方和是多少？
+\item \textbf{不唯一。}在重复特征问题中列出全部最优参数，证明 $(7/6,1/4,1/4)$是最小范数解。
+\item \textbf{正定性。}求例题6.6两个矩阵的特征值；说明为什么 $X^{\mathsf T}X$总半正定、何时严格正定。
+\item \textbf{SVD。}给出例题6.7矩阵的经济SVD形状、伪逆、秩一近似与误差。奇异向量同时变号为什么不影响重建？
+\item \textbf{条件数。}将例题6.8中 $10^{-8}$改为 $10^{-4}$并相应改右端扰动，计算放大倍数与Gram条件数。为什么残差小不说明系数可靠？
+\item \textbf{微分。}从分量求导证明 $\nabla(\symbf x^{\mathsf T}A\symbf x)=(A+A^{\mathsf T})\symbf x$，说明何时可写成 $2A\symbf x$。
+\item \textbf{梯度。}重算例题6.9，再把损失改为 $\frac1n\|X\symbf w-\symbf y\|^2$。梯度如何变化？多输出时若按全部元素平均，分母如何变化？
+\item \textbf{编程。}运行两个实验与答案核对；改变最后目标为3，核对参数1、1与正交条件；对SVD比较重建而非固定奇异向量符号。
+\item \textbf{综合。}某数据矩阵有两列几乎相同。解释参数不稳定、训练预测变化小、测试预测可能变化大怎样同时发生，并提出需记录的诊断量。
+\end{enumerate}
+
+\subsection{习题参考答案}
+\subsubsection*{6.1--6.5：度量、秩与投影}
+\textbf{6.1}\quad 原题内积2，a范数3、$\sqrt5$、2，b范数均2，欧氏距离 $\sqrt5$，余弦 $1/\sqrt5$。b改为 $-2\symbf a$时方向相反，余弦 $-1$，差向量为 $3\symbf a$，距离 $3\sqrt5$。
+
+\textbf{6.2}\quad $\|\symbf u-\symbf v\|^2=\|\symbf u\|^2+\|\symbf v\|^2-2\symbf u^{\mathsf T}\symbf v=2-2\cos\theta$。单位化须排除零向量。0到2平方距离4，大于0到1与1到2之和2，因此不满足距离公理中的三角不等式。
+
+\textbf{6.3}\quad 解 $\alpha+\beta=3,\alpha-\beta=2$，得 $\alpha=5/2,\beta=1/2$。严格线性要求映射零向量到零，故仿射式中的固定b必须为零。增广一个常数坐标可以用矩阵表示仿射式，但不改变原空间中它含平移的事实。
+
+\textbf{6.4}\quad 秩2，零空间由 $(0,1,-1)$张成。满列秩保证在可解时唯一，但不保证任意右端可解；满行秩保证任意右端可解，但若列数多于行数就有非零零空间，解不唯一。方阵满秩才同时对任意右端可解且唯一。
+
+\textbf{6.5}\quad 投影 $(1,1,0)$、残差 $(1,-1,3)$；P的左上2乘2块全为1/2，其余0。平方后该块每项为 $1/4+1/4=1/2$，P对称且幂等。$P(0,0,1)^{\mathsf T}=0$，故不等于 $I_3$；它只保留一维方向。
+
+\subsubsection*{6.6--6.10：拟合、分解与敏感性}
+\textbf{6.6}\quad 带截距参数 $(7/6,1/2)$，残差 $(-1/6,1/3,-1/6)$，平方和 $1/6$。无截距时 $a=6/5$，预测 $(0,6/5,12/5)$，残差 $(1,4/5,-2/5)$，残差和 $7/5$，平方和 $1+16/25+4/25=9/5$。输入与残差内积仍为0，但常数方向未包含在设计矩阵中。
+
+\textbf{6.7}\quad 全部最优参数为 $(7/6,t,1/2-t)$。参数范数平方为 $(7/6)^2+2(t-1/4)^2+1/8$，唯一最小点 $t=1/4$。最小范数选择不增加数据中不存在的辨识信息。
+
+\textbf{6.8}\quad 第一矩阵特征值3、1，正定；第二矩阵3、$-1$，不定。对任意v，$\symbf v^{\mathsf T}X^{\mathsf T}X\symbf v=\|X\symbf v\|^2\ge0$。严格正定当且仅当X没有非零零空间，即满列秩；若存在非零v被消去，则二次型可为零。
+
+\textbf{6.9}\quad U形状3乘2，s长2，V转置为2乘2；奇异值3、1，伪逆主非零项为1/3、1。秩一只保留第一项3，Frobenius误差1。外积中两向量同时变号，乘积 $(-\symbf u)(-\symbf v)^{\mathsf T}=\symbf u\symbf v^{\mathsf T}$，所以重建不变。
+
+\textbf{6.10}\quad A条件数 $10^4$，Gram条件数 $10^8$，右端相对变化 $10^{-4}$，解相对变化1，放大倍数 $10^4$。残差衡量当前计算解满足当前输入方程的程度，不能说明输入本身没有误差，也不能排除误差在弱方向上的放大。
+
+\subsubsection*{6.11--6.14：微分、程序与综合判断}
+\textbf{6.11}\quad 分量和 $\sum_{i,j}x_iA_{ij}x_j$中，求第k项导数需分别考虑左侧 $x_i$与右侧 $x_j$；得到 $\sum_jA_{kj}x_j+\sum_iA_{ik}x_i$。向量化为 $(A+A^{\mathsf T})\symbf x$；A对称时化为 $2A\symbf x$。反对称部分对二次型没有贡献。
+
+\textbf{6.12}\quad 原损失 $1/8$、梯度 $(-1/6,1/6)$。去掉 $1/2$后损失 $1/4$、梯度 $(-1/3,1/3)$。多输出按 $nk$个元素平均的半平方损失梯度为 $X^{\mathsf T}(XW-Y)/(nk)$，梯度形状仍与W一致。
+
+\textbf{6.13}\quad 改后 $\symbf y=(1,2,3)$恰在X列空间中，参数 $(1,1)$，残差数值上约为0。仍应检查形状与有限性，并用容差比较。SVD核对 $U\Sigma V^{\mathsf T}$与输入矩阵一致，U/V对应列行符号不作固定要求。配套脚本额外拒绝列形标签、非数值、非有限与溢出输入。
+
+\textbf{6.14}\quad 近相关列产生小奇异值。参数沿相应右奇异方向变化时，被训练X强烈压缩，训练预测可能变化不大；新样本未必保持同样相关结构，参数变化就可能显现为大预测变化。应记录特征单位与缩放、奇异值谱、数值秩及阈值、条件数、残差范数、参数范数与分布变化；不能仅凭训练误差小判断可靠。后续可比较简化特征或正则化，但需遵守验证流程。
+
+\subsection{本章小结}
+线性代数把数值计算组织成方向、空间与变换。内积连接夹角与得分，范数连接大小与误差，列空间限制可实现的预测，正交投影给出平方误差下的最佳近似。秩与零空间解释参数的可辨认性，不能与拟合误差或方程数量简单等同。
+
+特征分解揭示对称二次型的方向，SVD适用于一般长方形矩阵，并统一解释秩、伪逆、低秩近似和敏感性。矩阵微分则把这些结构转换成参数梯度。后续学习算法时，仍应同时核对公式条件、数组形状、数值尺度与数据含义。
+
 \clearpage
 \section*{资料说明与配套实验索引}
 \markboth{资料说明与配套实验索引}{}
 \pdfbookmark[1]{资料说明与配套实验索引}{references}
-本累计版包含第1章《人工智能与机器学习全景》、第2章《Python语言基础》、第3章《Python程序组织与调试》和第4章《NumPy与向量化计算》。后续8篇44章的整体规划保存在同目录大纲中，未完成章节不列入本PDF正文目录。已完成章节的编号、术语与实验编号供后续章节沿用。
+本累计版包含第1章《人工智能与机器学习全景》、第2章《Python语言基础》、第3章《Python程序组织与调试》、第4章《NumPy与向量化计算》、第5章《pandas、数据探索与可视化》和第6章《线性代数复习》。后续8篇44章的整体规划保存在同目录大纲中，未完成章节不列入本PDF正文目录。已完成章节的编号、术语与实验编号供后续章节沿用。
 
 本讲义中的例题、任务卡、教学数据与代码为针对本书学习目标编写的示例。基础语法可对照Python官方教程核对，可靠评价的流程可对照机器学习工具的官方实践说明。参考入口如下，访问日期为2026年10月8日；网页版本可能随官方维护更新，本章示例采用常见Python 3语法。
 \begin{enumerate}
@@ -3538,6 +4707,22 @@ NumPy把数值内容、类型和形状放在同一数组结构中。逐元素运
 \url{https://numpy.org/doc/2.3/reference/generated/numpy.std.html}\newline
 \url{https://numpy.org/doc/2.3/reference/generated/numpy.savez.html}
 \end{enumerate}
+\begingroup\Urlmuskip=0mu plus 2mu
+第5、6章另核对pandas、Matplotlib与NumPy线性代数官方文档，访问日期为2026年10月11日。pandas参考固定在2.2系列，本批实际使用2.2.3；Matplotlib参考为当前稳定版；分位数、缺失与合并规则均在正文明确说明。
+\begin{enumerate}
+\item pandas：索引、缺失、分组与合并。\newline
+\url{https://pandas.pydata.org/pandas-docs/version/2.2/user_guide/indexing.html}\newline
+\url{https://pandas.pydata.org/pandas-docs/version/2.2/user_guide/missing_data.html}\newline
+\url{https://pandas.pydata.org/pandas-docs/version/2.2/user_guide/groupby.html}\newline
+\url{https://pandas.pydata.org/pandas-docs/version/2.2/user_guide/merging.html}
+\item Matplotlib：画布、绘图区与基本作图。\newline
+\url{https://matplotlib.org/stable/users/explain/quick_start.html}
+\item NumPy 2.3：最小二乘、SVD与条件数。\newline
+\url{https://numpy.org/doc/2.3/reference/generated/numpy.linalg.lstsq.html}\newline
+\url{https://numpy.org/doc/2.3/reference/generated/numpy.linalg.svd.html}\newline
+\url{https://numpy.org/doc/2.3/reference/generated/numpy.linalg.cond.html}
+\end{enumerate}
+\endgroup
 上列资料为相关机制的核对与进阶入口，不要求先通读才能运行本批实验。第一章的近邻、风险与评价指标将在相应后续章节补充完整算法、统计假设和推导。
 
 \begin{center}
@@ -3555,6 +4740,12 @@ NumPy把数值内容、类型和形状放在同一数组结构中。逐元素运
 \code{ch04_arrays.py} & 实验4.1 & 形状、视图、广播与稳定计算\\
 \code{ch04_numeric.py} & 实验4.2 & 训练缩放、批量近邻与计时\\
 \code{ch04_solutions.py} & 第4章习题 & 形状、手算、分块与边界核对\\
+\code{ch05_tables.py} & 实验5.1 & 类型、审计、分组与合并\\
+\code{ch05_eda.py} & 实验5.2 & 统计、多图与探索报告\\
+\code{ch05_solutions.py} & 第5章习题 & 手算、冲突与合并核对\\
+\code{ch06_geometry.py} & 实验6.1 & 投影、QR与秩亏拟合\\
+\code{ch06_svd.py} & 实验6.2 & SVD、条件数与梯度\\
+\code{ch06_solutions.py} & 第6章习题 & 手算与非法输入核对\\
 \code{README.md} & 实验说明 & 环境、运行、预期与修改任务\\\bottomrule
 \end{tabularx}
 \end{center}

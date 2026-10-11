@@ -1,0 +1,79 @@
+(13, 7)
+    id  split area weight_kg distance_km late fee_yuan
+0  t01  train    A         1          10    0        6
+1  t02  train    A         2          20    0        8
+2  t03  train    B         3          10    1       10
+id             string[python]
+split          string[python]
+area           string[python]
+weight_kg      string[python]
+distance_km    string[python]
+late           string[python]
+fee_yuan       string[python]
+dtype: object
+block 0: passed
+(3,)
+(3, 1)
+['id', 'weight', 'area']
+block 1: passed
+2.0
+2.0
+    id  weight
+10  p1     1.0
+20  p2     2.0
+    id  weight
+10  p1     1.0
+20  p2     2.0
+block 2: passed
+    id  weight
+30  p3     4.0
+block 3: passed
+a    12
+b    21
+dtype: int64
+[11 22]
+block 4: passed
+[[ 1. 10.]
+ [ 2. 20.]]
+block 5: passed
+[False, True, False, False]
+[False, False, True, False]
+block 6: passed
+2.0 2 3
+0.3333333333333333
+4.0
+block 7: passed
+block 8: passed
+block 9: passed
+      rows  weights  mean_fee  late_rate
+area
+A        4        3      11.5       0.25
+B        4        3      20.5       0.75
+block 10: passed
+block 11: passed
+block 12: passed
+    id  weight_kg
+7  t08       20.0
+6.166666666666667 7.026141662866374
+block 13: passed
+6 0.9999999999999999
+late
+0.0    4
+1.0    4
+Name: count, dtype: int64
+late
+0.0    0.5
+1.0    0.5
+Name: proportion, dtype: float64
+block 14: passed
+block 15: passed
+block 16: passed
+block 17: passed
+(3, 2) (2,) (2, 2)
+[3. 1.]
+block 18: passed
+block 19: passed
+block 20: passed
+all source Python blocks syntax: 160
+new source Python blocks executed: 21
+independent modification checks: passed

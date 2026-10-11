@@ -1,0 +1,12 @@
+w: [1.166667 0.5     ]
+prediction: [1.166667 1.666667 2.166667]
+residual y-Xw: [-0.166667  0.333333 -0.166667]
+SSE: 0.16666666666666657
+X.T @ residual: [0. 0.]
+rank: 2 singular values: [2.676243 0.915272]
+rank-deficient w: [1.166667 0.25     0.25    ]
+rank-deficient rank / residual-array-size: 2 0
+alternative w: [ 1.166667  1.25     -0.75    ]
+coefficient norms: 1.2190615698606488 1.8671130418673396
+inner / distance / cosine: 2.0 2.23606797749979 0.4472135954999579
+all checks passed

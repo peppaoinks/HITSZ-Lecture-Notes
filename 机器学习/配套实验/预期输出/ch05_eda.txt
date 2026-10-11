@@ -1,0 +1,51 @@
+{
+  "versions": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "pandas": "2.2.3",
+    "matplotlib": "3.11.2"
+  },
+  "input_sha256": {
+    "areas.csv": "9ddb06611a5a34c639fe67dfa4d4835b3800194e138a83bbeb76e60b784fdf5f",
+    "parcels.csv": "d530f6fe67012c66081a9c519cca3032a0c264e873a7e81fb135e6c7ed252fe6"
+  },
+  "rows_raw": 13,
+  "rows_unique": 12,
+  "duplicates": 1,
+  "training_rows": 8,
+  "valid_weights": 6,
+  "weight_mean": 6.166666666666667,
+  "weight_median": 4.0,
+  "q1": 2.25,
+  "q3": 5.75,
+  "fences": [
+    -3.0,
+    11.0
+  ],
+  "flagged_ids": [
+    "t08"
+  ],
+  "correlation": 0.9999999999999999,
+  "correlation_pairs": 6,
+  "histogram_counts": [
+    3,
+    2,
+    0,
+    0,
+    1
+  ],
+  "histogram_edges": [
+    0,
+    5,
+    10,
+    15,
+    20,
+    25
+  ],
+  "late_counts": {
+    "0": 4,
+    "1": 4
+  },
+  "policy": "training-only EDA; retain flagged t08; train median fill=4; no model evaluation"
+}
+report and overview saved; all checks passed

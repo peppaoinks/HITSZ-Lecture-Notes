@@ -1,0 +1,30 @@
+{
+  "python": "3.12.14",
+  "numpy": "2.3.5",
+  "singular_values": [
+    3.0,
+    1.0
+  ],
+  "rank1_frobenius_error": 1.0,
+  "condition_number": 100000000.0,
+  "condition_gram": 9999999999999998.0,
+  "solution_before": [
+    1.0,
+    0.0
+  ],
+  "solution_after": [
+    1.0,
+    1.0
+  ],
+  "relative_amplification": 100000000.0,
+  "loss": 0.125,
+  "analytic_gradient": [
+    -0.16666666666666666,
+    0.16666666666666666
+  ],
+  "finite_difference": [
+    -0.16666666664139074,
+    0.1666666666760852
+  ],
+  "gradient_max_error": 2.5275920245704242e-11
+}

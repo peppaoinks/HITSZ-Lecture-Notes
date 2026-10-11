@@ -30,6 +30,7 @@ predictions = {
     "B": [6.0, 8.0, 10.0, 16.0],
 }
 for name, predicted in predictions.items():
+    validate_pairs(actual, predicted)
     errors = [p - y for y, p in zip(actual, predicted)]
     absolute = [abs(error) for error in errors]
     worst_index = absolute.index(max(absolute))

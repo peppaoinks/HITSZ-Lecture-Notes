@@ -1,0 +1,14 @@
+rows raw / unique: 13 12
+exact duplicates: 1
+splits: {'test': 2, 'train': 8, 'val': 2}
+audit:
+ id    column raw  reason
+t04 weight_kg     missing
+t07 weight_kg bad invalid
+training groups:
+      rows  weights  mean_fee  late_rate
+area
+A        4        3      11.5       0.25
+B        4        3      20.5       0.75
+aligned sum: {'a': 12, 'b': 21}
+all checks passed

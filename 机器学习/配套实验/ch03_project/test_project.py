@@ -14,9 +14,12 @@ class ProjectTests(unittest.TestCase):
         self.assertAlmostEqual(mae([5, 5], [7, 3]), 2.0)
         model = MeanRegressor().fit([1, 2, 3], [2, 2, 8])
         self.assertEqual(model.predict([99, -1]), [4.0, 4.0])
+        with self.assertRaises(ValueError):
+            MeanRegressor().fit([1, 2], [1e308, 1e308])
 
     def test_invalid_metrics(self):
-        for y, p in [([], []), ([1], []), ([1], [float("nan")])]:
+        for y, p in [([], []), ([1], []), ([1], [float("nan")]),
+                     ([-1e308], [1e308])]:
             with self.assertRaises(ValueError):
                 mae(y, p)
 
@@ -27,6 +30,8 @@ class ProjectTests(unittest.TestCase):
         model = NearestRegressor().fit(x, y)
         x[0], y[0] = 99, 99
         self.assertEqual(model.predict([2]), [6])  # first tie wins
+        with self.assertRaises(ValueError):
+            NearestRegressor().fit([-1e308], [1]).predict([1e308])
 
     def test_bad_csv(self):
         cases = [
@@ -43,6 +48,11 @@ class ProjectTests(unittest.TestCase):
                 path.write_text(content, encoding="utf-8")
                 with self.assertRaises(ValueError):
                     read_records(path)
+            # A quoted field spans two physical lines; the next bad row is line 4.
+            path.write_text('id,split,weight,cost\n"a\nb",train,1,6\n'
+                            'b,validation,nan,8\n', encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "row 4:"):
+                read_records(path)
 
     def test_dataset_values(self):
         path = Path(__file__).resolve().parent / "data" / "parcels.csv"
