@@ -1,0 +1,30 @@
+{
+  "python": "3.12.14",
+  "numpy": "2.3.5",
+  "seed": 20261013,
+  "coverage": {
+    "repetitions": 5000,
+    "n": 25,
+    "true_mu": 10,
+    "known_sigma": 2,
+    "half_width": 0.7839855938160214,
+    "fraction": 0.9524,
+    "empirical_mean_sd": 0.40015745429618776
+  },
+  "paired_bootstrap": {
+    "repetitions": 10000,
+    "n": 20,
+    "mae_a": 1.75,
+    "mae_b": 1.35,
+    "difference_a_minus_b": 0.4,
+    "empirical_difference_variance": 0.5399999999999998,
+    "conditional_theoretical_se": 0.1643167672515498,
+    "bootstrap_se": 0.16360036455622062,
+    "percentile_interval": [
+      0.05,
+      0.7
+    ],
+    "quantile_method": "linear",
+    "scope": "fixed predictions; iid test records; no retraining"
+  }
+}

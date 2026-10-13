@@ -1,5 +1,5 @@
 % 机器学习讲义：累计、单文件源文档。
-% 累计完成第1--6章。后续完整章节在文末资料说明前增补。
+% 累计完成第1--8章。后续完整章节在文末资料说明前增补。
 % 计划范围见工作目录的机器学习讲义大纲.md；不生成未完成章节目录。
 \documentclass[UTF8,fontset=none,zihao=-4,a4paper]{ctexart}
 \usepackage[left=26mm,right=26mm,top=25mm,bottom=25mm,headheight=15pt]{geometry}
@@ -27,7 +27,7 @@
 \usetikzlibrary{arrows.meta,positioning,calc}
 \usepackage{fvextra}
 \usepackage[hidelinks]{hyperref}
-\hypersetup{pdftitle={机器学习},pdfsubject={第1--6章：编程、数据探索与线性代数准备},bookmarksdepth=2}
+\hypersetup{pdftitle={机器学习},pdfsubject={第1--8章：编程与数学准备},bookmarksdepth=2}
 \definecolor{ThemeMain}{HTML}{35566E}
 \definecolor{ThemeBack}{HTML}{F2F6F8}
 \definecolor{ThemeBorder}{HTML}{B8C8D3}
@@ -4665,11 +4665,1193 @@ $X^{\mathsf T}(XW-Y)$ & $d\times k$ & 多输出参数梯度的未归一化部分
 
 特征分解揭示对称二次型的方向，SVD适用于一般长方形矩阵，并统一解释秩、伪逆、低秩近似和敏感性。矩阵微分则把这些结构转换成参数梯度。后续学习算法时，仍应同时核对公式条件、数组形状、数值尺度与数据含义。
 
+\chapterpage{微积分复习与优化准备}\label{ch:calculus}
+\begin{infobox}{先修知识、学习目标与本章位置}
+本章使用高等数学中的极限和导数、第6章的内积、特征值与正定性，以及第4章的NumPy数组。需要复习的微积分概念均从定义和小例子重新说明，不要求预先学过最优化课程。
+
+学习后应能把参数变化写成局部近似；区分偏导、梯度与方向导数；沿计算图累加多条路径的导数；利用Hessian与凸性判断驻点；推导梯度下降在二次函数上的收敛条件；用有限差分检查程序中的梯度。本章为第11、12章的模型训练与第23章的反向传播准备数学工具，暂不讨论动量和自适应优化器。
+\end{infobox}
+第6章已经求出平方损失的梯度。求出导数以后，还有三个问题：参数应往哪个方向改变？一次改变多大才能降低损失？公式和代码中的导数是否一致？微积分给出局部变化，优化方法根据这种变化反复更新参数，数值检查则帮助发现实现错误。
+
+本章把待最小化的标量函数记为 $f(\symbf\theta)$，其中 $\symbf\theta\in\mathbb R^d$为列向量。它可以是损失，也可以是损失加正则项。讨论函数性质时把数据固定，只对参数求导。参数的单位和尺度可能不同；本章的最陡方向以所选坐标中的欧氏长度为标准。
+
+\subsection{一元导数：瞬时变化与切线近似}
+\subsubsection{变化率是极限，不是一次有限差值}
+对实函数 $f:\mathbb R\to\mathbb R$，若极限存在且有限，定义
+\[
+ f'(a)=\lim_{h\to0}\frac{f(a+h)-f(a)}h.
+\]
+分子是输出变化，分母是输入变化；商表示平均变化率，取极限得到点 $a$处的\term{导数}（derivative）。$h$允许从正负两侧趋近0。导数存在蕴含连续，但连续不保证可导，例如 $|x|$在0处左右导数分别为 $-1$和1。
+
+导数的单位是输出单位除输入单位。若费用 $f(x)$以元计、重量 $x$以千克计，则 $f'(x)$以元/千克计。损失对某一参数的导数同样受该参数单位影响；把特征从米换成厘米后，梯度数值没有理由保持不变。
+
+导数定义也可写成
+\[
+ f(a+h)=f(a)+f'(a)h+r(h),\qquad \frac{r(h)}{|h|}\to0.
+\]
+余项记为 $o(|h|)$，表示它相对 $|h|$趋于0，不表示余项处处等于0。这给出\term{一阶局部近似}：在足够小的邻域，用切线替代曲线。近似的有效范围由函数的弯曲程度决定。
+
+\begin{infobox}{例题7.1：由差商到近似误差}
+设 $f(x)=(x-3)^2$。求 $f'(1)$，用一阶近似估计 $f(1.1)$，并比较精确值。导数为负是否意味着任意增加 $x$都会降低函数？
+\end{infobox}
+\sol 展开 $f(1+h)=4-4h+h^2$，差商为 $-4+h$，所以 $f'(1)=-4$。线性估计 $f(1.1)\approx4-4(0.1)=3.6$，精确值3.61，误差0.01恰为 $h^2$。
+
+当 $x$从1增加到3时函数下降，但增加到6会得到9，大于起点的4。导数只描述起点附近的变化趋势，不能为任意长度的移动提供保证。这个区别直接解释了为什么沿负梯度走得过远仍会使损失增加。
+
+\subsubsection{常用求导规则及使用条件}
+在相应定义域内，常用规则为
+\[
+ (x^k)'=kx^{k-1},\quad (e^x)'=e^x,\quad
+ (\ln x)'=\frac1x\ (x>0),\quad (c)'=0.
+\]
+对可导函数 $u,v$，有 $(u+v)'=u'+v'$、$(uv)'=u'v+uv'$，以及 $(u/v)'=(u'v-uv')/v^2$，后者要求 $v\ne0$。常数倍可移到导数外。概率损失大量使用自然对数；先检查概率是否为正，再讨论其导数，不能把 $\ln0$当作普通有限数。
+
+复合函数 $f(x)=g(u(x))$满足 $f'(x)=g'(u(x))u'(x)$。外层导数在当前中间值 $u(x)$处计算，不能把 $g'(u(x))$误写为 $g'(x)$。例如 $\ln(1+e^x)$的导数为 $e^x/(1+e^x)$；正是内部指数的导数产生分子 $e^x$。
+
+\subsection{偏导、可微与梯度的几何含义}
+\subsubsection{固定其他坐标，只改变一个坐标}
+对 $f:\mathbb R^d\to\mathbb R$，第 $j$个\term{偏导数}（partial derivative）定义为
+\[
+ \frac{\partial f}{\partial\theta_j}(\symbf\theta)
+ =\lim_{h\to0}\frac{f(\symbf\theta+h\symbf e_j)-f(\symbf\theta)}h,
+\]
+$\symbf e_j$是第 $j$个标准基向量。求偏导时其他参数固定，训练数据也固定。例如 $f(u,v)=u^2+uv+2v^2$有
+\[
+ \frac{\partial f}{\partial u}=2u+v,\qquad
+ \frac{\partial f}{\partial v}=u+4v.
+\]
+$uv$对两个变量都有贡献；对 $u$求偏导时 $v$是常数，对 $v$求偏导时 $u$是常数。
+
+把偏导按参数顺序排成列向量，得到\term{梯度}（gradient）
+\[
+ \nabla f(\symbf\theta)=
+ \begin{pmatrix}\partial f/\partial\theta_1\\\vdots\\\partial f/\partial\theta_d\end{pmatrix}
+ \in\mathbb R^d.
+\]
+梯度与参数维度相同，不与样本数相同。NumPy用形状\code{(d,)}的一维数组存储本章参数和梯度；数学公式仍按列向量理解。
+
+\subsubsection{全微分与多元局部近似}
+若存在向量 $\symbf g$，使任意小位移 $\symbf\delta$满足
+\[
+ f(\symbf\theta+\symbf\delta)
+ =f(\symbf\theta)+\symbf g^{\mathsf T}\symbf\delta
+ +o(\|\symbf\delta\|_2),
+\]
+则称 $f$在该点\term{可微}（differentiable），并且 $\symbf g=\nabla f$。线性部分称为\term{全微分}：$\mathrm df=(\nabla f)^{\mathsf T}\mathrm d\symbf\theta$。输入位移是向量，输出变化是标量；内积把所有坐标的贡献相加。
+
+各偏导在邻域存在且连续，是可微的一个充分条件。只知道各偏导在一点存在还不够，因为偏导只检查坐标轴方向。例子
+\[
+ g(u,v)=\begin{cases}\dfrac{uv}{u^2+v^2},&(u,v)\ne(0,0),\\0,&(u,v)=(0,0)\end{cases}
+\]
+在原点沿两条坐标轴恒为0，因此两个偏导都为0；沿 $u=v\ne0$却恒为1/2，甚至不连续。后续使用梯度的一阶近似时，应有可微性依据，而不能只列出偏导值。
+
+\begin{infobox}{例题7.2：两个参数同时改变}
+对 $f(u,v)=u^2+uv+2v^2$，在 $(1,-1)$处令位移 $\symbf\delta=(0.1,0.2)^{\mathsf T}$。计算梯度、一阶预测变化与真实变化。
+\end{infobox}
+\sol 起点函数值2，梯度为 $(1,-3)^{\mathsf T}$。预测变化为 $1(0.1)-3(0.2)=-0.5$，故预测新值1.5。真实新值
+\[
+ f(1.1,-0.8)=1.21-0.88+1.28=1.61.
+\]
+二次余项为 $0.1^2+0.1(0.2)+2(0.2)^2=0.11$。若只观察第一偏导为正，便断言此次移动使函数增加，会漏掉第二坐标的更大下降贡献。
+
+\subsection{方向导数与最陡下降方向}
+取单位向量 $\symbf v$，沿直线 $\symbf\theta+t\symbf v$的变化率称为\term{方向导数}（directional derivative）：
+\[
+ D_{\symbf v}f(\symbf\theta)
+ =\left.\frac{\mathrm d}{\mathrm dt}f(\symbf\theta+t\symbf v)\right|_{t=0}
+ =\nabla f(\symbf\theta)^{\mathsf T}\symbf v,
+\]
+最后的等式要求 $f$在该点可微。若方向向量未单位化，此表达式是对 $t$的变化率，其大小还包含速度 $\|\symbf v\|$，不便直接比较不同方向的单位距离变化。
+
+由第6章的Cauchy--Schwarz不等式，对 $\|\symbf v\|_2=1$有
+\[
+ -\|\nabla f\|_2\le\nabla f^{\mathsf T}\symbf v\le\|\nabla f\|_2.
+\]
+梯度非零时，上界在 $\symbf v=\nabla f/\|\nabla f\|$处取得，下界在其相反方向取得。因此负梯度给出当前欧氏坐标中单位距离的一阶最快下降方向。沿与梯度正交的方向，一阶变化为0，但二阶变化仍可不为0。
+
+对例题7.2，沿正 $u$轴的变化率为1，沿正 $v$轴为 $-3$；最陡下降单位方向为 $(-1,3)^{\mathsf T}/\sqrt{10}$，变化率为 $-\sqrt{10}$。方向 $\symbf v=(3,1)^{\mathsf T}/\sqrt{10}$与梯度正交，一阶变化为0。
+
+\begin{center}
+\begin{tikzpicture}[scale=0.95,>=Latex,font=\small]
+\draw[->,draw=ThemeMain] (-0.2,0)--(7,0) node[right] {$u$};
+\draw[->,draw=ThemeMain] (0,-0.2)--(0,4.6) node[above] {$v$};
+\draw[draw=ThemeBorder] (3.6,2.3) ellipse (2.7 and 1.7);
+\draw[draw=ThemeBorder] (3.6,2.3) ellipse (1.8 and 1.13);
+\draw[draw=ThemeBorder] (3.6,2.3) ellipse (0.9 and 0.57);
+\fill[ThemeMain] (5.1,3.24) circle(2pt);
+\draw[->,very thick,draw=ThemeMain] (5.1,3.24)--(4.5,2.29) node[below right] {$-\nabla f$};
+\draw[->,draw=ThemeMain] (5.1,3.24)--(4.02,3.94) node[left] {切向};
+\node at (3.6,2.3) {$\symbf\theta^*$};
+\node[anchor=west] at (5.2,3.45) {$\symbf\theta$};
+\end{tikzpicture}
+\end{center}
+图示表示光滑二次函数的等高线和局部方向。可微且梯度非零处，等高线切向与梯度正交；负梯度指向局部较低的一侧。一次更新若很长，可能穿过谷底并到达更高的等高线。
+
+\subsection{链式法则：向量映射与多条依赖路径}
+\subsubsection{Jacobian的形状与乘法顺序}
+设中间映射 $\symbf z=\symbf g(\symbf\theta)\in\mathbb R^m$，最终 $L=\ell(\symbf z)\in\mathbb R$。定义\term{Jacobian矩阵}（雅可比矩阵）为
+\[
+ J_g=\left[\frac{\partial z_i}{\partial\theta_j}\right]_{i,j}
+ \in\mathbb R^{m\times d}.
+\]
+每行对应一个输出，每列对应一个输入。微分为 $\mathrm d\symbf z=J_g\mathrm d\symbf\theta$，代入 $\mathrm dL=(\nabla_z\ell)^{\mathsf T}\mathrm d\symbf z$得
+\begin{equation}\label{eq:chain-vector}
+ \nabla_\theta L=J_g^{\mathsf T}\nabla_z\ell
+ \in\mathbb R^d.
+\end{equation}
+乘法维度为 $(d\times m)(m\times1)$。按分量展开，就是
+\[
+ \frac{\partial L}{\partial\theta_j}
+ =\sum_{i=1}^m\frac{\partial L}{\partial z_i}
+                 \frac{\partial z_i}{\partial\theta_j}.
+\]
+同一个参数若影响多个中间量，必须把所有分支相加。只沿一条路径求导会得到形状正确、数值错误的结果。
+
+\subsubsection{偏导与总导数不能混用}
+令 $F(x,y)=xy+y^2$，再令 $y=x^2$。在二元函数中保持 $y$固定，有 $\partial F/\partial x=y$；沿指定曲线，$F(x,x^2)=x^3+x^4$，所以
+\[
+ \frac{\mathrm d}{\mathrm dx}F(x,y(x))
+ =\frac{\partial F}{\partial x}+\frac{\partial F}{\partial y}\frac{\mathrm dy}{\mathrm dx}
+ =x^2+(x+2x^2)2x=3x^2+4x^3.
+\]
+前者问一个坐标单独变化的影响，后者问所有由 $x$引起的变化。在 $x=1$处两者分别为1和7，不能互相代替。
+
+\begin{infobox}{例题7.3：同一变量进入两条路径}
+设 $a=x^2$，$b=3x$，$c=a+b$，$L=c^2/2$。在 $x=1$处计算前向数值，并沿两条路径求 $\mathrm dL/\mathrm dx$。若只经过 $a$会得到什么？
+\end{infobox}
+\sol 前向依次得到 $a=1,b=3,c=4,L=8$。外层导数为 $\partial L/\partial c=c=4$，加法对每个输入的局部导数都是1。因此
+\[
+ \frac{\mathrm dL}{\mathrm dx}
+ =\underbrace{4\cdot1\cdot2x}_{x\to a\to c\to L}
+ +\underbrace{4\cdot1\cdot3}_{x\to b\to c\to L}
+ =8+12=20.
+\]
+只保留平方分支得到8。直接求导 $L=(x^2+3x)^2/2$也得到 $(x^2+3x)(2x+3)$，在1处为20。
+
+\subsection{计算图与导数的反向累加}
+\term{计算图}（computational graph）把复杂表达式拆成加法、乘法、平方等局部操作；节点存放中间结果，有向边表示依赖。此处没有循环依赖，可以按依赖顺序前向计算，再按相反顺序传播输出对各节点的导数。
+
+\begin{center}
+\begin{tikzpicture}[>=Latex,node distance=13mm and 15mm,font=\small,
+ every node/.style={draw=ThemeBorder,fill=ThemeBack,rounded corners=1pt,inner sep=5pt}]
+\node (x) {$x$};
+\node[right=of x,yshift=9mm] (a) {$a=x^2$};
+\node[right=of x,yshift=-9mm] (b) {$b=3x$};
+\node[right=of a,yshift=-9mm] (c) {$c=a+b$};
+\node[right=of c] (L) {$L=c^2/2$};
+\draw[->,draw=ThemeMain] (x)--(a);\draw[->,draw=ThemeMain] (x)--(b);
+\draw[->,draw=ThemeMain] (a)--(c);\draw[->,draw=ThemeMain] (b)--(c);
+\draw[->,draw=ThemeMain] (c)--(L);
+\end{tikzpicture}
+\end{center}
+记 $\bar z=\partial L/\partial z$，横线是导数标记，不是样本均值。先把各节点的 $\bar z$置0，再从 $\bar L=1$开始，对每条父子边执行
+\[
+ \bar z\mathrel{+}=\bar q\frac{\partial q}{\partial z},
+\]
+其中 $q$为使用 $z$的后继节点。使用累加而非覆盖，是因为同一节点可能被多次使用。若 $q=z\cdot z$，两条输入边各贡献 $z$，总局部导数为 $2z$。
+
+例题7.3的手写实现如下，代码变量\code{bar_x}对应 $\bar x$：
+\begin{pycode}
+x = 1.0
+a = x * x
+b = 3 * x
+c = a + b
+loss = c * c / 2
+bar_c = c
+bar_a = bar_c
+bar_b = bar_c
+bar_x = 0.0
+bar_x += bar_a * (2 * x)
+bar_x += bar_b * 3
+print(loss, bar_x)  # 8.0 20.0
+\end{pycode}
+反向计算需要前向值，例如平方节点要用当前的 $x$或 $c$。这解释了训练时保存中间结果的用途。对标量输出、很多参数的计算图，反向累加通常能以与前向计算同一量级的算术工作获得全部参数导数，代价是保存或重新计算中间量。第23章再把这个机制用于多层网络。
+
+\term{自动微分}（automatic differentiation）自动组织这些局部求导和链式累加。它不同于用有限差分近似导数，也不同于把表达式完全化简后做符号运算；实际结果仍受浮点舍入和所实现操作的导数规则影响。自动微分不会检查输入标签是否错配，也不会判断目标函数是否符合任务。
+
+\subsection{Hessian与二阶局部近似}
+\subsubsection{二阶导数描述曲率}
+若 $f$二阶连续可微，定义\term{Hessian矩阵}（海森矩阵）
+\[
+ H(\symbf\theta)=\left[\frac{\partial^2 f}{\partial\theta_i\partial\theta_j}\right]_{i,j}
+ \in\mathbb R^{d\times d}.
+\]
+二阶偏导连续时混合偏导可交换，所以 $H=H^{\mathsf T}$。二阶Taylor展开为
+\begin{equation}\label{eq:taylor2}
+ f(\symbf\theta+\symbf\delta)
+ =f(\symbf\theta)+\nabla f^{\mathsf T}\symbf\delta
+ +\frac12\symbf\delta^{\mathsf T}H\symbf\delta
+ +o(\|\symbf\delta\|_2^2).
+\end{equation}
+这里 $H$在起点处取值；二次函数的二阶展开精确，没有更高余项。一般函数只在足够小邻域近似有效。
+
+在单位方向 $\symbf v$上，二阶方向变化率为 $\symbf v^{\mathsf T}H\symbf v$。第6章的对称特征分解把它拆成各特征方向的曲率。正特征值表示该方向向上弯曲，负特征值表示向下弯曲；零特征值说明二阶项在该方向没有信息，仍须看更高阶项。
+
+对例题7.2，
+\[
+ H=\begin{pmatrix}2&1\\1&4\end{pmatrix},\qquad
+ \frac12\symbf\delta^{\mathsf T}H\symbf\delta
+ =\delta_u^2+\delta_u\delta_v+2\delta_v^2.
+\]
+它恰好补回一阶近似漏掉的0.11。Hessian需要 $d^2$个条目，参数很多时完整存储和求解代价很高；本章用小矩阵解释性质，不据此要求大模型显式构造Hessian。
+
+\subsubsection{驻点、极值与鞍点的区别}
+定义域内点满足 $\nabla f(\symbf\theta^*)=0$时称为\term{驻点}（stationary point）。局部极小要求某邻域内 $f(\symbf\theta)\ge f(\symbf\theta^*)$，全局极小则要求整个可行域内成立。对可微的无约束内点，极小必须是驻点；反过来不成立。
+
+二阶连续可微函数在驻点处，若Hessian正定，则为严格局部极小；负定则为严格局部极大；若同时有正、负特征值，则为\term{鞍点}（saddle point）。仅半正定或半负定不能完成判定。若在非驻点检查Hessian，正定也不意味着该点已经是极小点。
+
+\begin{infobox}{例题7.4：零梯度的四种情形}
+在原点判断 $f_1(u,v)=u^2+v^2$、$f_2(u,v)=u^2-v^2$、$f_3(x)=x^4$与 $f_4(x)=x^3$。若问题改为在 $[0,\infty)$上最小化 $f(x)=x$，最优点梯度为多少？
+\end{infobox}
+\sol 四个函数在原点梯度都为0。$f_1$的Hessian为 $2I$，正定，原点是唯一全局极小；$f_2$的Hessian为 $\operatorname{diag}(2,-2)$，沿两坐标轴分别上升、下降，原点是鞍点。$f_3''(0)=f_4''(0)=0$，二阶检验都无法判定；但 $x^4\ge0$给出极小，$x^3$在原点两侧一正一负，给出非极值的驻点。
+
+最后一个约束问题的最优点为边界0，导数为1，不满足无约束内点的必要条件。因此判断极值前需先说明定义域和约束。后续的概率参数常受 $0\le p\le1$约束，边界不能靠令导数为0自动找到。
+
+\subsection{凸性：由局部导数获得全局结论}
+\subsubsection{定义、切平面与Hessian判据}
+若集合 $C$包含任意两点之间的整条线段，则称为\term{凸集}。函数 $f:C\to\mathbb R$满足对任意 $\symbf a,\symbf b\in C$、$t\in[0,1]$，
+\[
+ f((1-t)\symbf a+t\symbf b)
+ \le(1-t)f(\symbf a)+tf(\symbf b),
+\]
+则称为\term{凸函数}（convex function）。图像位于两点连线下方；这个定义比较整个线段，不能只凭一个点处的曲率判断全域凸性。
+
+对开凸域上的可微函数，凸性等价于一阶下界
+\[
+ f(\symbf b)\ge f(\symbf a)+\nabla f(\symbf a)^{\mathsf T}(\symbf b-\symbf a).
+\]
+其含义是任意切平面都从下方支撑函数。代入驻点 $\nabla f(\symbf a)=0$，得到任意 $\symbf b$都有 $f(\symbf b)\ge f(\symbf a)$，于是凸函数的驻点是全局极小。
+
+对二阶连续可微函数，在开凸域上处处 $H\succeq0$等价于凸性。可从任意直线上的函数 $\phi(t)=f(\symbf a+t\symbf v)$理解：$\phi''(t)=\symbf v^{\mathsf T}H\symbf v\ge0$，每条直线限制都是凸的一元函数。这里 $H\succeq0$表示半正定，而非各矩阵元素都非负。
+
+若对不同点与 $0<t<1$严格小于连线，称为\term{严格凸}；严格凸函数至多有一个极小点，但未必一定取得最小值，例如 $e^x$在实数域上只有下确界0。处处Hessian正定是严格凸的充分条件，并非必要条件：$x^4$严格凸而在0处二阶导数为0。
+
+\subsubsection{强凸与光滑性分别控制什么}
+若存在 $\mu>0$，对任意两点有
+\[
+ f(\symbf b)\ge f(\symbf a)+\nabla f(\symbf a)^{\mathsf T}(\symbf b-\symbf a)
+ +\frac\mu2\|\symbf b-\symbf a\|_2^2,
+\]
+则称 $f$为 $\mu$\term{强凸}（strongly convex）。二阶连续可微时可由 $H\succeq\mu I$保证。它给出统一的最小曲率，比严格凸更强；$x^4$在整个实数域上没有正的统一曲率下界。
+
+若梯度满足
+\[
+ \|\nabla f(\symbf a)-\nabla f(\symbf b)\|_2
+ \le M\|\symbf a-\symbf b\|_2,
+\]
+则称梯度是 $M$-Lipschitz连续，或函数为 $M$\term{光滑}（smooth）。本章用 $M$表示光滑常数，避免与损失符号 $L$混淆。二阶连续可微时，$\|H\|_2\le M$可保证该性质。它约束梯度变化不能过快，与“图画得光滑”或“处处可导”不是同一强度的条件。
+
+对正定二次函数 $f(\symbf\theta)=\frac12\symbf\theta^{\mathsf T}A\symbf\theta-\symbf b^{\mathsf T}\symbf\theta+c$，$A=A^{\mathsf T}\succ0$，梯度为 $A\symbf\theta-\symbf b$，Hessian为 $A$，可取 $\mu=\lambda_{\min}(A)$、$M=\lambda_{\max}(A)$。因此第6章的特征值与条件数可以直接描述优化难度。
+
+\subsection{梯度下降：更新规则与下降条件}
+\subsubsection{把局部下降方向变成迭代算法}
+\term{梯度下降}（gradient descent）用当前梯度更新参数：
+\begin{equation}\label{eq:gd-update}
+ \symbf\theta_{t+1}=\symbf\theta_t-\eta\nabla f(\symbf\theta_t),\qquad\eta>0.
+\end{equation}
+下标 $t$是更新次数，$\eta$称为\term{步长}或\term{学习率}（learning rate）。实际位移长度为 $\eta\|\nabla f\|_2$；固定学习率不意味着每次走一样远。算法需要起点、目标与梯度、学习率、停止条件和最大迭代数。
+
+\begin{enumerate}
+\item 在同一个当前参数处计算 $f_t$与完整梯度 $\symbf g_t$。
+\item 检查损失、梯度是否有限；记录梯度范数和必要的诊断量。
+\item 若达到指定停止条件则返回；否则同时更新全部坐标。
+\item 继续下一次迭代，直到收敛判据成立或到达迭代上限。
+\end{enumerate}
+“同时”表示各坐标都使用旧参数计算的梯度。如果在循环内更新第一个坐标后立即用新值计算第二个偏导，执行的已是另一种更新方式。每次稠密线性模型的完整梯度需 $O(nd)$运算，$T$次约为 $O(Tnd)$；是否值得迭代，还要与第6章的直接数值求解比较。
+
+\subsubsection{由光滑上界推导学习率约束}
+设连接两点的线段上满足前述 $M$-光滑条件，令位移为 $\symbf s$。沿线段积分有
+\begin{align*}
+ f(\symbf\theta+\symbf s)-f(\symbf\theta)
+ &=\int_0^1\nabla f(\symbf\theta+t\symbf s)^{\mathsf T}\symbf s\,\mathrm dt\\
+ &=\nabla f(\symbf\theta)^{\mathsf T}\symbf s
+ +\int_0^1(\nabla f(\symbf\theta+t\symbf s)-\nabla f(\symbf\theta))^{\mathsf T}\symbf s\,\mathrm dt\\
+ &\le\nabla f(\symbf\theta)^{\mathsf T}\symbf s+\frac M2\|\symbf s\|_2^2.
+\end{align*}
+最后一步先用内积不等式，再用梯度差不超过 $Mt\|\symbf s\|$，最后积分 $\int_0^1t\,\mathrm dt=1/2$。代入 $\symbf s=-\eta\nabla f$：
+\[
+ f(\symbf\theta_{t+1})
+ \le f(\symbf\theta_t)-\eta\left(1-\frac{M\eta}{2}\right)\|\nabla f(\symbf\theta_t)\|_2^2.
+\]
+因此 $0<\eta<2/M$时，非零梯度能保证本步严格下降；$\eta\le1/M$给出更常用的保守选择。这里不要求凸性，但要求适用的光滑上界。下降并不自动保证找到全局最小，函数甚至可能没有下界。
+
+把函数乘常数 $a>0$后，梯度与光滑常数也乘 $a$，维持同一参数轨迹应把学习率除以 $a$。这解释了把平均损失改为求和后，原学习率可能过大。损失归一化是训练配置的一部分。
+
+\begin{infobox}{例题7.5：一元二次函数的四种步长}
+最小化 $f(x)=\frac12(2)(x-3)^2$，从 $x_0=0$开始。比较 $\eta=0.25,0.75,1,1.1$的更新行为，并写出精确收敛条件。
+\end{infobox}
+\sol 梯度为 $2(x-3)$。令误差 $e_t=x_t-3$，则 $e_{t+1}=(1-2\eta)e_t$，所以 $e_t=(1-2\eta)^t e_0$。收敛要求 $|1-2\eta|<1$，即 $0<\eta<1$。
+
+步长0.25时误差每步乘0.5，$x$依次为0、1.5、2.25；步长0.75时乘 $-0.5$，$x$依次为0、4.5、2.25，跨过最优点但误差缩小；步长1时乘 $-1$，在0和6之间往复，损失恒为9；步长1.1时乘 $-1.2$，误差绝对值增大。跨越谷底不等于发散，关键是各步误差的放大倍数。
+
+\subsection{多元二次函数的收敛与特征尺度}
+\subsubsection{在特征方向上分解迭代}
+对正定二次函数 $f=\frac12\symbf\theta^{\mathsf T}A\symbf\theta-\symbf b^{\mathsf T}\symbf\theta+c$，最优点满足 $A\symbf\theta^*=\symbf b$，且唯一。令 $\symbf e_t=\symbf\theta_t-\symbf\theta^*$，有
+\[
+ \symbf e_{t+1}=(I-\eta A)\symbf e_t.
+\]
+第6章给出 $A=Q\Lambda Q^{\mathsf T}$，其中 $Q$正交。用特征坐标 $\symbf z_t=Q^{\mathsf T}\symbf e_t$得到
+\[
+ \symbf z_{t+1}=(I-\eta\Lambda)\symbf z_t,\qquad
+ z_{t+1,j}=(1-\eta\lambda_j)z_{t,j}.
+\]
+每个方向都变成例题7.5的一元问题。对任意起点保证收敛，当且仅当
+\begin{equation}\label{eq:quadratic-step}
+ 0<\eta<\frac2{\lambda_{\max}(A)}.
+\end{equation}
+若起点恰好不含某个不稳定方向，该方向不影响这次精确算术轨迹；但不能据此把步长说成对任意起点稳定。浮点误差也可能激发本来为零的方向。
+
+令 $\rho=\max_j|1-\eta\lambda_j|<1$，则
+\[
+ \|\symbf e_t\|_2\le\rho^t\|\symbf e_0\|_2,\qquad
+ f(\symbf\theta_t)-f(\symbf\theta^*)=\frac12\sum_j\lambda_jz_{t,j}^2.
+\]
+这是误差按固定比例缩小的\term{线性收敛}，名称描述比例而不是误差随次数画成直线。函数差的上界可按 $\rho^{2t}$缩小。
+
+在最小、最大特征值分别为 $\mu,M$的二次问题中，让两端放大因子的绝对值相等，即 $1-\eta\mu=-(1-\eta M)$，可得最坏方向意义下的最优固定步长
+\[
+ \eta_* =\frac2{M+\mu},\qquad
+ \rho_* =\frac{M-\mu}{M+\mu}=\frac{\kappa-1}{\kappa+1},\quad \kappa=M/\mu.
+\]
+$\kappa$很大时 $\rho_*$接近1。高曲率方向限制步长，低曲率方向因此每步进展很慢。这是狭长谷地中梯度下降缓慢的代数解释。
+
+\begin{infobox}{例题7.6：同一学习率面对不同曲率}
+设 $f(u,v)=\frac12(u^2+9v^2)$，起点 $(1,1)$。计算步长0.1、0.2、$2/9$与0.23下的一步更新，并比较长期行为。若用变量 $s=3v$重写目标，曲率怎样改变？
+\end{infobox}
+\sol Hessian为 $\operatorname{diag}(1,9)$，稳定区间为 $0<\eta<2/9$。一步更新为 $(1-\eta,1-9\eta)$，依次是 $(0.9,0.1)$、$(0.8,-0.8)$、$(7/9,-1)$与 $(0.77,-1.07)$。前两种收敛；$2/9$使第二坐标等幅振荡；0.23使第二坐标发散。固定步长最优值 $2/(1+9)=0.2$，两方向误差绝对值每步乘0.8。
+
+令 $\symbf\phi=(u,s)$，新目标为 $(u^2+s^2)/2$，Hessian变成单位阵。在新坐标中取步长1可一步到达原点。不过这相当于改变原坐标中的更新尺度，不能一边用新目标的梯度，一边仍把第二坐标当作原变量 $v$。
+
+\subsubsection{平方损失、秩亏与停止条件}
+对第6章的 $L(\symbf w)=\|X\symbf w-\symbf y\|^2/(2n)$，
+\[
+ \nabla L=X^{\mathsf T}(X\symbf w-\symbf y)/n,\qquad
+ H=X^{\mathsf T}X/n\succeq0.
+\]
+满列秩时Hessian正定，稳定步长由 $\lambda_{\max}(X^{\mathsf T}X/n)$确定。对满列秩 $X$，Hessian条件数为 $\kappa_2(X)^2$；高度相关或尺度悬殊的特征可能让迭代变慢。
+
+秩亏时存在零特征值，零空间方向没有梯度更新，初始参数在该方向的分量保留。最小二乘总存在极小解；对非零特征方向采用稳定步长时，预测和损失可收敛，参数则收敛到由起点决定的一组解。从零初始化开始，迭代始终位于 $X^{\mathsf T}$的列空间中，极限为最小范数解；任意初始化不能直接宣称有这个性质。
+
+停止时可联合查看梯度范数、参数变化、损失变化和迭代上限。梯度小可能来自近极小，也可能来自尺度、平坦区域或鞍点。若函数 $\mu$-强凸且有极小点，则
+\[
+ \|\symbf\theta-\symbf\theta^*\|_2\le\frac{\|\nabla f(\symbf\theta)\|_2}{\mu}.
+\]
+当 $\mu$很小时，相同梯度容差对应更大的参数误差。在一般非凸模型中没有这样的统一保证。训练损失收敛还不能替代验证与测试评价。
+
+\subsection{有限差分与梯度检查}
+\subsubsection{截断误差和舍入误差怎样竞争}
+无法直接获得导数时，可以用\term{有限差分}（finite difference）近似：
+\[
+ D_h^+f(x)=\frac{f(x+h)-f(x)}h,\qquad
+ D_h^0f(x)=\frac{f(x+h)-f(x-h)}{2h}.
+\]
+分别称为前向差分和中心差分。若函数在邻域足够光滑，Taylor展开给出
+\begin{align*}
+ f(x+h)&=f(x)+hf'(x)+\tfrac12h^2f''(x)+O(h^3),\\
+ f(x-h)&=f(x)-hf'(x)+\tfrac12h^2f''(x)+O(h^3).
+\end{align*}
+相减后偶次项抵消，所以中心差分的截断误差通常为 $O(h^2)$，前向差分通常为 $O(h)$。这里 $O(h^2)$表示小 $h$时误差绝对值可由常数乘 $h^2$控制，不承诺固定的数值误差。
+
+浮点计算会使两个非常接近的函数值相减时丢失有效数字；函数求值中的绝对误差除以 $h$后可能放大。粗略模型为
+\[
+ \text{中心差分误差}\ \lesssim C_1h^2+C_2\frac{\varepsilon}{h},
+\]
+其中 $\varepsilon$为机器精度量级，常数依赖函数值和导数尺度。$h$大时截断误差主导，$h$极小时舍入误差主导。双精度、尺度接近1的光滑函数常可从 $10^{-4}$到 $10^{-6}$一带试起，再做多个数量级的扫描；不能把某个步长当作所有问题的固定答案。
+
+\begin{infobox}{例题7.7：差分误差可以精确算出}
+对 $f(x)=x^3$在 $x=1$求导。分别展开前向和中心差分，并给出 $h=0.1$与0.01时的截断误差。为什么二次函数不足以展示中心差分的一般误差趋势？
+\end{infobox}
+\sol 精确导数为3。前向差分为 $3+3h+h^2$，中心差分为 $3+h^2$。两步长下前向误差分别为0.31、0.0301，中心误差为0.01、0.0001。对二次多项式，中心差分在精确算术中恰好给出导数，没有三阶导数产生的截断误差；只用二次函数检查，可能误以为任意步长都同样好。
+
+\subsubsection{逐坐标核对与方向核对}
+对 $d$维参数，第 $j$项中心差分为
+\[
+ g_j^{\rm num}=\frac{f(\symbf\theta+h_j\symbf e_j)-f(\symbf\theta-h_j\symbf e_j)}{2h_j}.
+\]
+可取 $h_j=h\max(1,|\theta_j|)$适应坐标尺度，但仍需扫描基本步长 $h$。逐坐标检查约需 $2d$次函数求值，加一次解析梯度；它适合小模型调试，不适合每个训练步骤都做。
+
+应先检查解析梯度与参数同形、所有结果有限，再比较差异。混合判据
+\[
+ |g_j^{\rm ana}-g_j^{\rm num}|\le\text{atol}+\text{rtol}|g_j^{\rm num}|
+\]
+兼顾近零值和大值。只除以 $|g_j|$会在零梯度附近产生不稳定的相对误差。也可报告最大绝对差及整体归一化差，不仅给一个“通过”结论。
+
+若参数很多，可取若干固定随机单位方向 $\symbf v$，比较
+\[
+ \nabla f(\symbf\theta)^{\mathsf T}\symbf v
+ \quad\text{与}\quad
+ \frac{f(\symbf\theta+h\symbf v)-f(\symbf\theta-h\symbf v)}{2h}.
+\]
+每个方向只需两次函数求值，但有限几个方向无法排除所有错误，特别是局部或稀疏的错误；应与逐坐标小输入核对结合。
+
+\begin{infobox}{注意：数值梯度的一致性条件}
+两侧函数求值必须使用相同数据、相同损失归一化和相同随机状态。关闭随机丢弃、抽样和更新副作用；正则项也需包含在解析和数值两侧。避开绝对值、最大值等不可导点，且检查扰动是否跨过分段边界。解析与数值一致只能证明当前输入附近的实现相互一致，不能证明模型设计、数据划分或统计假设正确。
+\end{infobox}
+例如 $|x|$在0处中心差分为0，但数学导数不存在。若 $x>0$且 $h>x$，两侧跨过拐点也不能按同一光滑分支的截断公式解释。应选择远离拐点的测试值，并单独检查边界规则。
+
+\subsection{实验7.1：曲率、学习率与收敛轨迹}
+入口为\code{配套实验/ch07_optimization.py}，只依赖NumPy，数据固定在脚本中，不需下载。安装本批依赖并在项目目录运行：
+\begin{console}
+python3 -m pip install -r 配套实验/requirements-ch07.txt
+python3 配套实验/ch07_optimization.py
+\end{console}
+实验先运行例题7.6的四种步长，保存每个起点及随后30步的参数、函数值与梯度范数；再对第6章三条数据做梯度下降，与\code{np.linalg.lstsq}得到的参数对照。完整脚本会检查输入、有限性和输出；以下是已经给定矩阵 $A$和步长 $\eta$后，二次函数轨迹的核心循环：
+\begin{pycode}
+import numpy as np
+A = np.diag([1.0, 9.0])
+eta = 0.2
+theta = np.array([1.0, 1.0])
+trajectory = [theta.copy()]
+for _ in range(30):
+    grad = A @ theta
+    theta = theta - eta * grad
+    trajectory.append(theta.copy())
+trajectory = np.array(trajectory)
+print(trajectory[1])  # [ 0.8 -0.8]
+\end{pycode}
+\code{copy()}用于保存各步独立的数值状态。若在原数组上原地更新，却把同一对象反复放入列表，可能让历史记录都变成最终参数。
+
+对原点最优的对角二次函数，$u_t=(1-\eta)^t$、$v_t=(1-9\eta)^t$给出独立核对。步长0.2时第30步的函数值为 $5(0.8)^{60}$，约 $7.6625\times10^{-6}$；步长 $2/9$时第二坐标绝对值保持1，函数值不可能趋于0。步长0.23运行30步只是有限时长的发散演示，不运行到浮点溢出。
+
+线性拟合用
+\[
+ X=\begin{pmatrix}1&0\\1&1\\1&2\end{pmatrix},\quad
+ \symbf y=(1,2,2)^{\mathsf T},\quad L=\|X\symbf w-\symbf y\|^2/6.
+\]
+从零参数开始，学习率0.5，迭代400次。Hessian的特征值为 $(4\pm\sqrt{10})/3$，最大值约2.3874，故0.5小于 $2/2.3874$。最终参数应接近 $(7/6,1/2)$，损失接近 $1/36$；参数绝对误差通常低于 $10^{-10}$，不是收敛到零损失。
+
+输出在\code{ch07_results/optimization.json}和\code{optimization.npz}；JSON记录环境、各步长的首末状态与拟合结果，数组文件保存完整轨迹。修改任务：把步长改为 $2/9$并解释函数值下界；把二次曲率9改为99后重新求稳定区间；对拟合同时把损失与梯度乘2，比较固定和减半学习率的轨迹。
+
+\subsection{实验7.2：计算图、差分扫描与故意漏项}
+入口为\code{配套实验/ch07_gradcheck.py}，依赖同上。运行：
+\begin{console}
+python3 配套实验/ch07_gradcheck.py
+python3 配套实验/ch07_solutions.py
+\end{console}
+第一部分复算例题7.3，核对完整导数20与漏分支导数8。第二部分在 $x=1$对指数函数扫描 $h=10^{-1},\ldots,10^{-16}$，记录前向与中心差分误差。指数函数比二次函数更适合显示截断与舍入的竞争；中心差分误差不会随 $h$无限减小。
+
+第三部分构造一个可微但非纯二次的目标，使用前述 $X,\symbf y$和参数 $\symbf w=(0.5,1)^{\mathsf T}$：
+\[
+ f(\symbf w)=\frac1{2n}\|X\symbf w-\symbf y\|^2+\alpha\sum_jw_j^4,
+ \qquad \alpha=0.05.
+\]
+梯度为 $X^{\mathsf T}(X\symbf w-\symbf y)/n+4\alpha\symbf w^{\odot3}$，其中 $\odot3$表示逐元素三次方，不能用矩阵乘法替代。在指定参数处，损失为0.178125，梯度为 $(-17/120,11/30)^{\mathsf T}$。实验使用以下逐坐标差分：
+\begin{pycode}
+from ch07_gradcheck import finite_difference, objective
+w = np.array([0.5, 1.0])
+loss, analytic = objective(w)
+numeric = finite_difference(lambda z: objective(z)[0], w, 1e-5)
+print(loss)
+print(analytic)
+print(np.max(np.abs(analytic - numeric)))
+\end{pycode}
+本框在\code{配套实验}目录运行，或将该目录加入导入路径；\code{np}沿用上一代码框的NumPy导入。完整入口无此上下文要求。中心差分与解析梯度在本环境中的最大绝对差通常小于 $10^{-8}$。脚本还故意删除正则项梯度，差异应约为 $(0.025,0.2)$，明确被核对发现。
+
+程序做若干固定单位方向核对，并检查原参数没有被差分过程修改。修改任务：把均值误改为求和、漏掉 $X^{\mathsf T}$或更改正则系数但不改梯度，分别解释形状错误与数值错误。另在 $|x|$的0点执行中心差分，说明返回0为何不能证明可导。
+
+\subsection{常见误区、知识联系与自检}
+\begin{center}
+\begin{tabularx}{\linewidth}{Y Y}
+\toprule
+判断或操作 & 需要检查的依据\\\midrule
+负梯度一定下降 & 本步长度、局部光滑性与曲率上界\\
+梯度为0即最小 & 是否内点、是否凸、Hessian与高阶项\\
+Hessian半正定即严格最小 & 是全域凸性还是单点二阶信息，有无平坦方向\\
+学习率固定即位移固定 & 位移还乘当前梯度范数\\
+差分步长越小越准 & 截断误差、舍入误差与输入尺度\\
+差分通过即训练正确 & 数据、随机性、边界与目标定义仍需独立核对\\\bottomrule
+\end{tabularx}
+\end{center}
+第6章的矩阵几何解释最小二乘为何是投影，本章的驻点条件解释怎样通过迭代到达投影。两者对同一损失给出一致答案，但计算成本与适用规模不同。第8章会解释为什么某些概率假设导出平方损失或对数损失；第12章再处理每步只用部分样本时的梯度噪声。
+
+自检时应能独立回答：为什么输出为标量而梯度为向量？为什么一个节点被使用两次时导数需要相加？二次函数的最大特征值为何限制学习率？秩亏为什么允许预测收敛但参数不唯一？数值梯度为零在哪些情况下不足以判断可导或最优？
+
+\subsection{分层习题}
+以下编号为7.1--7.14。默认实数、无约束内点和列向量；涉及差分时另行说明光滑性和步长。
+\begin{enumerate}[label=\textbf{7.\arabic*}]
+\item \textbf{导数。}从差商推导 $f(x)=(x-3)^2$的导数，给出在1处 $h=-0.1$的一阶近似与精确值。
+\item \textbf{可微性。}解释正文 $uv/(u^2+v^2)$在原点偏导存在却不可微的原因；可微与连续之间有什么关系？
+\item \textbf{局部变化。}重算例题7.2；若位移改成 $(0.2,0.1)$，一阶变化和二次余项各是多少？
+\item \textbf{方向。}在 $(1,-1)$处，求例题7.2函数沿 $(1,1)/\sqrt2$的方向导数及最陡下降单位方向。
+\item \textbf{链式法则。}对 $F(x,y)=xy+y^2,y=x^2$，在 $x=2$处计算偏导 $\partial F/\partial x$与沿曲线的总导数。
+\item \textbf{计算图。}把例题7.3改为 $b=3x^2$，求 $x=1$处 $L$与导数，分别列出两条路径贡献。
+\item \textbf{Hessian。}对 $f(u,v)=u^2+uv+2v^2$求Hessian与特征值；证明其严格凸且强凸，并指出最优点。
+\item \textbf{极值边界。}判断 $x^4,-x^4,x^3$的原点；说明Hessian为0为何不足以判定。再求 $f(x)=x$在 $[0,1]$上的最小与最大点。
+\item \textbf{一元迭代。}最小化 $\frac32(x-2)^2$，从0开始，给出步长1/6与1/2的前两次更新以及完整稳定区间。
+\item \textbf{谱与尺度。}对 $A=\operatorname{diag}(1,99)$，求稳定区间、最优固定步长与最坏方向缩小因子。与 $\operatorname{diag}(1,9)$比较。
+\item \textbf{秩亏。}最小化 $(w_1+w_2-2)^2/2$，步长1/4。从 $(0,0)$与 $(2,0)$开始，分别说明参数极限，为什么预测相同？
+\item \textbf{差分。}对 $x^3$在1处推导两种差分；对 $|x|$在0处求中心差分，说明能否据此判定可导。
+\item \textbf{编程。}运行实验7.2，对正则系数0、0.05、0.1核对梯度；实现四个固定方向的差分核对并记录误差。故意漏项必须能被发现。
+\item \textbf{诊断。}某训练程序损失先下降后震荡，梯度差分在一个点通过。提出后续检查顺序，并说明为什么不能直接认定数据或实现全部正确。
+\end{enumerate}
+
+\subsection{习题参考答案}
+\subsubsection*{7.1--7.4：局部变化与方向}
+\textbf{7.1}\quad 差商为 $2(x-3)+h$，极限为 $2(x-3)$。在1处 $f=4,f'=-4$；$h=-0.1$时线性估计4.4，精确值 $(-2.1)^2=4.41$，余项0.01。导数与增量的符号需要分别考虑。
+
+\textbf{7.2}\quad 沿 $u$轴和 $v$轴函数都恒为0，两个偏导为0；沿 $u=v$趋近原点函数值为1/2，不能趋近原点函数值0。因此不连续，更不可能可微。可微必连续，连续不必可微；偏导存在也不保证连续。
+
+\textbf{7.3}\quad 原位移一阶变化 $-0.5$，余项0.11；新位移一阶变化 $0.2-0.3=-0.1$，余项 $0.04+0.02+0.02=0.08$，新函数值 $2-0.1+0.08=1.98$。一阶近似只有1.9。
+
+\textbf{7.4}\quad 梯度 $(1,-3)$与单位方向内积为 $-2/\sqrt2=-\sqrt2$；最陡下降单位方向 $(-1,3)/\sqrt{10}$，方向导数 $-\sqrt{10}$。未经单位化的 $(-1,3)$给变化率 $-10$，不可直接与单位方向比较。
+
+\subsubsection*{7.5--7.8：链式法则与极值}
+\textbf{7.5}\quad $x=2,y=4$，偏导为 $y=4$；$\partial F/\partial y=x+2y=10$，$\mathrm dy/\mathrm dx=4$，总导数为 $4+10\times4=44$。直接对 $x^3+x^4$求导也得 $3x^2+4x^3=44$。
+
+\textbf{7.6}\quad $a=1,b=3,c=4,L=8$；两路径局部导数分别为 $2x$和 $6x$，贡献8与24，总导数32。直接式 $L=(4x^2)^2/2=8x^4$给 $32x^3$，在1处为32。
+
+\textbf{7.7}\quad Hessian为 $\begin{pmatrix}2&1\\1&4\end{pmatrix}$，特征多项式 $\lambda^2-6\lambda+7$，特征值 $3\pm\sqrt2$均正。全域Hessian不变且正定，故强凸常数可取 $3-\sqrt2$，也是严格凸。解 $2u+v=0,u+4v=0$得唯一最优点原点。
+
+\textbf{7.8}\quad $x^4$在原点严格极小，$-x^4$严格极大，$x^3$不是极值；三者二阶导数都为0，需要利用函数正负或高阶项。$x$在区间 $[0,1]$单调递增，最小点0、最大点1，导数均为1，边界不适用无约束驻点条件。
+
+\subsubsection*{7.9--7.12：收敛与差分}
+\textbf{7.9}\quad 梯度为 $3(x-2)$，误差倍数 $1-3\eta$。步长1/6时 $x_1=1,x_2=1.5$；步长1/2时 $x_1=3,x_2=1.5$。稳定区间 $0<\eta<2/3$，两种步长都收敛，后者来回跨过2。
+
+\textbf{7.10}\quad 稳定区间 $(0,2/99)$，最优固定步长 $2/(1+99)=0.02$，因子 $(99-1)/(99+1)=0.98$。曲率1和9时步长0.2、因子0.8。条件数增大使最坏方向误差每步保留更多；不能把0.2直接用于新矩阵。
+
+\textbf{7.11}\quad 梯度两个分量均为 $s-2$，其中 $s=w_1+w_2$。更新后 $s_{t+1}=s_t-\frac12(s_t-2)$，和趋于2；差 $w_1-w_2$保持初值不变。从零开始差为0，极限 $(1,1)$；从 $(2,0)$开始已经最优，极限仍为 $(2,0)$。零空间方向不受损失约束，预测只由和决定。
+
+\textbf{7.12}\quad 前向差分 $3+3h+h^2$，中心差分 $3+h^2$。$|x|$在0处中心差分 $(|h|-|-h|)/(2h)=0$，但左右导数不等。对称差商的极限存在不等价于普通导数存在。
+
+\subsubsection*{7.13--7.14：程序与诊断}
+\textbf{7.13}\quad 解析梯度统一为 $X^{\mathsf T}\symbf e/n+4\alpha\symbf w^{\odot3}$。参数 $(0.5,1)$下，三个系数给梯度分别为 $(-1/6,1/6)$、$(-17/120,11/30)$与 $(-7/60,17/30)$。固定单位方向比较内积与中心差分，容差可先取绝对 $10^{-8}$、相对 $10^{-6}$并扫描步长。答案入口验证这些值、方向检查及故意漏项；若误差只在极小步长恶化，应先检查舍入而非立即改公式。
+
+\textbf{7.14}\quad 先确认输出有限、损失归一化和数据没有在更新中改变；记录梯度范数、位移及逐步损失，减小学习率做受控对照；再检查特征尺度、是否用旧参数同步计算所有梯度、随机批次和不可导边界。在多个参数点与小输入上重复梯度核对，单独检查数据对齐和评价流程。一个点差分通过不能排除其他分支错误；即使梯度全对，学习率也可能不稳定，且训练下降仍不保证泛化。
+
+\subsection{本章小结}
+导数与梯度描述局部线性变化，链式法则把中间量的依赖转为路径贡献。Hessian描述方向曲率，凸性决定什么时候能由局部信息推到全局最优。梯度下降把局部方向用于迭代，其稳定性和速度受曲率、尺度与步长共同控制。
+
+有限差分是调试工具，需要同时考虑截断、舍入、形状和随机性。后续训练实现应保留目标、梯度、更新、停止与评价之间的区别；任何一个环节的正确都不能自动替代其余环节的核对。
+
+\chapterpage{概率统计与信息论准备}\label{ch:probability}
+\begin{infobox}{先修知识、学习目标与本章位置}
+本章使用求和、积分、自然对数、第6章的向量与协方差矩阵所需的线性代数，以及第7章的求导和凸性。概率统计正在学习的内容在此围绕机器学习重新组织：随机性如何进入数据，怎样从有限样本估计参数，为什么对数概率能成为损失，怎样表达评价结果的不确定性。
+
+学习后应能区分概率质量与密度；计算条件概率并检查独立假设；使用期望、方差和协方差；推导伯努利和高斯模型的最大似然；理解最大后验与正则项的关系；解释熵、交叉熵与KL散度；实施有明确抽样单位的重采样。本章不替代完整概率统计课程，假设检验、随机过程与更复杂的贝叶斯计算可在后续课程继续学习。
+\end{infobox}
+同一个模型在两批样本上的准确率可能不同；同一组训练数据也可能支持多个参数解释。概率描述未确定的结果，统计利用已观察的数据推断这些结果背后的规律，信息论则给出比较概率分布的量。三者共同决定损失函数的含义和实验结论的可信范围。
+
+本章用大写 $X,Y$表示随机变量，小写 $x,y$表示实现值；数据矩阵仍可记为 $X\in\mathbb R^{n\times d}$，具体段落会注明用途。$P(A)$表示事件概率，$p(x)$或 $p_\theta(x)$表示概率质量或密度，需由变量类型区分。所有教学数字和模拟数据均为构造，不代表真实业务中的发生率或模型效果。
+
+\subsection{从随机试验到随机变量}
+\subsubsection{样本空间、事件与概率规则}
+一次结果尚未确定的观察或操作可以作为\term{随机试验}。所有可能结果构成\term{样本空间} $\Omega$，事件 $A\subseteq\Omega$是一组关心的结果。例如随机抽一件包裹检查，“发生延迟”是事件，“该件重量”是数值属性；概率模型规定这些结果出现的规律。
+
+概率满足 $P(A)\ge0$、$P(\Omega)=1$，以及互斥事件的概率可相加。由此得到
+\[
+ P(A^{\rm c})=1-P(A),\qquad
+ P(A\cup B)=P(A)+P(B)-P(A\cap B).
+\]
+$A^{\rm c}$表示补事件，$A\cap B$表示同时发生，$A\cup B$表示至少一个发生。若事件重叠，直接相加会重复计数。概率是模型中的量，有限样本频率是它的估计；10次中3次发生不等于已知真实概率恰好为0.3。
+
+\term{随机变量}（random variable）是把试验结果映成数值的函数。例如 $Y=1$表示延迟、$Y=0$表示未延迟。变量名称随机，不意味着每次都用随机数生成器计算；它表示在观察前数值尚不确定。观察后得到 $y=1$，这一实现值已经固定。
+
+\term{指示变量} $\mathbf1_A$在事件 $A$发生时取1，否则取0。它把事件计数与代数连接起来：$\sum_i\mathbf1_{A_i}$是发生次数，平均值是发生比例，期望则为 $P(A)$。
+
+\subsubsection{离散质量、连续密度与分布函数}
+离散随机变量的可能值有限或可数，\term{概率质量函数}（probability mass function，PMF）为 $p(x)=P(X=x)$，满足 $p(x)\ge0$、$\sum_xp(x)=1$。例如二元标签有 $p(1)=q,p(0)=1-q$。
+
+连续变量在本章假设有\term{概率密度函数}（probability density function，PDF）$f(x)$，满足 $f(x)\ge0$、$\int_{-\infty}^{\infty}f(x)\,\mathrm dx=1$，区间概率为
+\[
+ P(a\le X\le b)=\int_a^b f(x)\,\mathrm dx.
+\]
+单点概率为0，但并不意味着所有数值都“不可能被观察到”；有限精度记录实际上对应一个小区间。密度可以大于1，因为它不是单点概率；密度的单位为变量单位的倒数。
+
+\term{累积分布函数}（cumulative distribution function，CDF）$F(x)=P(X\le x)$适用于离散与连续变量，单调不减，取值在 $[0,1]$，两端分别趋于0和1。连续且具有密度时 $F(b)-F(a)=\int_a^b f(x)\,\mathrm dx$；离散变量的CDF在有质量的点跳跃。
+
+\begin{infobox}{例题8.1：密度大于1并不违反概率规则}
+令等待时间 $T$在 $[0,0.5]$分钟上均匀分布。写出密度与CDF，计算 $P(0.1\le T\le0.2)$与 $P(T=0.1)$。若改用秒，密度怎样变化？
+\end{infobox}
+\sol 密度在该区间为2分钟$^{-1}$，区间外为0；CDF在 $t<0$为0，在 $0\le t\le0.5$为 $2t$，在 $t>0.5$为1。区间概率为 $2(0.2-0.1)=0.2$，单点概率为0。
+
+令 $S=60T$，则 $S$在 $[0,30]$秒均匀分布，密度为 $1/30$秒$^{-1}$。同一区间变为6到12秒，其概率仍为 $(12-6)/30=0.2$。数值密度随单位改变，事件概率不变；不能直接比较不同单位的密度值大小。
+
+\subsection{联合、边缘与条件概率}
+\subsubsection{由联合表获得不同问题的答案}
+两个随机变量的\term{联合分布}描述一对结果同时出现的概率。离散情形 $p(x,y)=P(X=x,Y=y)$；对另一个变量求和可得\term{边缘分布}，例如 $p(y)=\sum_xp(x,y)$。连续情形将求和换成积分。
+
+对 $P(B)>0$，\term{条件概率}（conditional probability）定义为
+\begin{equation}\label{eq:conditional}
+ P(A\mid B)=\frac{P(A\cap B)}{P(B)}.
+\end{equation}
+分母把观察范围缩小为 $B$，分子数其中还满足 $A$的部分。乘法公式 $P(A\cap B)=P(A\mid B)P(B)$只是这一定义的移项。$P(A\mid B)$与 $P(B\mid A)$分母不同，一般不相等。
+
+若 $B_1,\ldots,B_k$互斥且覆盖样本空间，则\term{全概率公式}为
+\[
+ P(A)=\sum_jP(A\mid B_j)P(B_j),
+\]
+条件概率项要求相应 $P(B_j)>0$；零概率部分不贡献联合概率。此式是按来源分组后再加总，不能把条件比例不加权地平均。
+
+\begin{infobox}{例题8.2：边缘比例与条件比例}
+设区域 $R\in\{A,B\}$，延迟标签 $Y\in\{0,1\}$。联合概率如下，求总延迟率、两区域的条件延迟率以及已延迟包裹来自B的概率。
+\begin{center}
+\begin{tabular}{c c c c}
+\toprule
+ & $Y=0$ & $Y=1$ & 合计\\\midrule
+$R=A$ & 0.54 & 0.06 & 0.60\\
+$R=B$ & 0.28 & 0.12 & 0.40\\\midrule
+合计 & 0.82 & 0.18 & 1.00\\\bottomrule
+\end{tabular}
+\end{center}
+\end{infobox}
+\sol 总延迟率为0.18。$P(Y=1\mid R=A)=0.06/0.60=0.10$，B为 $0.12/0.40=0.30$。全概率核对为 $0.1(0.6)+0.3(0.4)=0.18$。反向条件 $P(R=B\mid Y=1)=0.12/0.18=2/3$，不是0.30；分母从区域B总量变为延迟总量。
+
+\subsubsection{连续条件概率的最小解释}
+对连续变量，$P(X=x)=0$，不能直接把事件 $X=x$代入式\eqref{eq:conditional}并除以0。本章使用密度表达：若边缘密度 $f_X(x)>0$，则
+\[
+ f_{Y\mid X}(y\mid x)=\frac{f_{X,Y}(x,y)}{f_X(x)}.
+\]
+它作为 $y$的函数积分为1。机器学习中的 $p_\theta(y\mid\symbf x)$可表示给定特征后的类别概率，也可表示连续目标的条件密度；两者都称条件模型，但只有前者的某一类别值直接是事件概率。连续目标要对区间积分才得到概率。
+
+\subsection{独立性、条件独立与贝叶斯公式}
+\subsubsection{独立是分布的性质}
+事件 $A,B$满足 $P(A\cap B)=P(A)P(B)$时称为\term{独立}（independent）。若条件概率有定义，这等价于 $P(A\mid B)=P(A)$。随机变量独立要求所有相应取值事件都满足分解，离散时可写 $p(x,y)=p(x)p(y)$。
+
+互斥指不能同时发生，独立指得知一个不改变另一个的概率。若两个互斥事件概率都大于0，则交集概率0与概率乘积大于0矛盾，因此它们不独立。样本独立与样本内特征独立也不同：不同包裹的记录可能近似独立，同一包裹的重量与费用却可能强相关。
+
+\term{条件独立}要求给定某个变量后联合条件分布可分解，例如 $p(x_1,x_2\mid y)=p(x_1\mid y)p(x_2\mid y)$。总体独立并不保证给定标签后仍独立，条件独立也不保证边缘独立；第16章的朴素贝叶斯会把后者作为模型假设，而非从名称自动获得的事实。
+
+\subsubsection{交换条件方向需要基准发生率}
+由联合概率的两种分解得到\term{贝叶斯公式}（Bayes' rule）：
+\begin{equation}\label{eq:bayes}
+ P(A\mid B)=\frac{P(B\mid A)P(A)}{P(B)},\qquad P(B)>0.
+\end{equation}
+$P(A)$称为\term{先验概率}（prior），$P(B\mid A)$描述假设成立时观察结果的规律，$P(A\mid B)$称为\term{后验概率}（posterior），$P(B)$是归一化所需的边缘概率。公式没有创造新信息，只是把联合概率重新组织。
+
+\begin{infobox}{例题8.3：检测灵敏度不等于阳性后的概率}
+教学假设某异常发生率为1\%，检测对异常样本报阳性的概率为90\%，对正常样本误报阳性的概率为5\%。观察到阳性后，异常概率是多少？若异常发生率变为10\%而检测条件比例不变，结果怎样变化？
+\end{infobox}
+\sol 设异常为 $D$、阳性为 $+$。当 $P(D)=0.01$时
+\[
+ P(+)=0.9(0.01)+0.05(0.99)=0.0585,\qquad
+ P(D\mid+)=\frac{0.009}{0.0585}=\frac2{13}\approx0.153846.
+\]
+可按10000次教学试验理解：预期异常100，其中阳性90；正常9900，其中误报495；全部阳性585中只有90个异常。发生率为0.10时，后验为 $0.09/(0.09+0.045)=2/3$。同样检测规则在不同总体中的阳性解释可能不同；条件比例保持不变也是这里明确作出的教学假设。
+
+\subsection{期望、方差与条件期望}
+\subsubsection{加权平均与非线性变换}
+离散随机变量的\term{期望}（expectation）为 $\mathbb E[X]=\sum_xxp(x)$；连续变量为 $\int xf(x)\,\mathrm dx$，此处假设绝对期望有限。期望按分布加权，不必是变量能取到的值，例如公平骰子的期望3.5不是一个点数。
+
+对函数 $g$，直接按原分布计算 $\mathbb E[g(X)]=\sum_xg(x)p(x)$或相应积分。线性性给出
+\[
+ \mathbb E[aX+bY+c]=a\mathbb E[X]+b\mathbb E[Y]+c,
+\]
+不要求 $X,Y$独立；但一般 $\mathbb E[XY]\ne\mathbb E[X]\mathbb E[Y]$、$\mathbb E[g(X)]\ne g(\mathbb E[X])$。例如 $X$以各1/2概率取 $-1,1$，有 $\mathbb E[X]=0$而 $\mathbb E[X^2]=1$。
+
+令 $\mu=\mathbb E[X]$，\term{方差}（variance）定义为
+\[
+ \operatorname{Var}(X)=\mathbb E[(X-\mu)^2]
+ =\mathbb E[X^2]-\mu^2\ge0.
+\]
+方差的单位是原单位平方，\term{标准差} $\sigma=\sqrt{\operatorname{Var}(X)}$与原变量同单位。$\operatorname{Var}(aX+b)=a^2\operatorname{Var}(X)$；加常数只平移，不改变离散程度。数值实现中直接用“平方均值减均值平方”可能因大数相减损失精度，中心化再求平方通常更合适。
+
+对凸函数 $g$，在期望均存在的条件下，\term{Jensen不等式}给出 $g(\mathbb E[X])\le\mathbb E[g(X)]$。本章后面会用对数的凹性解释概率量；这里只需记住非线性变换与平均次序通常不能交换。
+
+\subsubsection{条件期望连接分组与预测}
+$\mathbb E[Y\mid X=x]$是给定 $X=x$后，按条件分布对 $Y$求平均。视为 $x$的函数，它是许多回归模型试图逼近的目标。对条件均值 $m(x)$，任意预测值 $a$有
+\begin{align*}
+ \mathbb E[(Y-a)^2\mid X=x]
+ &=\mathbb E[(Y-m(x)+m(x)-a)^2\mid X=x]\\
+ &=\operatorname{Var}(Y\mid X=x)+(m(x)-a)^2.
+\end{align*}
+交叉项为0，因为 $\mathbb E[Y-m(x)\mid X=x]=0$。因此平方误差下最优的点预测为条件均值；剩余条件方差表示单个点预测无法消除的波动。这一结论要求二阶矩存在，且不意味着均值能描述多峰分布的全部信息。
+
+\term{全期望公式} $\mathbb E[Y]=\mathbb E[\mathbb E[Y\mid X]]$对应先在组内平均，再按组概率平均。由中心化分解还可得到\term{全方差公式}
+\[
+ \operatorname{Var}(Y)=\mathbb E[\operatorname{Var}(Y\mid X)]
+ +\operatorname{Var}(\mathbb E[Y\mid X]).
+\]
+前项是组内波动，后项是组均值之间的波动。对例题8.2，总体 $Y$是成功率0.18的二元变量，方差 $0.18(0.82)=0.1476$；组内项 $0.6(0.09)+0.4(0.21)=0.138$，组间项 $0.6(0.1-0.18)^2+0.4(0.3-0.18)^2=0.0096$，相加正好为0.1476。
+
+\subsection{协方差、相关性与随机向量}
+\term{协方差}（covariance）在二阶矩有限时定义为
+\[
+ \operatorname{Cov}(X,Y)=\mathbb E[(X-\mathbb E X)(Y-\mathbb E Y)]
+ =\mathbb E[XY]-\mathbb E[X]\mathbb E[Y].
+\]
+它描述中心化后是否倾向同号变化；量纲为两个变量单位的乘积。若方差非零，相关系数为 $\rho=\operatorname{Cov}(X,Y)/(\sigma_X\sigma_Y)$。第5章的样本相关系数是对该总体量的估计。
+
+独立且二阶矩有限时协方差为0，反过来一般不成立。令 $X$等概率取 $-1,0,1$，$Y=X^2$，则 $\mathbb E[X]=0$、$\mathbb E[XY]=\mathbb E[X^3]=0$，协方差为0；但知道 $X=0$就确定 $Y=0$，两者明显依赖。零相关只排除线性的共同变化。
+
+对和的方差，必须保留协方差：
+\[
+ \operatorname{Var}(X+Y)=\operatorname{Var}(X)+\operatorname{Var}(Y)+2\operatorname{Cov}(X,Y).
+\]
+同一个随机变量相加时，$\operatorname{Var}(X+X)=4\operatorname{Var}(X)$，不是2倍。忽略样本相关性会低估平均值的不确定性。
+
+随机列向量 $\symbf X\in\mathbb R^d$的均值 $\symbf\mu=\mathbb E[\symbf X]\in\mathbb R^d$，\term{协方差矩阵}为
+\[
+ \Sigma=\mathbb E[(\symbf X-\symbf\mu)(\symbf X-\symbf\mu)^{\mathsf T}]
+ \in\mathbb R^{d\times d}.
+\]
+对角线是各方差，非对角是成对协方差。它对称且半正定，因为对任意 $\symbf v$，$\symbf v^{\mathsf T}\Sigma\symbf v=\operatorname{Var}(\symbf v^{\mathsf T}\symbf X)\ge0$。若 $\symbf Z=A\symbf X+\symbf b$，则
+\[
+ \mathbb E[\symbf Z]=A\symbf\mu+\symbf b,\qquad
+ \operatorname{Cov}(\symbf Z)=A\Sigma A^{\mathsf T}.
+\]
+这使第6章的线性变换可以同时作用于均值和波动；第21章会用协方差的特征方向构造PCA。
+
+\subsection{常见分布：符号、参数与适用假设}
+\subsubsection{伯努利、二项与类别分布}
+\term{伯努利分布}（Bernoulli）描述一次二元结果，$Y\sim\operatorname{Bernoulli}(p)$表示
+\[
+ P(Y=y)=p^y(1-p)^{1-y},\quad y\in\{0,1\},\qquad
+ \mathbb E[Y]=p,\quad\operatorname{Var}(Y)=p(1-p).
+\]
+参数满足 $0\le p\le1$，端点为确定性结果。取 $n$次独立且成功率相同的伯努利结果之和 $K$，得到\term{二项分布}（binomial）：
+\[
+ P(K=k)=\binom nkp^k(1-p)^{n-k},\quad k=0,\ldots,n,
+ \qquad \mathbb E[K]=np,\quad\operatorname{Var}(K)=np(1-p).
+\]
+$\binom nk$计数哪些位置成功；若只问某个固定顺序，便不应乘组合数。成功率不相同或试验相关时，不能直接套该二项模型。
+
+\term{类别分布}（categorical）描述 $C$个互斥类别，概率 $\symbf p=(p_1,\ldots,p_C)$满足 $p_c\ge0,\sum_cp_c=1$。一次只产生一个类别；若任务允许多个标签同时为真，则不能未经转换就用这个互斥类别模型。第13章的softmax用于产生这样的概率向量。
+
+\begin{infobox}{例题8.4：计数事件与某个顺序}
+假设四次独立二元试验的成功率都是1/4。求成功次数 $K$的期望、方差、恰好两次成功的概率，以及固定顺序“成功、失败、成功、失败”的概率。
+\end{infobox}
+\sol $\mathbb E[K]=1$，$\operatorname{Var}(K)=4(1/4)(3/4)=3/4$。恰两次有 $\binom42=6$种顺序，故概率为 $6(1/4)^2(3/4)^2=27/128\approx0.2109375$。固定顺序只有一项，概率 $9/256\approx0.03515625$，相差组合数6。
+
+\subsubsection{均匀、高斯与多元高斯}
+\term{均匀分布} $X\sim U(a,b)$，$a<b$，在区间内密度 $1/(b-a)$，均值 $(a+b)/2$、方差 $(b-a)^2/12$。区间外密度为0，表示模型排除了该区间外的值，而不只是说那些值较少见。
+
+\term{高斯分布}或\term{正态分布}（Gaussian/normal）$X\sim\mathcal N(\mu,\sigma^2)$，$\sigma^2>0$，密度为
+\[
+ f(x)=\frac1{\sqrt{2\pi\sigma^2}}
+ \exp\left[-\frac{(x-\mu)^2}{2\sigma^2}\right].
+\]
+$\mu$是均值，$\sigma^2$是方差；第二参数不是标准差。标准化 $Z=(X-\mu)/\sigma\sim\mathcal N(0,1)$，约95\%的质量在 $\mu\pm1.96\sigma$内。这个范围描述单个观测的分布，与均值的置信区间不同。
+
+对 $d$维向量，均值 $\symbf\mu$、正定协方差 $\Sigma$的\term{多元高斯分布}密度为
+\[
+ f(\symbf x)=\frac1{(2\pi)^{d/2}\det(\Sigma)^{1/2}}
+ \exp\left[-\frac12(\symbf x-\symbf\mu)^{\mathsf T}\Sigma^{-1}(\symbf x-\symbf\mu)\right].
+\]
+这里 $\det$是行列式；二次型对偏差按方向方差缩放。$\Sigma$奇异时随机向量可能只落在低维子空间，不能直接用上述全维密度公式。数值实现通常用分解求解而不显式求逆。高斯族中不相关分量独立，但这一特性不能推广到所有分布。
+
+\subsubsection{泊松分布及模型选择边界}
+\term{泊松分布}（Poisson）可用于固定观察窗口内的非负整数计数，$K\sim\operatorname{Poisson}(\lambda)$，$\lambda>0$：
+\[
+ P(K=k)=e^{-\lambda}\frac{\lambda^k}{k!},\qquad
+ \mathbb E[K]=\operatorname{Var}(K)=\lambda.
+\]
+窗口长度改变时，恒定发生强度假设下 $\lambda$随长度成比例。若经验计数方差远大于均值，或事件集中成簇，简单泊松假设可能不适合。一个数值是计数、比例还是连续测量，会限制可以采用的分布，但不会唯一决定它。
+
+上述分布是建模工具。直方图近似钟形不证明精确正态；标签为0和1不证明不同样本独立；使用高斯噪声是假设，而非所有真实误差的共同属性。应分别记录变量取值范围、分布形状、样本依赖和参数含义。
+
+\subsection{抽样、估计量与标准误}
+\subsubsection{总体参数与样本统计量}
+\term{总体}是希望推断的对象范围，\term{样本}是实际观察到的有限记录。参数 $\mu,p$描述总体分布，样本均值 $\bar X$、样本比例 $\hat p$是由数据计算的\term{统计量}。用于估计参数的统计量称为\term{估计量}（estimator）；观察前它是随机变量，观察后得到一个估计值。
+
+\term{独立同分布}（independent and identically distributed，i.i.d.）假设要求样本相互独立且来自同一分布。假设下，均值与比例为
+\[
+ \bar X=\frac1n\sum_iX_i,\qquad
+ \hat p=\frac1n\sum_iY_i.
+\]
+$\mathbb E[\bar X]=\mu$，称其\term{无偏}；若方差为 $\sigma^2$，独立性给出
+\[
+ \operatorname{Var}(\bar X)=\frac1{n^2}\sum_i\operatorname{Var}(X_i)=\frac{\sigma^2}{n}.
+\]
+\term{标准误}（standard error，SE）是估计量抽样分布的标准差，不是原始观测的标准差。均值标准误为 $\sigma/\sqrt n$，实际常以 $s/\sqrt n$估计；比例的标准误常估计为 $\sqrt{\hat p(1-\hat p)/n}$。标准差描述数据散布，标准误描述估计随抽样的波动。
+
+若样本相关，方差还包含 $2\sum_{i<j}\operatorname{Cov}(X_i,X_j)/n^2$。同一用户的多条记录、连续时间窗口或同一设备重复测量往往相关；把它们当作同数量独立用户可能严重缩小标准误。
+
+\subsubsection{样本方差为何除以 $n-1$}
+第5章已区分描述方差与样本方差。对i.i.d.且有限方差的样本，利用恒等式
+\[
+ \sum_i(X_i-\bar X)^2=\sum_i(X_i-\mu)^2-n(\bar X-\mu)^2
+\]
+取期望得到 $n\sigma^2-n(\sigma^2/n)=(n-1)\sigma^2$。因此
+\[
+ s^2=\frac1{n-1}\sum_i(X_i-\bar X)^2\quad(n\ge2)
+\]
+对总体方差无偏，而除以 $n$的量通常偏小。无偏性属于重复抽样意义，不保证每一个样本的数值更接近真值；平方根 $s$也并非因此自动无偏。
+
+\subsubsection{大数定律与中心极限定理的角色}
+对i.i.d.且期望适当存在的样本，\term{大数定律}说明样本均值随样本量增大趋近总体均值。它不说前几次偏多后面就必须补少；每次独立试验仍按原概率发生。增加样本也不能消除有偏抽样造成的总体不匹配。
+
+i.i.d.且有限非零方差时，\term{中心极限定理}说明
+\[
+ \frac{\bar X-\mu}{\sigma/\sqrt n}
+\]
+的分布随 $n$增大近似标准正态。原始数据不必正态；近似速度依赖分布偏态和尾部，没有对所有数据都可靠的固定“30条”阈值。重尾分布若方差不存在，不能直接使用这里的结论。后续的正态近似区间依赖这些条件，而非只依赖一个公式。
+
+\begin{infobox}{例题8.5：数据标准差与均值标准误}
+观测到四个独立同分布教学数值 $1,2,2,3$。计算均值、描述方差、样本方差和均值标准误。若保持总体方差相同，将样本量从4增加到16，理论标准误变为几倍？
+\end{infobox}
+\sol 均值2，中心平方和2，描述方差 $2/4=0.5$，样本方差 $2/3$，$s=\sqrt{2/3}$，估计标准误 $s/2=\sqrt{1/6}\approx0.408248$。理论标准误与 $1/\sqrt n$成比例，增加到16后为原来的1/2。原始数据标准差并不因为样本量增大就自动变为一半。
+
+\subsection{似然与最大似然估计}
+\subsubsection{数据固定，比较不同参数}
+给定参数化分布 $p_\theta(x)$和已观测数据 $D=(x_1,\ldots,x_n)$，若假设样本独立，\term{似然函数}（likelihood）为
+\[
+ \mathcal L(\theta;D)=\prod_{i=1}^n p_\theta(x_i).
+\]
+数据在此固定，参数作为函数自变量。它与“给定参数后计算数据概率”使用同一个表达式，但比较方向不同；似然不是参数的概率分布，不必对参数积分为1。连续数据使用密度乘积，不是各单点事件概率的乘积。
+
+\term{最大似然估计}（maximum likelihood estimation，MLE）选择使观测数据似然最大的参数：$\hat\theta_{\rm MLE}=\arg\max_\theta\mathcal L(\theta;D)$。正似然下自然对数严格递增，所以可改为最大化
+\[
+ \ell(\theta)=\log\mathcal L(\theta;D)=\sum_i\log p_\theta(x_i),
+\]
+或最小化\term{负对数似然}（negative log-likelihood，NLL）。乘积变为求和，减轻小概率连乘下溢，也方便求导；数值稳定仍需选择合适实现。若样本不独立，应使用相应联合或条件分解，不能无条件把数据项相乘。
+
+\subsubsection{伯努利最大似然与边界}
+设 $Y_i\overset{\rm iid}{\sim}\operatorname{Bernoulli}(p)$，观察到 $k=\sum_i y_i$个1。对 $0<p<1$，
+\[
+ \ell(p)=k\log p+(n-k)\log(1-p),\qquad
+ \ell'(p)=\frac{k}{p}-\frac{n-k}{1-p}.
+\]
+当 $0<k<n$时令导数为0得 $k(1-p)=(n-k)p$，所以 $\hat p=k/n$。二阶导数为 $-k/p^2-(n-k)/(1-p)^2<0$，故它是区间内唯一最大点。若 $k=0$，最大值在 $p=0$；若 $k=n$，在 $p=1$。仅求内点导数会遗漏这两种情况。
+
+\begin{infobox}{例题8.6：有限样本下的零概率估计}
+五个标签为 $1,0,1,1,0$。求伯努利最大似然估计与总负对数似然；若五个标签全为1，MLE怎样变化，它是否说明下一次必然成功？
+\end{infobox}
+\sol $n=5,k=3$，$\hat p=3/5=0.6$，总NLL为
+\[
+ -3\log0.6-2\log0.4\approx3.365058,
+\]
+平均NLL约0.673012。全为1时MLE为1，这是在有限数据上最大化似然得到的边界估计，不是对未来必然成功的证明。若下一次出现0，模型对它赋概率0，负对数损失为无穷大；先验或平滑可以改变这种估计。
+
+\subsubsection{高斯均值、方差与平方损失}
+设标量样本 $X_i\overset{\rm iid}{\sim}\mathcal N(\mu,\sigma^2)$，$\sigma^2>0$。令 $v=\sigma^2$，NLL为
+\[
+ -\ell(\mu,v)=\frac n2\log(2\pi v)+\frac1{2v}\sum_i(x_i-\mu)^2.
+\]
+固定 $v$对 $\mu$求导为 $\sum_i(\mu-x_i)/v$，令其为0得 $\hat\mu=\bar x$。再固定该均值对 $v$求导为 $n/(2v)-\sum_i(x_i-\bar x)^2/(2v^2)$，得到
+\[
+ \hat\sigma^2_{\rm MLE}=\frac1n\sum_i(x_i-\bar x)^2.
+\]
+MLE分母为 $n$，与无偏样本方差分母 $n-1$不同，因为两者优化的标准不同。当所有数据相等、平方和为0时，正方差域内没有取得的有限最大值，似然在方差趋0时无界；不能把0代入上述非退化密度后继续当作普通高斯模型。
+
+回归中假设 $Y_i=m_\theta(\symbf x_i)+\varepsilon_i$，误差独立、同方差且为 $\mathcal N(0,\sigma^2)$，固定输入与噪声方差后，NLL对 $\theta$的可变部分就是 $\sum_i(y_i-m_\theta(\symbf x_i))^2/(2\sigma^2)$。因此最小化平方误差等价于该高斯条件模型下的MLE。若各样本噪声方差不同，得到按方差倒数加权的平方项；如果方差也由模型预测，不能丢掉 $\log\sigma_i^2$项。
+
+\subsection{贝叶斯估计、最大后验与正则化}
+\subsubsection{参数也建立概率分布}
+贝叶斯参数推断给参数指定先验 $p(\theta)$，观察数据后有
+\[
+ p(\theta\mid D)=\frac{p(D\mid\theta)p(\theta)}{p(D)},\qquad
+ p(D)=\int p(D\mid\theta)p(\theta)\,\mathrm d\theta,
+\]
+离散参数则求和。分母在给定数据后不随 $\theta$变化，保证后验归一化。\term{最大后验估计}（maximum a posteriori，MAP）选择后验密度最大的参数，等价于
+\[
+ \hat\theta_{\rm MAP}=\arg\min_\theta\{-\log p(D\mid\theta)-\log p(\theta)\}.
+\]
+MLE只使用似然；MAP还使用先验。MAP是一个点，并不包含完整后验的不确定性，也不同于后验均值。对连续参数，密度的峰值还依赖参数化方式，阅读推断结果时需明确参数定义。
+
+\subsubsection{Beta先验与二元比例的平滑}
+伯努利参数 $p\in(0,1)$可取\term{Beta分布}先验，其密度为
+\[
+ \pi(p)=\frac{p^{a-1}(1-p)^{b-1}}{B(a,b)},\qquad a,b>0,
+\]
+$B(a,b)$为使积分为1的常数。乘伯努利似然后，后验与 $p^{k+a-1}(1-p)^{n-k+b-1}$成比例，所以后验仍为Beta分布：
+\[
+ p\mid D\sim\operatorname{Beta}(a+k,b+n-k).
+\]
+同一分布族对更新封闭，称为\term{共轭先验}。当后验两个形状参数均大于1时，内点MAP为
+\[
+ \hat p_{\rm MAP}=\frac{k+a-1}{n+a+b-2};
+ \qquad \mathbb E[p\mid D]=\frac{k+a}{n+a+b}.
+\]
+若形状参数不满足条件，MAP可能在边界或不唯一，不能机械代入内点公式。后验均值同时给出下一次伯努利成功的后验预测概率，因为 $P(Y_{\rm new}=1\mid D)=\int p\,\pi(p\mid D)\,\mathrm dp$。
+
+\begin{infobox}{例题8.7：MLE、MAP与后验预测不相同}
+使用例题8.6的五个标签与 $\operatorname{Beta}(2,2)$先验。求后验、MAP、后验均值。再改用均匀先验 $\operatorname{Beta}(1,1)$，比较“加一平滑”对应哪一种估计。
+\end{infobox}
+\sol 原先验下后验为 $\operatorname{Beta}(5,4)$，MAP为 $(5-1)/(5+4-2)=4/7\approx0.571429$，后验均值为 $5/9\approx0.555556$，MLE仍为0.6。
+
+均匀先验下后验为 $\operatorname{Beta}(4,3)$，内点MAP为 $3/5=0.6$，后验均值为 $4/7$。因此常见加一形式 $(k+1)/(n+2)$可解释为均匀先验下的后验均值或预测概率；它不是该先验下的MAP。相同数值也可能由另一先验的MAP得到，必须同时说明先验与估计标准。
+
+\subsubsection{高斯先验怎样产生二次惩罚}
+设回归噪声方差固定为 $\sigma^2$，参数先验为 $\symbf w\sim\mathcal N(0,\tau^2I)$，其中 $\tau^2>0$固定。略去与 $\symbf w$无关项，负对数后验为
+\[
+ \frac1{2\sigma^2}\|X\symbf w-\symbf y\|^2+\frac1{2\tau^2}\|\symbf w\|^2.
+\]
+乘正数 $\sigma^2/n$不改变极小点，得到
+\[
+ \frac1{2n}\|X\symbf w-\symbf y\|^2+\frac\lambda2\|\symbf w\|^2,
+ \qquad\lambda=\frac{\sigma^2}{n\tau^2}.
+\]
+这与第11章的岭惩罚形式相同。这里的 $\lambda$依赖所选平均方式；若用平方和而非均值，系数不同。先验方差越小，允许参数离0的程度越小，惩罚越强。截距是否惩罚取决于先验设定；不能把所有实现默认当作相同模型。
+
+MAP为正则化提供一种概率解释，但一个惩罚项的实用性仍需数据与验证来判断。先验也可能不适合当前任务；“加入先验”不自动保证估计更接近真参数或测试指标更高。
+
+\subsection{熵、交叉熵与KL散度}
+\subsubsection{从惊讶程度到平均信息量}
+对离散结果，$-\log p(x)$在结果越罕见时越大，可作为该结果的\term{自信息}。独立结果的联合概率相乘，负对数相加；这解释了对数在累积信息量中的作用。本章默认自然对数，单位为\term{nat}；若用以2为底的对数，单位为\term{bit}，两者相差 $\ln2$的换算因子。
+
+离散分布 $P=(p_1,\ldots,p_C)$的\term{熵}（entropy）为
+\[
+ H(P)=-\sum_cp_c\log p_c.
+\]
+约定 $0\log0=0$，来自极限 $\lim_{p\downarrow0}p\log p=0$。熵是按真实分布对自信息求期望。有限 $C$类别时 $0\le H(P)\le\log C$；确定性分布熵为0，均匀分布达到上界。
+
+二元熵 $h(p)=-p\log p-(1-p)\log(1-p)$在 $p=1/2$最大，为 $\log2$；当 $p$接近0或1时较小。它描述单次结果分布的不确定性，不能等同于参数估计的不确定性：即使样本量无穷大而已知 $p=1/2$，每次结果仍然不确定。
+
+\subsubsection{用模型分布编码真实分布}
+设真实离散分布为 $P$，模型分布为 $Q=(q_1,\ldots,q_C)$。\term{交叉熵}（cross-entropy）为
+\[
+ H(P,Q)=-\sum_cp_c\log q_c,
+\]
+即真实结果按 $P$发生，却用模型 $Q$的对数概率计分。如果 $p_c>0$而 $q_c=0$，该交叉熵为无穷大；如果 $p_c=0$，对应项按0处理，无须实际计算 $0\log0$。
+
+\term{KL散度}（Kullback--Leibler divergence）定义为
+\[
+ D_{\rm KL}(P\|Q)=\sum_{c:p_c>0}p_c\log\frac{p_c}{q_c}
+ =H(P,Q)-H(P).
+\]
+它是非负的，有限离散情形等于0当且仅当 $P=Q$。可用 $\log t\le t-1$证明：当所有 $p_c>0$的类别都有 $q_c>0$，
+\[
+ -D_{\rm KL}(P\|Q)
+ =\sum_{p_c>0}p_c\log\frac{q_c}{p_c}
+ \le\sum_{p_c>0}q_c-\sum_{p_c>0}p_c\le0.
+\]
+等号要求正质量处 $q_c=p_c$且没有额外质量落到 $P$支持集之外。若 $Q$在真实正质量处为0，散度直接为无穷大，结论仍成立。
+
+KL一般不对称，也不满足三角不等式，所以名称中的散度不是第6章意义下的距离。最小化交叉熵等价于最小化相应方向的KL，是因为固定 $P$的熵不随模型变化，而不是两个量数值总相同。
+
+\begin{infobox}{例题8.8：两个模型都选同一类别，损失仍不同}
+真实分布 $P=(3/4,1/4)$，模型 $Q=(1/2,1/2)$。求熵、交叉熵、两个方向的KL。再对一个真实标签为第一类的样本，比较概率向量 $(0.6,0.4)$和 $(0.9,0.1)$的负对数损失。
+\end{infobox}
+\sol
+\begin{align*}
+ H(P)&=-\tfrac34\log\tfrac34-\tfrac14\log\tfrac14\approx0.562335,\\
+ H(P,Q)&=\log2\approx0.693147,\\
+ D_{\rm KL}(P\|Q)&\approx0.130812,\\
+ D_{\rm KL}(Q\|P)&=\tfrac12\log\tfrac{1/2}{3/4}+\tfrac12\log\tfrac{1/2}{1/4}
+ \approx0.143841.
+\end{align*}
+单样本标签第一类时损失分别为 $-\log0.6\approx0.510826$和 $-\log0.9\approx0.105361$。按最大概率选类别，两者都正确；对数损失还区分给真实类别分配的概率。若真实标签是第二类，第二模型受到的惩罚更大，因此概率质量需要在所有可能结果上评价。
+
+\subsubsection{经验交叉熵、分类损失与连续情形}
+一个类别标签可写成\term{独热向量}（one-hot vector）$\symbf y$，真实类别对应项为1，其余为0。若预测概率为 $\symbf q$，单样本交叉熵为 $-\sum_cy_c\log q_c=-\log q_{c^*}$。对样本平均得到经验负对数似然；二元情况为
+\[
+ -\frac1n\sum_i\{y_i\log q_i+(1-y_i)\log(1-q_i)\}.
+\]
+这里 $q_i$是模型在第 $i$个输入上预测标签1的概率，不是全体样本公用的发生率。第13章将把 $q_i$参数化为sigmoid输出，并推导梯度。
+
+真实条件分布未知时，用标签的平均损失近似其期望。有限样本上的经验值有抽样波动，模型也可能过拟合。把概率裁剪到 $[\epsilon,1-\epsilon]$可避免数值无穷，但会改变损失，必须记录 $\epsilon$；若模型提供未归一化得分，应优先采用稳定的对数概率公式，第13章详细讨论。
+
+连续密度可定义\term{微分熵} $h(f)=-\int f(x)\log f(x)\,\mathrm dx$，但它可以为负且随单位变化。例如 $U(0,0.5)$的微分熵为 $\log0.5<0$。不能把离散熵的非负性直接移植过来。连续KL在适当可积和支持条件下定义为 $\int f\log(f/g)$，仍非负；对同一个可逆坐标变换同时转换两分布，Jacobian因子在比值与积分中抵消。
+
+\subsection{置信区间与评价结果的不确定性}
+\subsubsection{区间是随机的构造规则}
+\term{置信区间}（confidence interval）是由样本计算的随机区间 $[L(D),U(D)]$。若重复按同一抽样方案取数据，区间覆盖固定总体参数的概率为 $1-\alpha$，则称该构造具有 $1-\alpha$的覆盖率。观察到一个具体区间后，它是否包含固定参数已是确定事实；频率学派的95\%不表示参数在这个固定区间中的后验概率为95\%。后者需要先验和后验，称为\term{可信区间}（credible interval）。
+
+对独立正态总体、已知标准差 $\sigma$的均值，精确95\%区间为
+\[
+ \bar x\pm1.959964\frac\sigma{\sqrt n}.
+\]
+标准差未知但总体正态时使用
+\[
+ \bar x\pm t_{0.975,n-1}\frac{s}{\sqrt n},
+\]
+$t_{0.975,n-1}$是自由度 $n-1$的Student $t$分布分位数；分位数指CDF达到0.975处的数值。非正态大样本可考虑近似方法，但需检查偏态、重尾与依赖。区间描述总体均值，不是未来单个观测落入的范围。
+
+\begin{infobox}{例题8.9：置信区间与单个观测范围}
+设 $X_i$独立来自 $\mathcal N(\mu,4)$，已知总体标准差2，$n=100$，样本均值10。计算总体均值的95\%置信区间。与正态总体约95\%观测的范围相比，宽度有什么区别？
+\end{infobox}
+\sol 均值标准误为 $2/10=0.2$，区间为 $10\pm1.959964(0.2)$，约 $[9.6080,10.3920]$。总体约95\%观测落在 $\mu\pm1.96(2)$，半宽约3.92，中心为未知真实 $\mu$。前者半宽约0.392，随 $n$增大而缩小；个体分布的标准差仍是2。若需未来单个观测的预测区间，还要同时考虑均值估计误差，而不能把均值区间直接使用。
+
+\subsubsection{比例的正态近似与Wilson区间}
+对固定分类器的独立测试样本，正确与否可看作伯努利变量，准确率为样本比例 $\hat p=k/n$。常见正态近似区间为 $\hat p\pm z\sqrt{\hat p(1-\hat p)/n}$。当样本少或 $\hat p$接近0、1时，它可能越出 $[0,1]$，甚至在全部正确时退化为零宽度，不宜机械使用。
+
+一种常用改进是\term{Wilson区间}。在二项模型下，对候选真实比例 $p$使用检验不等式 $(\hat p-p)^2\le z^2p(1-p)/n$，整理为关于 $p$的二次不等式，求两根得到
+\[
+ \text{中心}=\frac{\hat p+z^2/(2n)}{1+z^2/n},\qquad
+ \text{半宽}=\frac{z}{1+z^2/n}
+ \sqrt{\frac{\hat p(1-\hat p)}n+\frac{z^2}{4n^2}}.
+\]
+95\%时常取 $z=1.959964$。这是基于正态分位数的近似区间，并非对所有 $p,n$都具有恰好95\%覆盖率的精确方法；不过它避免上述零宽度和越界问题。若数据相关，仍需先解决抽样单位，换区间公式不能修复依赖假设。
+
+假设20个独立样本全部正确，普通插入式正态区间为 $[1,1]$，Wilson区间约 $[0.8389,1]$。观测100\%准确率仍允许总体准确率低于1。此处分类器视为训练后固定；区间只反映测试抽样，不能包含训练数据选择、参数初始化和调参流程全部变动。
+
+\subsubsection{不确定性的来源需要分别说明}
+测试样本变化、训练样本变化、随机初始化和部署分布变化是不同来源。对同一固定测试集换随机种子训练，结果的标准差主要描述该训练流程的随机波动；对固定模型重采样测试记录，主要描述测试抽样波动。两种标准差不应混写成同一个“模型不确定性”。
+
+交叉验证的各折训练集高度重叠，因此折分数并非相互独立的重复试验，不能直接把折数当独立样本数套均值区间。反复查看测试集挑选模型也会改变评价含义。第14章进一步讨论评价协议与选择偏差，本章先保留这两个必要限制。
+
+\subsection{重采样：用已有样本近似抽样波动}
+\subsubsection{非参数bootstrap的步骤与条件}
+\term{自助法}（bootstrap）把当前样本看作总体分布的经验近似，反复有放回抽取与原样本同样多的记录，重新计算统计量。对 $n$条近似独立同分布记录，最基本流程为：
+\begin{enumerate}
+\item 固定目标统计量、抽样单位、区间方法与重采样次数 $B$。
+\item 每轮抽取索引 $i_1,\ldots,i_n$，每个索引在 $0,\ldots,n-1$中等概率选择，允许重复。
+\item 用这一组索引构成重采样数据，计算统计量 $T_b^*$。
+\item 用 $T_1^*,\ldots,T_B^*$的标准差估计标准误；百分位法取2.5\%与97.5\%分位数构成近似95\%区间。
+\end{enumerate}
+重采样不是产生新事实。$B$增大只减少模拟分位数的数值波动，不会让原数据量变大；有偏样本、极少样本、极端尾部或复杂非光滑统计量下，简单百分位区间可能表现不佳。区间覆盖率需要适用条件，不能只因代码执行成功就认定可靠。
+
+对固定预测的MAE，记录每条误差 $e_i=|\hat y_i-y_i|$，重采样这些误差的均值即可。对F1或AUC，不能把一个最终分数直接重采样，必须重采样对应的标签和预测，再完整重算指标；某轮可能只有一个类别，AUC此时未定义，需要事先规定处理策略。
+
+\subsubsection{比较两个模型要保留配对}
+两个模型在同一批样本上评价时，共享样本难度。令 $d_i=e_{A,i}-e_{B,i}$，平均差 $\bar d$为正表示A的误差较大。重采样应对同一索引同时抽取A和B，或直接抽取 $d_i$，以保留配对。独立抽两个模型的误差会改变协方差结构，导致对差值波动的错误估计。
+
+同一用户有多条相关记录时，可把用户作为整组抽样单位；时间序列则可能需要连续区块重采样。训练变化若也是目标的一部分，需在每轮重新抽训练数据、拟合和评价，计算量与含义都改变。当前章实验只处理固定模型的独立测试记录，不重新训练。
+
+\Needspace{8\baselineskip}
+\begin{infobox}{例题8.10：手算一次配对重采样}
+四个样本上，模型A绝对误差为 $(1,2,0,3)$，B为 $(1,1,1,2)$。求原始MAE差。一次有放回抽样选第1、1、3、4条记录，求该轮两模型MAE与差，说明为何要使用同一索引。
+\end{infobox}
+\sol 原MAE分别为1.5与1.25，差为0.25；逐条差为 $(0,1,-1,1)$。指定重采样后A误差 $(1,1,0,3)$，均值1.25；B误差 $(1,1,1,2)$，均值1.25；差为0。直接抽差值 $(0,0,-1,1)$也得到0。若A和B抽不同样本，就不再比较同一组样本难度下的误差差异。
+
+\subsection{实验8.1：概率更新、似然与信息量}
+入口\code{配套实验/ch08_probability.py}只依赖NumPy，固定数据在脚本中，不需要下载。运行：
+\begin{console}
+python3 -m pip install -r 配套实验/requirements-ch08.txt
+python3 配套实验/ch08_probability.py
+\end{console}
+程序依次核对联合表、贝叶斯反向条件、二项计数、样本方差、伯努利MLE/MAP/后验均值、熵/交叉熵/KL以及20条全正确的Wilson区间。所有概率向量先检查非负、有限、非空、总和近似1，且比较分布类别顺序必须一致。轻微浮点误差可按 $10^{-12}$容忍，但接口不会把任意不归一化得分静默变为概率。
+
+熵的关键代码先筛掉 $p_c=0$项，避免计算 $0\log0$：
+\begin{pycode}
+import numpy as np
+p = np.array([0.75, 0.25])
+q = np.array([0.5, 0.5])
+mask = p > 0
+entropy = -np.sum(p[mask] * np.log(p[mask]))
+cross_entropy = -np.sum(p[mask] * np.log(q[mask]))
+kl = cross_entropy - entropy
+print(entropy, cross_entropy, kl)
+\end{pycode}
+这个片段假设已验证 $p,q$且在 $p>0$位置 $q>0$；完整脚本会处理模型零概率：若真实概率为正而模型为0，交叉熵和KL返回正无穷，而非用小常数偷偷改变定义。结果摘要保存时将有意的无穷情形写为说明字符串，保持JSON为标准有限数值格式。
+
+主要核对值：阳性后验 $2/13$，MLE0.6，Beta(2,2)先验下MAP $4/7$、后验均值 $5/9$；$H(P)\approx0.562335$，$H(P,Q)\approx0.693147$，KL约0.130812。连续高斯MLE对 $(1,2,2,3)$给均值2、方差0.5，与无偏样本方差 $2/3$不同。
+
+输出\code{ch08_results/probability.json}记录环境与全部结果。修改任务：把异常发生率从0.01改为0.10；把模型 $Q$改为 $P$验证KL近零；令 $P=(1,0),Q=(0,1)$检查无穷；把标签改为全1，区分MLE边界与后验预测仍小于1。相同类别顺序和模型假设必须在修改中保持明确。
+
+\Needspace{13\baselineskip}
+\subsection{实验8.2：均值覆盖率与配对bootstrap}
+入口\code{配套实验/ch08_uncertainty.py}依赖同上，CPU运行。固定种子20261013，两个部分使用分别初始化的随机生成器，避免前一部分抽样次数改变后一部分结果。运行：
+\begin{console}
+python3 配套实验/ch08_uncertainty.py
+python3 配套实验/ch08_solutions.py
+\end{console}
+第一部分模拟 $R=5000$次独立取样，每次从 $\mathcal N(10,4)$生成 $n=25$条数据。已知标准差2，用 $\bar x\pm1.959964(2/\sqrt{25})$构造区间，并记录是否覆盖已知真均值10：
+\begin{pycode}
+rng = np.random.default_rng(20261013)
+samples = rng.normal(10.0, 2.0, size=(5000, 25))
+means = samples.mean(axis=1)
+half_width = 1.959963984540054 * 2 / np.sqrt(25)
+covered = (means - half_width <= 10) & (10 <= means + half_width)
+print(covered.mean())
+\end{pycode}
+数组每行是一份新样本，沿\code{axis=1}求该样本均值；覆盖率是5000个覆盖指示量的平均。实测值应在0.95附近，而不是强制等于0.95。重复覆盖指示的标准误约 $\sqrt{0.95(0.05)/5000}\approx0.00308$，因此0.93到0.97是本实验宽松的现象核对范围，不是另外给实际数据构造的置信区间。样本均值的实测标准差应接近0.4。
+
+第二部分使用20条固定教学测试记录的成对绝对误差。A误差向量为
+\[
+ (1,2,0,3,1,2,1,4,0,2,3,1,2,0,4,1,2,3,1,2),
+\]
+B误差向量为
+\[
+ (1,1,1,2,1,1,1,3,1,1,2,1,1,1,3,1,1,2,1,1).
+\]
+原MAE分别为1.75和1.35，差0.40。实验用 $B=10000$次配对重采样，保存全部重采样均值差；标准误用这些差值的样本标准差，区间用\code{np.quantile(..., method="linear")}的2.5\%与97.5\%分位数。以下核心操作每个索引同时作用于A和B：
+\begin{pycode}
+error_a = np.array([1, 2, 0, 3, 1, 2, 1, 4, 0, 2,
+                    3, 1, 2, 0, 4, 1, 2, 3, 1, 2])
+error_b = np.array([1, 1, 1, 2, 1, 1, 1, 3, 1, 1,
+                    2, 1, 1, 1, 3, 1, 1, 2, 1, 1])
+difference = error_a - error_b
+rng = np.random.default_rng(20261013)
+index = rng.integers(0, len(difference), size=(10000, len(difference)))
+boot = difference[index].mean(axis=1)
+interval = np.quantile(boot, [0.025, 0.975], method="linear")
+print(difference.mean(), boot.std(ddof=1), interval)
+\end{pycode}
+对经验分布可独立算出重采样均值差的条件标准差为 $\sqrt{\operatorname{Var}_{\rm empirical}(d)/n}$；该固定数据中经验方差0.54，理论条件标准差约0.164317。模拟标准误应接近它，区间通常约为 $[0.05,0.70]$，确切末位与随机版本及次数有关，应以摘要记录为准。不能把这个构造数据区间当作真实业务模型的优劣证据。
+
+输出\code{ch08_results/uncertainty.json}记录种子、样本量、重复次数、覆盖率、MAE差、标准误与区间；\code{uncertainty.npz}保存抽样均值、覆盖指示、固定误差与重采样差值。当前实现保存索引矩阵，内存为 $O(Bn)$，适合小实验；大数据可分批生成索引，并保存 $B$个统计量，而非全部重采样数据。
+
+修改任务：将 $n$改为100，核对已知方差均值区间半宽减半；只增加 $B$观察原MAE差不变；交换A/B，使用同一索引时区间应变为 $[-U,-L]$；改成两模型分别重采样并解释协方差为何丢失。最后假想这20条记录来自4个用户，说明为什么需要用户级信息才能实施合理的分组bootstrap。
+
+\subsection{知识联系、常见误区与自检}
+\begin{center}
+\begin{tabularx}{\linewidth}{Y Y}
+\toprule
+容易混淆的量 & 区别与条件\\\midrule
+密度与概率 & 密度需积分，数值依赖单位，可以大于1\\
+独立与零相关 & 独立通常推出零相关，反向一般不成立\\
+数据标准差与标准误 & 前者描述观测散布，后者描述估计的抽样波动\\
+似然与后验 & 前者把数据固定比较参数，后者还需先验并归一化\\
+MLE、MAP与后验均值 & 不同估计标准，端点与先验条件需分别处理\\
+熵与交叉熵 & 前者只用真实分布，后者还取决于模型概率\\
+准确率与概率损失 & 前者只统计类别判断，后者还评价分配的概率\\
+bootstrap次数与数据量 & 增加次数改善模拟精度，不增加独立观测信息\\\bottomrule
+\end{tabularx}
+\end{center}
+第5章的数据描述回答当前样本是什么样，本章的统计推断再问它对目标总体说明多少。第6章的协方差矩阵与第7章的求导，分别进入表示学习与似然优化。第9章将把期望损失和经验损失写成统一学习问题；第13章展开交叉熵分类器；第14章讨论可靠评价。
+
+自检应能说明：为什么连续观测可用于似然而单点概率仍为0？为什么100\%样本准确率不证明总体准确率为1？为什么交叉熵最低值一般不是0？为什么增加bootstrap次数无法修复同一用户记录之间的依赖？回答应包含变量、条件和抽样单位，而不只复述公式名称。
+
+\Needspace{10\baselineskip}
+\subsection{分层习题}
+以下编号为8.1--8.16。概率计算保留事件定义，估计与区间注明分布和独立性条件，信息量使用自然对数。
+\begin{enumerate}[label=\textbf{8.\arabic*}]
+\item \textbf{密度。}对 $U(0,0.5)$，求 $P(T>0.4)$与 $F(0.3)$。用秒表示时，求 $P(S>24)$，解释密度为何改变。
+\item \textbf{联合表。}用例题8.2求 $P(R=A\mid Y=0)$，检验 $R$和 $Y$是否独立。
+\item \textbf{贝叶斯。}完成例题8.3两种发生率；保持1\%发生率与90\%灵敏度，误报率降为1\%时，阳性后验是多少？
+\item \textbf{独立性。}两个互斥事件概率分别为0.2和0.3，是否独立？用 $X\in\{-1,0,1\},Y=X^2$验证零协方差但不独立。
+\item \textbf{期望与方差。}$X$以0.25、0.75概率取0、2，求均值、方差、$\mathbb E[X^2]$与 $\operatorname{Var}(3X-1)$。
+\item \textbf{条件均值。}用例题8.2验证全期望与全方差公式；说明预测延迟标签的条件均值等于什么。
+\item \textbf{分布。}对 $K\sim\operatorname{Binomial}(4,1/4)$求 $P(K=0)$和 $P(K\ge1)$；对 $Z\sim\operatorname{Poisson}(2)$求 $P(Z=0)$。二者的假设怎样不同？
+\item \textbf{估计。}对 $1,2,2,3$推导样本方差、均值标准误；若四个数其实为同一设备的相关测量，原标准误还能否直接使用？
+\item \textbf{MLE。}从伯努利对数似然推导内点与两端MLE；五个全1标签的MLE给未来0结果分配多少概率？
+\item \textbf{高斯。}对 $1,2,2,3$求高斯均值与方差MLE；解释与无偏方差的差别。所有数值相同时为什么需单独处理？
+\item \textbf{MAP。}五个标签中3个1，先验改为Beta(3,2)，求后验、MAP与后验预测成功率；明确内点公式的条件。
+\item \textbf{正则化。}固定 $\sigma^2=4,\tau^2=2,n=10$，按正文平均平方损失归一化求 $\lambda$；若使用未平均的平方和形式，系数如何变化？
+\item \textbf{信息量。}重算例题8.8；若 $P=(1,0),Q=(1/2,1/2)$，求熵、交叉熵与KL；若 $Q=(0,1)$又如何？
+\item \textbf{区间。}求20条全部正确的Wilson区间；比较 $n=100,\sigma=2$与 $n=400,\sigma=2$时均值区间半宽。解释95\%的频率含义。
+\item \textbf{配对。}完成例题8.10。对实验8.2的数据推导bootstrap均值差的条件标准误，并解释交换模型后的区间变化。
+\item \textbf{实验设计。}运行两实验和答案入口。测试数据来自多个用户、每用户多条记录时，设计重采样单位；说明固定模型重采样没有覆盖哪种训练变化。
+\end{enumerate}
+
+\subsection{习题参考答案}
+\subsubsection*{8.1--8.4：概率与独立性}
+\textbf{8.1}\quad $P(T>0.4)=2(0.5-0.4)=0.2$，$F(0.3)=0.6$。$S=60T$时 $P(S>24)=(30-24)/30=0.2$。变换把区间长度放大60倍，密度缩小60倍，以保持积分概率不变。
+
+\textbf{8.2}\quad $P(R=A\mid Y=0)=0.54/0.82=27/41\approx0.658537$。若独立，应有 $P(R=A,Y=1)=P(R=A)P(Y=1)=0.6(0.18)=0.108$，实际为0.06；因此不独立。也可比较两区域条件延迟率0.1与0.3。
+
+\textbf{8.3}\quad 原条件下后验分别 $2/13$与 $2/3$。误报率为0.01时 $P(+)=0.9(0.01)+0.01(0.99)=0.0189$，异常后验 $0.009/0.0189=10/21\approx0.476190$。即使误报率降到1\%，低发生率仍会影响阳性的解释。
+
+\textbf{8.4}\quad 互斥时交集为0，但概率乘积0.06，不独立。后一例 $\mathbb E[X]=\mathbb E[X^3]=0$，所以 $\operatorname{Cov}(X,X^2)=0$；$P(Y=0\mid X=0)=1$，而 $P(Y=0)=1/3$，故不独立。两个反例分别区分互斥、独立和不相关。
+
+\subsubsection*{8.5--8.8：矩与抽样}
+\textbf{8.5}\quad $\mathbb E[X]=0(0.25)+2(0.75)=1.5$，$\mathbb E[X^2]=3$，方差 $3-1.5^2=0.75$；$\operatorname{Var}(3X-1)=9(0.75)=6.75$。均值的平方2.25不能替代平方的期望3。
+
+\textbf{8.6}\quad $\mathbb E[Y]=0.18$，条件均值在A为0.1、B为0.3，按0.6、0.4加权得到0.18。组内方差期望0.138，组间均值方差0.0096，相加0.1476，等于 $0.18(0.82)$。对0/1变量条件期望就是条件成功概率，不要求真实标签本身为小数。
+
+\textbf{8.7}\quad $P(K=0)=(3/4)^4=81/256$，$P(K\ge1)=175/256$；$P(Z=0)=e^{-2}\approx0.135335$。二项固定试验次数，每次独立同成功率，计数上限4；泊松用于窗口计数，取值可为任意非负整数，均值和方差均为2。仅因两者都是整数不能互换。
+
+\textbf{8.8}\quad 均值2，平方和2，$s^2=2/3$，均值标准误估计 $\sqrt{(2/3)/4}=\sqrt{1/6}$。相关测量需在均值方差中加入协方差项，不能直接使用独立样本公式。可依据实验结构建立相关模型或按独立设备/独立组抽样；仅四个数本身不足以确定依赖程度。
+
+\subsubsection*{8.9--8.12：似然与后验}
+\textbf{8.9}\quad 内点导数 $k/p-(n-k)/(1-p)=0$给 $p=k/n$，二阶导负保证极大。$k=0$时似然 $(1-p)^n$随 $p$减小而增加，端点0最优；$k=n$时 $p^n$在1最优。全1样本的MLE给未来0概率0，负对数损失为无穷；不能把边界估计当作真实概率已经确定。
+
+\textbf{8.10}\quad 均值MLE2，方差MLE $2/4=0.5$，无偏方差 $2/3$。前者最大化似然，后者令重复抽样期望等于总体方差，两种标准不同。全相同观测下让均值等于观测并使正方差趋0，密度峰值无限增大，原正方差参数域内没有有限的最大似然点，需要约束或另行建模退化情况。
+
+\textbf{8.11}\quad 后验Beta(6,4)，两个参数均大于1；MAP为 $5/8=0.625$，后验均值与预测成功率为 $6/10=0.6$。MAP使用形状参数减1，均值不减1；没有满足内点条件时须检查端点与密度形状。
+
+\textbf{8.12}\quad 平均形式 $\|X\symbf w-\symbf y\|^2/(2n)+\lambda\|\symbf w\|^2/2$中 $\lambda=4/(10\times2)=0.2$。若形式为平方和的一半加 $\lambda_{\rm sum}\|\symbf w\|^2/2$，则 $\lambda_{\rm sum}=\sigma^2/\tau^2=2$。两个目标相差整体正倍数10，极小点一致，但同一学习率的梯度轨迹会不同。
+
+\subsubsection*{8.13--8.16：信息、区间与重采样}
+\textbf{8.13}\quad 例题8.8三项约为0.562335、0.693147、0.130812，反向KL约0.143841。对 $P=(1,0),Q=(1/2,1/2)$，熵0，交叉熵与KL均为 $\log2$。若 $Q=(0,1)$，真实必出现的第一类被赋概率0，交叉熵和KL均为正无穷。真实零质量的第二类本身不贡献求和。
+
+\textbf{8.14}\quad $\hat p=1,n=20$，代入Wilson式得下界 $n/(n+z^2)\approx0.838875$，上界1。均值已知方差区间半宽分别 $1.959964(2/10)\approx0.391993$与 $1.959964(2/20)\approx0.195996$。95\%表示反复按规定抽样并构造区间时的长期覆盖率，不是对一个已经固定区间中的参数赋后验概率。
+
+\textbf{8.15}\quad 小例原始差0.25，指定重采样差0。实验数据差值均值0.40，平方差均值0.70，经验方差 $0.70-0.40^2=0.54$。从该经验分布独立抽20项后取均值，条件方差为 $0.54/20$，标准误 $\sqrt{0.027}\approx0.164317$。交换模型时每条差值变号，使用同一索引后全部bootstrap统计量变号，分位数区间从 $[L,U]$变为 $[-U,-L]$。
+
+\textbf{8.16}\quad 先确认要估计的是按记录平均还是按用户平均的指标。若用户间近似独立、用户内相关，抽用户并保留该用户全部记录，再按预先选定的权重重算统计量；两个模型仍使用相同抽样用户。固定模型重采样只改变测试组成，没有重新采训练数据、初始化和训练；若目标包含这些变化，需更外层的重新训练设计。实验入口检查确定性手算、边界与配对关系；覆盖率模拟和区间末位允许随随机环境变化。
+
+\subsection{本章小结}
+概率把未确定的结果组织为联合、条件与边缘分布；期望和方差分别描述中心与波动，独立性决定许多简化公式能否使用。统计估计将有限样本转成参数信息，最大似然和最大后验对应不同的优化目标。平方损失与交叉熵可以从明确的条件分布假设推导，而不是任意选择的计算符号。
+
+熵、交叉熵与KL连接概率模型和损失，置信区间与bootstrap说明实验数值的抽样波动。每项结论都依赖总体、抽样单位、目标统计量和评价协议；增加公式复杂度或重采样次数不能代替这些条件。第一篇至此完成编程与数学准备，后续第9章开始统一表达监督学习问题。
+
 \clearpage
 \section*{资料说明与配套实验索引}
 \markboth{资料说明与配套实验索引}{}
 \pdfbookmark[1]{资料说明与配套实验索引}{references}
-本累计版包含第1章《人工智能与机器学习全景》、第2章《Python语言基础》、第3章《Python程序组织与调试》、第4章《NumPy与向量化计算》、第5章《pandas、数据探索与可视化》和第6章《线性代数复习》。后续8篇44章的整体规划保存在同目录大纲中，未完成章节不列入本PDF正文目录。已完成章节的编号、术语与实验编号供后续章节沿用。
+本累计版包含第1章《人工智能与机器学习全景》、第2章《Python语言基础》、第3章《Python程序组织与调试》、第4章《NumPy与向量化计算》、第5章《pandas、数据探索与可视化》、第6章《线性代数复习》、第7章《微积分复习与优化准备》和第8章《概率统计与信息论准备》。后续8篇44章的整体规划保存在同目录大纲中，未完成章节不列入本PDF正文目录。已完成章节的编号、术语与实验编号供后续章节沿用。
 
 本讲义中的例题、任务卡、教学数据与代码为针对本书学习目标编写的示例。基础语法可对照Python官方教程核对，可靠评价的流程可对照机器学习工具的官方实践说明。参考入口如下，访问日期为2026年10月8日；网页版本可能随官方维护更新，本章示例采用常见Python 3语法。
 \begin{enumerate}
@@ -4723,12 +5905,27 @@ $X^{\mathsf T}(XW-Y)$ & $d\times k$ & 多输出参数梯度的未归一化部分
 \url{https://numpy.org/doc/2.3/reference/generated/numpy.linalg.cond.html}
 \end{enumerate}
 \endgroup
+第7、8章的推导、手算与固定教学数据为本讲义编写。另对照下列官方课程资料与工具文档核对机制，访问日期为2026年10月13日；这些核对不改变原大纲的范围与符号约定。
+\begin{enumerate}
+\item Stanford CS229讲义：概率建模与链式求导的课程入口。\newline
+\url{https://cs229.stanford.edu/main_notes.pdf}
+\item NIST统计手册：均值置信区间及长期覆盖含义。\newline
+\url{https://www.itl.nist.gov/div898/handbook/eda/section3/eda352.htm}
+\item NumPy 2.3：有放回抽样与分位数插值约定。\newline
+\url{https://numpy.org/doc/2.3/reference/random/generated/numpy.random.Generator.choice.html}\newline
+\url{https://numpy.org/doc/2.3/reference/generated/numpy.quantile.html}
+\end{enumerate}
+本批实验只依赖NumPy，分别提供梯度下降、差分检查、概率推断和不确定性模拟。数值环境及实测输出见配套实验目录；区间实验只覆盖固定预测下的独立测试抽样，不包含重新训练或分布变化。
+
 上列资料为相关机制的核对与进阶入口，不要求先通读才能运行本批实验。第一章的近邻、风险与评价指标将在相应后续章节补充完整算法、统计假设和推导。
 
-\begin{center}
-\begin{tabularx}{\linewidth}{l l Y}
+\begingroup\small\renewcommand{\arraystretch}{1.12}
+\begin{longtable}{l l >{\raggedright\arraybackslash}p{0.40\linewidth}}
 \toprule
 入口文件 & 对应位置 & 内容\\\midrule
+\endfirsthead
+\toprule 入口文件 & 对应位置 & 内容\\\midrule
+\endhead
 \code{ch01_regression.py} & 实验1.1 & 基线、近邻选择、最终测试\\
 \code{ch01_classification.py} & 实验1.2 & 阈值、四类计数与指标\\
 \code{ch02_basics.py} & 实验2.1 & 文本清理、拒绝记录、统计\\
@@ -4746,8 +5943,14 @@ $X^{\mathsf T}(XW-Y)$ & $d\times k$ & 多输出参数梯度的未归一化部分
 \code{ch06_geometry.py} & 实验6.1 & 投影、QR与秩亏拟合\\
 \code{ch06_svd.py} & 实验6.2 & SVD、条件数与梯度\\
 \code{ch06_solutions.py} & 第6章习题 & 手算与非法输入核对\\
+\code{ch07_optimization.py} & 实验7.1 & 曲率、步长与最小二乘迭代\\
+\code{ch07_gradcheck.py} & 实验7.2 & 多路径导数、差分扫描与故意漏项\\
+\code{ch07_solutions.py} & 第7章习题 & 迭代、方向与边界核对\\
+\code{ch08_probability.py} & 实验8.1 & 贝叶斯、似然、后验与信息量\\
+\code{ch08_uncertainty.py} & 实验8.2 & 覆盖率与配对bootstrap\\
+\code{ch08_solutions.py} & 第8章习题 & 手算、概率零值与配对对称性\\
 \code{README.md} & 实验说明 & 环境、运行、预期与修改任务\\\bottomrule
-\end{tabularx}
-\end{center}
+\end{longtable}
+\endgroup
 实验输出记录另保存在“配套实验/预期输出”目录。主源文件为“源文件/机器学习讲义.tex”，可使用XeLaTeX继续编译与增补。源码集中定义版式与颜色，图示在文内生成，不需要另附图片才能编译。
 \end{document}

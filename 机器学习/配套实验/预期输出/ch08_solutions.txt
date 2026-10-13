@@ -1,0 +1,1 @@
+chapter 8: hand calculations, zero probabilities, Wilson, paired symmetry, and invalid inputs passed

@@ -1,0 +1,15 @@
+166 cumulative blocks passed AST syntax; 6 new blocks executed with documented context.
+new code block 1
+8.0 20.0
+new code block 2
+[ 0.8 -0.8]
+new code block 3
+0.178125
+[-0.14166667  0.36666667]
+2.072070293124284e-11
+new code block 4
+0.5623351446188083 0.6931471805599453 0.130812035941137
+new code block 5
+0.9524
+new code block 6
+0.4 0.16360036455622062 [0.05 0.7 ]
