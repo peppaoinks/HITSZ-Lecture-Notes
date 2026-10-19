@@ -31,7 +31,7 @@
 \pgfplotsset{compat=1.18}
 \usetikzlibrary{arrows.meta}
 \usepackage[hidelinks]{hyperref}
-\hypersetup{pdftitle={大学物理},pdfsubject={六份课件全部公式的符号、条件与使用场景详解},pdftitle={大学物理公式详解}}
+\hypersetup{pdftitle={大学物理},pdfsubject={热学及几何光学课件公式的符号、条件与使用场景详解},pdftitle={大学物理公式详解}}
 % ---------- 主题色与信息框：集中设置 ----------
 \definecolor{ThemeMain}{HTML}{35566E}
 \definecolor{ThemeBack}{HTML}{F2F6F8}
@@ -848,6 +848,195 @@ $i$ 个这样的能量项相加，单分子平均总能量为 $ikT/2$；$N$ 分�
 \approx\frac{3.51\times10^{22}}{\sqrt{MT}}p.
 \]
 按课件精度即 $3.5\times10^{22}$。单位约定由换算产生，不能把该系数当成无量纲常数。单层时间为 $t=(5\times10^{14})/\bar z$，沿用课件每平方厘米覆盖量；吸附概率小于一或存在脱附时，所需时间还会改变。
+
+\chapterpage{几何光学：传播、折射与全反射}
+\subsection{反射定律、折射定律与折射率}
+\begin{infobox}{课件公式}
+\[
+ i'=i,\qquad n_{12}=\frac{\sin i_1}{\sin i_2}
+ =\frac{n_2}{n_1}=\frac{v_1}{v_2},\qquad n=\frac cv,
+ \qquad n_1\sin i_1=n_2\sin i_2.
+\]
+\end{infobox}
+\explain{$i,i'$ 为反射问题的入射角和反射角；$i_1,i_2$ 为折射问题两侧的光线与法线的夹角。$n,n_1,n_2,n_{12}$ 无量纲；$c,v,v_1,v_2$ 是相速度，单位为 $\mathrm{m\,s^{-1}}$。本课件的 $n_{12}$ 表示介质2相对于介质1的折射率。}{几何光学近似、静止的均匀各向同性介质及清晰界面。相对折射率的比值应比较同一频率的光。}{先分清入射侧、出射侧和法线，再写折射定律；从低折射率进入高折射率时折射光向法线偏。正入射时 $i_1=i_2=0$，正弦比为 $0/0$，应使用折射率比或折射定律，不能据此说相对折射率不存在。}
+反射光、入射光与法线共面且分居法线两侧；折射问题也满足共面性。折射率较大称光密，较小称光疏，该名称不判断质量密度。正常色散区通常有紫光折射率大于红光，不能推广到所有波段。
+
+\subsection{临界角与全反射}
+\begin{infobox}{课件公式}
+\[
+ \sin i_{\mathrm c}=\frac{n_2}{n_1},\qquad
+ i_{\mathrm c}=\arcsin\frac{n_2}{n_1},\qquad n_1>n_2.
+\]
+\end{infobox}
+\explain{$i_{\mathrm c}$ 为折射角等于 $90^\circ$ 时的入射角。角度可用度表示；参与小角近似和求导时用弧度。}{光从光密介质射向光疏介质，界面无吸收。$i>i_{\mathrm c}$ 为全反射，$i=i_{\mathrm c}$ 为临界边界。}{从折射定律令 $i_2=90^\circ$ 得临界角。$i>i_{\mathrm c}$ 时要求 $\sin i_2>1$，不存在向第二介质传播的折射光线；不应继续求一个实数折射角。}
+推导只需 $n_1\sin i_{\mathrm c}=n_2$。若 $n_1\le n_2$，就没有此类全反射临界角。水到空气取 $n_1=1.33,n_2=1$ 时，$i_{\mathrm c}\approx48.75^\circ$。全反射不排除第二介质近界面的倏逝场。
+
+\subsection{光纤的端面折射、侧壁全反射与接收角}
+\begin{infobox}{课件关系与其直接推论}
+\begin{gather*}
+ n_0\sin i=n_1\sin i',\qquad i_1=\frac\pi2-i',\qquad
+ \sin i_{\mathrm c}=\frac{n_2}{n_1},\\
+ \mathrm{NA}=\sqrt{n_1^2-n_2^2},\qquad
+ n_0\sin i<\mathrm{NA}.
+\end{gather*}
+\end{infobox}
+\explain{$n_0$ 为光纤端面外介质折射率，$n_1$ 为纤芯折射率，$n_2$ 为包层折射率；$i$ 是外部相对光轴的入射角，$i'$ 是纤芯内相对光轴的角，$i_1$ 是侧壁相对法线的入射角。NA 是数值孔径，无量纲。}{直的阶跃折射率光纤，$n_1>n_2$，端面垂直光轴；这里讨论包含光轴平面内的子午光线。}{从侧壁全反射 $\sin i_1>n_2/n_1$ 出发，用 $\sin i_1=\cos i'$，得 $\sin^2 i'<1-n_2^2/n_1^2$；再用端面折射定律消去 $i'$。端面角与侧壁角互余，不能用同一个角直接替换。}
+接收锥边界定义为
+\[
+ i_{\max}=\arcsin\!\left(\min\left\{1,\frac{\sqrt{n_1^2-n_2^2}}{n_0}\right\}\right).
+\]
+课件取 $n_1=1.8,n_2=1.4,n_0=1$，则 $\sqrt{n_1^2-n_2^2}=\sqrt{1.28}>1$。此时侧壁条件不再给空气侧角度额外限幅，不能写出 $\arcsin\sqrt{1.28}$ 的实数值。趋近掠入射时还须考虑端面耦合，不能将几何条件解释成所有光能都能进入并无损传输。
+
+\chapterpage{几何光学：光程与费马原理}
+\subsection{分段光程、连续光程与传播时间}
+\begin{infobox}{课件公式}
+\[
+ L=\sum_{j=1}^k n_j\Delta l_j,\qquad
+ L=\int_A^B n\,\mathrm dl,\qquad
+ t=\frac1c\int_A^B n\,\mathrm dl=\frac Lc.
+\]
+\end{infobox}
+\explain{$\Delta l_j$ 为第 $j$ 段几何路程，$n_j$ 为该段折射率；$L,l$ 单位为 m，$t$ 为 s，$c$ 为 $\mathrm{m\,s^{-1}}$。$k$ 在这里是路径分段数。}{分段公式用于各段均匀介质，积分公式用于折射率沿路径连续变化的介质；本章采用静止介质中的光线描述。}{每段时间 $\Delta t_j=\Delta l_j/v_j=n_j\Delta l_j/c$，相加即得 $t=L/c$，再取分段极限得到积分。光程是等时间的真空路程，并非介质中的实际几何路程。}
+例如 $0.10\unit m$ 的玻璃光路取 $n=1.50$，光程为 $0.15\unit m$。比较两路传播时间时须比较光程；若折射率不同，几何路程短的一路未必用时短。
+
+\subsection{驻值条件与折射定律的变分推导}
+\begin{infobox}{课件公式及准确含义}
+\[
+ \delta t=\delta\left[\frac1c\int_A^B n\,\mathrm dl\right]=0,
+ \qquad\delta L=\delta\int_A^B n\,\mathrm dl=0.
+\]
+\end{infobox}
+\explain{$\delta$ 是固定端点后对邻近路径所作的变分；$\delta L$ 为光程一阶变化，单位为 m。}{端点、介质和界面固定，以邻近允许路径比较。准确结论是驻值，不保证全局最小，也不保证严格极值。}{均匀介质中直线使路程最小；椭球面两焦点间的反射光路等光程。用该原理推导定律时，必须先把路径写为可变交点的函数。}
+设界面交点为 $(x,0)$，端点分别为 $(x_A,a)$、$(x_B,-b)$，$a,b>0$，则
+\begin{align*}
+ L(x)&=n_1\sqrt{(x-x_A)^2+a^2}+n_2\sqrt{(x_B-x)^2+b^2},\\
+ \frac{\mathrm dL}{\mathrm dx}
+ &=n_1\frac{x-x_A}{\sqrt{(x-x_A)^2+a^2}}
+ -n_2\frac{x_B-x}{\sqrt{(x_B-x)^2+b^2}}=0.
+\end{align*}
+认出两个分式为 $\sin i_1,\sin i_2$，便得 $n_1\sin i_1=n_2\sin i_2$。反射时两个端点同侧、两段折射率相同，求导得 $\sin i=\sin i'$，在通常角度范围得到 $i=i'$。将像端点关于平面镜对称，也可把反射折线变为直线，得到相同结论。
+
+\chapterpage{几何光学：单球面折射与反射}
+\subsection{坐标、光束和傍轴条件}
+成像公式中的 $s,s',r$ 都是有向距离：入射光从左到右，顶点 $O$ 为原点，右正左负；$s,s',r$ 分别对应物点 $S$、像点 $S'$ 和球心 $C$。课件角度约定为顺时针正、逆时针负。未经系统变换的发散、会聚光束分别对应实物、虚物；变换后的会聚、发散光束分别对应实像、虚像。
+\[
+ \sin u\approx\tan u\approx u,\qquad \cos u\approx1
+ \quad(|u|\ll1).
+\]
+角度用弧度。傍轴光线同时要求角度小、靠近光轴；成像关系忽略高阶项，不能用于任意孔径。平面镜不需要这一近似：物像关于镜面对称，实物成等大的虚像。
+
+\subsection{从正弦定理到球面折射公式}
+\begin{infobox}{课件公式}
+\begin{gather*}
+ \frac{-s+r}{\sin i_1}=\frac r{\sin(-u)},\qquad
+ \frac{s'-r}{\sin i_2}=\frac r{\sin u'},\\
+ s'=r+\frac{n_1}{n_2}(-s+r)\frac{\sin(-u)}{\sin u'},\\
+ \frac{n_2}{s'}-\frac{n_1}{s}=\frac{n_2-n_1}{r}.
+\end{gather*}
+\end{infobox}
+\explain{$u,u'$ 为课件图中入射、折射光线与轴有关的有向角，$i_1,i_2$ 为相应入射角和折射角；$s,s',r$ 单位为 m。$n_1,n_2$ 为物像方折射率。}{前两行的三角关系按课件所画的左实物、右实像、球心在右的几何构型读取；最后一行为按有向距离延拓使用的傍轴成像公式。}{先用两个三角形的正弦定理，再用 $n_1\sin i_1=n_2\sin i_2$ 消去入射角。取光线高度 $h=\overline{MO}$，傍轴时 $\sin(-u)\approx h/(-s)$、$\sin u'\approx h/s'$。}
+两正弦之比约为 $-s'/s$，所以
+\[
+ s'=r+\frac{n_1}{n_2}(r-s)\left(-\frac{s'}s\right).
+\]
+除以 $rs'$，得到 $n_2/r=n_2/s'-n_1/s+n_1/r$，移项即为单球面公式。推导中除过的量为零或无穷远时，应回到最终关系取极限，而不是在中间式硬代入。
+
+\subsection{费马原理的精确光程与傍轴极限}
+课件另用 $n,n'$ 表示 $n_1,n_2$，用 $l,l'$ 表示两段几何长度，$\phi$ 表示球心处的角。按其图示构型有
+\begin{equation*}\begin{aligned}
+ l&=\sqrt{r^2+(r-s)^2-2r(r-s)\cos\phi},\\
+ l'&=\sqrt{r^2+(s'-r)^2+2r(s'-r)\cos\phi},\\
+ \Delta_{PAP'}&=nl+n'l'.
+\end{aligned}\end{equation*}
+这里 $\Delta_{PAP'}$ 表示光程，单位为 m，不是内能变化。$n,n'$ 无量纲，$l,l',r,s,s'$ 单位为 m。对固定物像点，令光程对非零小角 $\phi$ 的导数为零，约去 $r\sin\phi$ 后得
+\[
+ \frac{n(r-s)}l-\frac{n'(s'-r)}{l'}=0,
+ \qquad
+ \frac{n'}{l'}+\frac nl=\frac1r\left(\frac{n's'}{l'}+\frac{ns}l\right).
+\]
+近轴时，图示的左实物、右实像满足 $l\to-s,l'\to s'$，代入得
+\[
+ \frac{n'}{s'}-\frac ns=\frac{n'-n}r.
+\]
+精确式中 $l,l'$ 随入射位置改变，一般对应不同 $s'$；傍轴近似才把同一物点的像位置确定为近似唯一值。课件图示 $l\to-s$ 用到了 $s<0$，不能对任意虚物直接套用正长度展开。
+
+\subsection{光焦度、物方焦距与像方焦距}
+\begin{infobox}{课件公式}
+\begin{gather*}
+ \Phi=\frac{n_2-n_1}{r},\qquad
+ f'=\frac{n_2r}{n_2-n_1},\qquad
+ f=-\frac{n_1r}{n_2-n_1},\\
+ \frac f{f'}=-\frac{n_1}{n_2},\qquad
+ \Phi=\frac{n_2}{f'}=-\frac{n_1}{f}.
+\end{gather*}
+\end{infobox}
+\explain{$\Phi$ 为光焦度，单位 $\mathrm{m^{-1}}$，$1\unit D=1\unit{m^{-1}}$。$f,f'$ 是物方、像方焦点相对顶点的有向距离，单位为 m。}{单球面、正折射率介质、傍轴成像；$n_2\ne n_1$ 时存在上述有限焦距。}{令 $1/s=0$，解出 $s'=f'$；令 $1/s'=0$，解出 $s=f$。入射平行光在像方焦点会聚或其反向延长线相交；物方焦点对应出射平行光。}
+$\Phi>0$ 对应会聚作用，$\Phi<0$ 对应发散作用。$n_2=n_1$ 时界面无折射本领，$\Phi=0$，焦点退至无穷远，不应把焦距公式中的分母零当作有限答案。课件像方焦点处写 $s=\infty$，就左侧实物趋于无穷远而言可写成 $s\to-\infty$；成像式实际只用 $1/s\to0$。
+
+\subsection{高斯公式、牛顿公式与平面极限}
+\begin{infobox}{课件公式}
+\[
+ \frac fs+\frac{f'}{s'}=1,\qquad
+ -s=-x-f,\quad s'=x'+f',\qquad xx'=ff'.
+\]
+\end{infobox}
+\explain{$s,s'$ 从球面顶点量起，$x=s-f,x'=s'-f'$ 从各自焦点量起，单位均为 m。$xx',ff'$ 单位为 $\mathrm{m^2}$。}{与单球面傍轴公式相同的条件；两套距离均保留右正左负的轴向约定。}{先用 $f=-n_1/\Phi,f'=n_2/\Phi$ 把单球面公式除以 $\Phi$ 得高斯式；再代入 $s=x+f,s'=x'+f'$ 并展开，得到牛顿式。}
+展开过程为 $fx'+ff'+f'x+ff'=xx'+xf'+fx'+ff'$，约去共同项即得 $xx'=ff'$。左实物并不保证 $x<0$，因为物点可能在物方焦点的右侧。
+
+令 $r\to\infty$，单球面式得 $n_2/s'=n_1/s$。近法线从空气观察水中深度 $d$ 的物点，取入射侧为水，有 $s=-d$，$s'=-(n_{\mathrm{air}}/n_{\mathrm{water}})d$，视深为 $|s'|$。这是一阶折射成像极限，不能当作任意观察角下的严格点成像。
+
+\par\medskip
+\subsection{反射成像公式和焦距}
+\begin{infobox}{课件公式}
+\[
+ n_2=-n_1\quad\Longrightarrow\quad
+ \frac1s+\frac1{s'}=\frac2r,\qquad f=f'=\frac r2.
+\]
+\end{infobox}
+\explain{$s,s',r$ 为固定空间轴向上的有向距离，单位为 m。焦距 $f,f'$ 也遵守同一约定。$n_2=-n_1$ 是将反向传播代入折射形式的计算手段。}{傍轴球面镜、入射光从左向右、顶点右正左负。介质的真实折射率仍为正。}{将 $n_2=-n_1$ 代入 $n_2/s'-n_1/s=(n_2-n_1)/r$，两边除以 $-n_1$ 即得。再令物点或像点在无穷远，得 $f=f'=r/2$。}
+对左侧入射的凹镜，$r<0$；左侧实物 $s<0$，镜前实像 $s'<0$，镜后虚像 $s'>0$。凸镜球心在右，$r>0$。物像空间几何重叠不意味着入射、反射传播方向相同。
+
+\subsection{凹镜正长度公式与费马推导}
+\begin{infobox}{课件另一套记号}
+\[
+ \frac1p+\frac1q=\frac2r,\qquad f=\frac r2,
+ \qquad\frac1p+\frac1q=\frac1f.
+\]
+\end{infobox}
+\explain{本组式子的 $p,q,r$ 在课件凹镜实物、实像图中均为正的几何长度，与前一组有向距离不是同一套约定；$f$ 也表示正的焦距大小，所有长度单位为 m。}{图示凹镜、实物、实像及傍轴条件。若转用有向距离，须同时作 $s=-p,s'=-q,r_{\mathrm{signed}}=-r$。}{在本小节保留课件局部正长度写法；不能把前面有向半径的负值直接代入这一组正长度公式。}
+课件图中的路径 $PMQ$，两段长度为
+\begin{align*}
+ \overline{PM}&=\sqrt{p^2+4r(r-p)\sin^2\frac\varphi2},\\
+ \overline{MQ}&=\sqrt{q^2+4r(r-q)\sin^2\frac\varphi2}.
+\end{align*}
+课件把 $L(PMQ)$ 写成这两段几何长度之和；同一均匀介质中，真正光程应乘共同折射率 $n$，但该常数不影响驻值条件。对 $\varphi$ 求导、约去非零公共因子得
+\[
+ \frac{r-p}{\sqrt{p^2+4r(r-p)\sin^2(\varphi/2)}}
+ =\frac{q-r}{\sqrt{q^2+4r(r-q)\sin^2(\varphi/2)}}.
+\]
+再取 $\varphi\to0$：$(r-p)/p=(q-r)/q$，即 $r/p+r/q=2$，得到成像式。令 $p\to\infty$ 得 $q=r/2=f$。这一取极限顺序保留了像点约束；直接以轴上 $\sin\varphi=0$ 结束求导会丢失该约束。
+
+\subsection{平面镜全身像与计算核对}
+\[
+ H_{\mathrm{mirror},\min}=\frac H2,\qquad
+ h_{\mathrm{upper}}=\frac{H+h_e}2,\qquad
+ h_{\mathrm{lower}}=\frac{h_e}2.
+\]
+$H,h_e$ 为身高、眼高，三个结果单位均为 m。人直立、镜面竖直且镜的位置覆盖所需高度区间时成立；由眼睛到头顶、脚底两条反射光路的中点关系推得，与人镜距离无关。
+
+\begin{center}
+\begin{tabularx}{\linewidth}{l Y Y}
+\toprule
+场景 & 代入条件 & 结果与判断\\
+\midrule
+球面折射 & $n_1=1,n_2=1.5,r=0.10\unit m,s=-0.30\unit m$ & $s'=0.90\unit m$，像方实像\\
+同一球面焦距 & $\Phi=5\unit{m^{-1}}$ & $f=-0.20\unit m,f'=0.30\unit m$\\
+凹镜反射 & $r=-0.20\unit m,s=-0.30\unit m$ & $s'=-0.15\unit m$，镜前实像\\
+凸镜反射 & $r=0.20\unit m,s=-0.30\unit m$ & $s'=0.075\unit m$，镜后虚像\\
+\bottomrule
+\end{tabularx}
+\end{center}
+计算依次检查：所选系统与入射方向、法线与光轴、距离原点、每个量的正负号、傍轴条件、最后像点所在位置。$n$ 在热学中可能表示数密度，在本批中表示折射率；$s$ 在本批表示物距，$S$ 表示物点；$\Phi$ 为光焦度，$\phi,\varphi$ 为角，不能仅凭形状相似判断含义。
 
 \chapterpage{主要联系与符号辨析}
 
