@@ -1,0 +1,7 @@
+boundary_tie_library [8.14285714]
+indices [[0 1 2]
+ [0 1 2]
+ [2 3 0]]
+weighted_regression [2.         4.         7.85714286]
+uniform_classification [1 1 0]
+all checks passed

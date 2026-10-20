@@ -1,0 +1,7 @@
+training_median [4.]
+training_mean [3.66666667]
+valid_transformed [[-0.392232  1.        0.      ]
+ [ 0.196116  0.        0.      ]
+ [ 3.726207  0.        1.      ]]
+prediction [ 6.929918  8.71967  18.804476]
+all checks passed

@@ -1,0 +1,2 @@
+9.3 risk=4; 9.4 MSE=2 MAE=4/3; 9.6 thresholds=.3/.4
+sample-centering identity and five invalid inputs: all checks passed

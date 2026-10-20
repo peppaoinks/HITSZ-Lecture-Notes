@@ -1,0 +1,7 @@
+OLS 1.166666666666667 [0.5]
+lambda=0.0 intercept=1.166667 slope=0.500000
+lambda=0.2 intercept=1.282051 slope=0.384615
+lambda=1.0 intercept=1.466667 slope=0.200000
+duplicate_columns [0.25 0.25]
+MAE MSE RMSE R2 0.22222222222222218 0.05555555555555556 0.23570226039551584 0.75
+all checks passed

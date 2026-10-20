@@ -1,0 +1,6 @@
+dimension 2 squared_distance_CV 1.0127905549731768 theory 1.0
+dimension 20 squared_distance_CV 0.3148857370835598 theory 0.31622776601683794
+dimension 200 squared_distance_CV 0.09997415925036424 theory 0.1
+scaled k 15 cv 0.8871794871794871 test 0.9230769230769231
+NCA k 3 cv 0.9333333333333332 test 0.9846153846153847
+all checks passed

@@ -1,0 +1,5 @@
+NCA_objective 3.4258441235987975
+NCA_gradient [[-0.54664103  0.06010996]
+ [-0.7184481   3.0283287 ]]
+max_gradient_error 1.588720266454402e-10
+all checks passed

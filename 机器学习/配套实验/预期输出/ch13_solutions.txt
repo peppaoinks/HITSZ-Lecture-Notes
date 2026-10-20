@@ -1,0 +1,3 @@
+exercise_13_4_update [ 0.99192029 -0.01903985]
+duplicate_data_mean_objective_same_parameters [ 1.17750526 -1.17750526]
+all checks passed

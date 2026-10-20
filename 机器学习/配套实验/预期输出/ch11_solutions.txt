@@ -1,0 +1,1 @@
+hand answers, ridge translation, correlated Lasso/library/KKT, zero column, invalid inputs: all checks passed

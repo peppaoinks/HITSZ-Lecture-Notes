@@ -1,0 +1,3 @@
+lasso [2.5 0. ] gradient [-0.5 -0.4]
+ridge_same_lambda [2.         0.26666667]
+all checks passed

@@ -1,0 +1,4 @@
+n=5 train=7.173637 population=10.788672 theory_train=7.200000 theory_population=10.800000
+n=20 train=8.551198 population=9.456116 theory_train=8.550000 theory_population=9.450000
+n=100 train=8.915109 population=9.090840 theory_train=8.910000 theory_population=9.090000
+all checks passed

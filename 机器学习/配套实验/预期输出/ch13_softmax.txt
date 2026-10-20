@@ -1,0 +1,6 @@
+extreme_probability [[0.244728 0.665241 0.090031]]
+class_1_loss 0.40760596444442854
+train_accuracy 0.9833333333333333
+gradient_check_max_error 1.168848351440488e-11
+library_probability_max_error 3.3306690738754696e-16
+all checks passed

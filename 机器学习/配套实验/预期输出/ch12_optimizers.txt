@@ -1,0 +1,7 @@
+sgd w [0. 0.] loss 0.00000000
+momentum w [ 4.2e-05 -3.4e-05] loss 0.00000001
+adagrad w [2.e-06 2.e-06] loss 0.00000000
+rmsprop w [-0.023109 -0.023109] loss 0.00267023
+adam w [5.7e-05 5.7e-05] loss 0.00000002
+adamw w [5.4e-05 5.4e-05] loss 0.00000001
+first_step Adam=.9 AdamW=.88; all checks passed

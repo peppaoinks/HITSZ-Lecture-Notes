@@ -1,0 +1,12 @@
+{
+  "best_epoch": 8,
+  "epochs_run": 20,
+  "steps_per_epoch": 7,
+  "best_valid_half_mse": 0.04412196331148542,
+  "weights": [
+    1.0061681628029613,
+    1.9218290263064193,
+    -0.9295369011332741
+  ]
+}
+all checks passed

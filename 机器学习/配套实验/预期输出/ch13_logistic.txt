@@ -1,0 +1,6 @@
+theta [ 1.350719  0.403469 -0.      ]
+probability [0.062889 0.279438 0.400479 0.599521 0.720562 0.937111]
+objective 0.40079535692619395
+gradient_check_max_error 1.1419531986689435e-11
+library_probability_max_error 1.1171381597563368e-09
+all checks passed

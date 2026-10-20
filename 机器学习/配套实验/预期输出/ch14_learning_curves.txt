@@ -1,0 +1,8 @@
+C n train_mean train_sd valid_mean valid_sd 0.01 50 0.590827 0.003999 0.617736 0.00501
+C n train_mean train_sd valid_mean valid_sd 0.01 150 0.546144 0.010711 0.563672 0.010282
+C n train_mean train_sd valid_mean valid_sd 0.01 400 0.508345 0.010741 0.515768 0.002089
+C n train_mean train_sd valid_mean valid_sd 10.0 50 0.212549 0.024504 1.027545 0.128515
+C n train_mean train_sd valid_mean valid_sd 10.0 150 0.411191 0.026243 0.555987 0.077451
+C n train_mean train_sd valid_mean valid_sd 10.0 400 0.448979 0.015494 0.480175 0.002516
+all checks passed
+Matplotlib is building the font cache; this may take a moment.

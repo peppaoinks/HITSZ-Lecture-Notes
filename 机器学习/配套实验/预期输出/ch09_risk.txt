@@ -1,0 +1,6 @@
+constant=0.0 population_MSE=1.000000
+constant=0.5 population_MSE=0.750000
+constant=1.0 population_MSE=1.000000
+threshold=0.500000 FP=1 FN=1 cost=6
+threshold=0.166667 FP=1 FN=0 cost=1
+all checks passed

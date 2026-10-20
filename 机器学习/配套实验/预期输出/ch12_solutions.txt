@@ -1,0 +1,1 @@
+momentum, AdaGrad, central difference, one-step Adam, online weighting, short batch: all checks passed

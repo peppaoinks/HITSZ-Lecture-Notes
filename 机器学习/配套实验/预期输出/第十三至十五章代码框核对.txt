@@ -1,0 +1,8 @@
+code block 1: executed
+code block 2: executed
+code block 3: executed
+code block 4: executed
+code block 5: executed
+code block 6: executed
+code block 7: executed
+training loop code: probability/parameters checked
