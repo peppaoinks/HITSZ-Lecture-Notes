@@ -31,7 +31,7 @@
 \pgfplotsset{compat=1.18}
 \usetikzlibrary{arrows.meta}
 \usepackage[hidelinks]{hyperref}
-\hypersetup{pdftitle={大学物理},pdfsubject={热学及几何光学课件公式的符号、条件与使用场景详解},pdftitle={大学物理公式详解}}
+\hypersetup{pdftitle={大学物理},pdfsubject={热学、成像、光学仪器及干涉公式的符号、条件与使用场景详解},pdftitle={大学物理公式详解}}
 % ---------- 主题色与信息框：集中设置 ----------
 \definecolor{ThemeMain}{HTML}{35566E}
 \definecolor{ThemeBack}{HTML}{F2F6F8}
@@ -1037,6 +1037,277 @@ $H,h_e$ 为身高、眼高，三个结果单位均为 m。人直立、镜面竖�
 \end{tabularx}
 \end{center}
 计算依次检查：所选系统与入射方向、法线与光轴、距离原点、每个量的正负号、傍轴条件、最后像点所在位置。$n$ 在热学中可能表示数密度，在本批中表示折射率；$s$ 在本批表示物距，$S$ 表示物点；$\Phi$ 为光焦度，$\phi,\varphi$ 为角，不能仅凭形状相似判断含义。
+
+\chapterpage{薄透镜公式、作图与组合成像}
+\subsection{薄透镜的两次折射与光焦度}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}
+ \frac{n'}{p'}-\frac np=\Phi,\qquad
+ \Phi=\frac{n_L-n}{r_1}+\frac{n'-n_L}{r_2}=\Phi_1+\Phi_2,\\
+ f'=\frac{n'}\Phi,\qquad f=-\frac n\Phi,\qquad
+ \frac f p+\frac{f'}{p'}=1,\qquad
+ \Phi=\frac{n'}{f'}=-\frac n f.
+\end{gather*}
+\end{infobox}
+\explain{$p,p'$ 为相对薄透镜的物像有向距离，入射从左向右时右正左负；$r_1,r_2$ 为两面有向曲率半径；$f,f'$ 为物像方有向焦距，长度单位均为 m。$n,n',n_L$ 为前方介质、后方介质、透镜折射率；$\Phi$ 为光焦度（$\mathrm{m^{-1}}$）。}{透镜厚度相对于曲率半径与物像距离可忽略；单色、傍轴、均匀各向同性介质。}{设第一面中间像距为 $q$，两次折射为 $n_L/q-n/p=\Phi_1$ 与 $n'/p'-n_L/q=\Phi_2$。薄透镜中两个顶点近似重合，故可相加消去 $q$。}
+令 $1/p=0$，得到 $p'=f'=n'/\Phi$；令 $1/p'=0$，得到 $p=f=-n/\Phi$。再除以 $\Phi$ 得高斯公式。只有 $n=n'$ 时两焦距绝对值相等且 $f=-f'$；$\Phi=0$ 时焦点退至无穷远。不能将薄透镜两表面光焦度直接相加的结论推广为任意间隔两透镜的公式。
+
+\subsection{空气中的制造者公式与横向放大率}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}
+ n=n'=1,\qquad \frac1{p'}-\frac1p=\frac1{f'},\\
+ f'=-f=\frac1{(n_L-1)(1/r_1-1/r_2)},\\
+ V=\frac{y'}y=\frac{np'}{n'p}.
+\end{gather*}
+\end{infobox}
+\explain{$V$ 为课件该处的横向放大率，无量纲，不是热学体积；$y,y'$ 为物像有向高度，单位为 m。其余符号同前。}{前两行要求薄透镜置于空气并取折射率1；最后一行允许两侧介质不同。}{将 $n=n'=1$ 代入一般光焦度式即可得到制造者公式。近轴中心光线满足 $n\alpha=n'\alpha'$，又 $\alpha\approx-y/p$、$\alpha'\approx-y'/p'$，所以 $V=np'/(n'p)$。两侧相同介质时化为 $p'/p$。}
+例：$n_L=1.50,r_1=-r_2=0.20\unit m$ 时，$f'=0.20\unit m$。
+
+\subsection{横向放大率的四种局部写法}
+\begin{center}
+\begin{tabularx}{\linewidth}{l Y Y}
+\toprule
+系统 & 课件公式 & 说明\\
+\midrule
+球面折射 & $\beta=y'/y=np'/(n'p)$ & 两侧折射率不能约去\\
+平面折射 & $p'=(n'/n)p,\ \beta=1$ & 与单球面平面极限相合\\
+球面反射 & $n'=-n,\ \beta=-p'/p$ & 负折射率为处理反向传播的形式替换\\
+平面反射 & $p'=-p,\ \beta=1$ & 正立等大\\
+同介质薄透镜 & $\beta=y'/y=p'/p$ & 与有向距离配套\\
+\bottomrule
+\end{tabularx}
+\end{center}
+球面折射也可用通过球心的辅助光线核对：$\beta=(p'-r)/(p-r)$。把单球面成像式乘 $rpp'$ 并整理，得 $n'p(r-p')=np'(r-p)$，故同样有 $\beta=np'/(n'p)$。
+
+以上 $V$ 和 $\beta$ 在各处都表示横向放大率，但课件采用了不同字母，按局部保留。多级系统相对于原物的总放大率为各级之积，不应把“相对于中间像倒立”当作“相对于原物倒立”。
+
+\subsection{特殊光线与焦平面构图}
+空气中薄透镜：平行主轴入射对应出射通过像方焦点；通过物方焦点入射对应出射平行主轴；过光心光线近似不偏折。焦点为虚焦点时，使用光线的延长线。最后一条依赖薄透镜及两侧相同介质，不是一般不同介质系统的普遍结论。
+
+给定任意入射线，可作一条过光心、与入射线平行的辅助线。它与像方焦平面的交点确定原线出射后的方向：同方向的平行入射光会聚于同一焦平面点，或其反向延长线交于该点。也可用物方焦平面先找辅助物点，再构造出射平行线。轴上物点必须选取离轴光线，不能只用两条相互重合的主轴线求像。
+
+\subsection{课件凸凹双透镜例题的逐级计算}
+已知 $f_1'=+10\unit{cm},f_2'=-4\unit{cm},d=12\unit{cm},s_1=-20\unit{cm}$。课件本例改用 $s$ 表示物距，等同本章前述 $p$。
+\begin{align*}
+ \frac1{s_1'}&=\frac1{f_1'}+\frac1{s_1}=\frac1{20},
+ &s_1'&=20\unit{cm},\\
+ s_2&=s_1'-d=8\unit{cm},
+ &\frac1{s_2'}&=-\frac14+\frac18=-\frac18,\\
+ s_2'&=-8\unit{cm},
+ &\beta_{\mathrm{total}}&=\frac{s_1'}{s_1}\frac{s_2'}{s_2}=+1.
+\end{align*}
+中间光束尚未在第一像点会聚，第二透镜面对虚物。最终像距第二透镜向左8 cm，即距第一透镜向右4 cm；最终像为正立、等大虚像。本组统一以 cm 及其倒数计算。
+
+\subsection{透镜与平面镜例题的往返传播}
+全局坐标右正，透镜在0，平面镜在15 cm，物在 $-15\unit{cm}$，透镜焦距大小30 cm。课件变量为 $S_1,S_2,S_3$，按各次系统的局部原点量距：
+\begin{align*}
+ S_1&=-15, & f_1'&=+30, & S_1'&=-30,\\
+ S_2&=S_1'-15=-45, & S_2'&=-S_2=+45,\\
+ S_3&=S_2'+15=+60, & f_3'&=-30, & S_3'&=-60.
+\end{align*}
+长度单位均为 cm。第二次过透镜的关系为 $1/S_3'=1/f_3'+1/S_3=-1/30+1/60=-1/60$。
+
+\begin{infobox}[breakable=false]{课件勘误：位置符号与虚实物}
+课件中间一行写 $S_2=-d+S_1'=45\unit{cm}$，应为 $-45\unit{cm}$，随后 $S_2'=45\unit{cm}$ 才成立。返回透镜处，课件把从镜后60 cm处发散的光束顶点称为“虚物”，应改为该次透镜的实物；$S_3=+60$ 与 $f_3'=-30$ 的有向坐标仍正确。最终实像位置为透镜左侧60 cm。
+\end{infobox}
+
+\chapterpage{光学仪器的曝光与放大率}
+\subsection{光圈数、照度和快门时间}
+\begin{infobox}[breakable=false]{课件公式与曝光关系}
+\[
+ f\text{数}=\frac fD,\qquad A\propto\left(\frac Df\right)^2,
+ \qquad H\propto\frac{t}{(f\text{数})^2}.
+\]
+\end{infobox}
+\explain{本小节 $f>0$ 为镜头焦距大小，$D$ 为有效入瞳直径，长度单位相同；$A$ 按课件表示相对进光能力；$t$ 为曝光时间（s），$H$ 为曝光量。$f$数无量纲，不是焦距值本身。}{同一场景、近轴成像、固定透过率和其他曝光条件；简单模型将有效入瞳近似为光圈孔径。}{通光面积与 $D^2$ 成正比，同一焦距下像面照度与 $(D/f)^2$ 成正比；曝光量为照度乘时间。$f$数乘 $\sqrt2$，照度约减半，要保持曝光就把时间加倍。}
+课件等级2、2.8、4、5.6、8、11、16、22为约 $\sqrt2$ 等比序列的舍入值。$f/4$、$1/500\unit s$ 与 $f/8$、$1/125\unit s$ 的 $t/(f\text{数})^2$ 都为 $1/8000\unit s$；中间 $f/5.6$、$1/250\unit s$ 约等效。
+
+\subsection{目镜角放大率及明视距离条件}
+\begin{infobox}[breakable=false]{课件公式及条件区分}
+\[
+ M_E=\frac{\omega'}\omega
+ =\frac{h_2/f_2}{h_2/(25\unit{cm})}=\frac{25\unit{cm}}{f_2}.
+\]
+\end{infobox}
+\explain{$h_2$ 为中间像高度，$f_2>0$ 为目镜焦距大小，$\omega,\omega'$ 为小视角，$M_E$ 无量纲。记明视距离 $D_0=25\unit{cm}$。}{出射近似平行，最终像在无穷远，眼睛近似位于目镜处；裸眼比较像位于明视距离。}{中间像在目镜物方焦平面，出射角约 $h_2/f_2$；裸眼参考角约 $h_2/D_0$，相除即得。}
+课件同时描述最终像在明视距离，这与本式的严格条件不同。若像确在明视距离，令实际正物距大小为 $u$，薄透镜给 $1/u-1/D_0=1/f_2$，所以
+\[
+ M_E=\frac{D_0}u=1+\frac{D_0}{f_2}.
+\]
+例如 $f_2=25\unit{mm}$，放松眼为10倍，明视距离为11倍。两个条件不能混称；若 $D_0/f_2\gg1$，忽略1也只是额外近似。
+
+\subsection{显微镜横向与角放大率的乘积}
+\begin{infobox}[breakable=false]{课件公式}
+\[
+ \beta_0=\frac{h_2}{h_1}=-\frac{s_1'}{s_1}\approx-\frac\Delta{f_1},
+ \qquad M=\beta_0M_E\approx-\frac{(25\unit{cm})\Delta}{f_1f_2}.
+\]
+\end{infobox}
+\explain{课件此处的 $s_1,s_1'>0$ 表示物镜物像距大小，与前面右正左负的距离约定分开。$f_1,f_2>0$ 为物镜、目镜焦距大小，$\Delta$ 是物镜像方焦点到目镜物方焦点的光学筒长，各长度采用同一单位。$\beta_0,M$ 无量纲。}{物在物镜焦点外侧附近；傍轴双会聚透镜；总式采用最终像在无穷远的目镜倍率。}{物镜先产生倒立放大实像，目镜再增大其视角，因此总倍率为横向倍率乘角倍率。中间像在目镜焦平面时 $s_1'=f_1+\Delta$，结合物镜成像式可得 $\beta_0=-\Delta/f_1$ 的一阶系统关系。}
+若最终像在明视距离，应使用 $M=\beta_0(1+D_0/f_2)$，物镜倍率按实际中间像位置重新核算。$f_1=4\unit{mm},f_2=25\unit{mm},\Delta=160\unit{mm}$ 的无穷远观察模型给 $M\approx-400$。负号只说明倒立，不能把它当成负的图像大小。
+
+\subsection{开普勒望远镜的视角比}
+\begin{infobox}[breakable=false]{课件公式}
+\[
+ \omega\approx-\frac h{f_1},\qquad \omega'\approx\frac h{f_2},
+ \qquad M=\frac{\omega'}\omega=-\frac{f_1}{f_2}.
+\]
+\end{infobox}
+\explain{$f_1,f_2>0$ 表示物镜、目镜焦距大小，$h$ 是中间像有向高度，角度用弧度，$M$ 无量纲。}{远物、正常调焦、两个会聚透镜；物镜像方焦点与目镜物方焦点重合，镜间距近似 $f_1+f_2$。}{物镜把远处物体方向变为焦平面上的高度，目镜再把该高度变为出射角，两式相除。负号代表倒像，焦距比给角放大率大小。}
+
+\chapterpage{相干叠加与杨氏双缝公式}
+\subsection{光波、光强和有限波列}
+\begin{infobox}[breakable=false]{课件公式}
+\[
+ E=E_0\cos\left(\omega t-\frac{2\pi r}{\lambda}+\varphi\right),
+ \qquad I\propto E_0^2,\qquad L=c\Delta t.
+\]
+\end{infobox}
+\explain{$E,E_0$ 为电场及振幅（$\mathrm{V\,m^{-1}}$），$\omega$ 为角频率（$\mathrm{s^{-1}}$），$I$ 为光强（$\mathrm{W\,m^{-2}}$），$r,\lambda,L$ 为长度（m），$\Delta t$ 为时间（s）。$E$ 此处不是内能。}{单色标量波近似；$r$ 为均匀介质中的几何路程时，$\lambda$ 是该介质波长；波列长度公式按真空传播 $c$ 取值。}{同一介质中用振幅平方比较强度。课件 $\Delta t\sim10^{-8}$ 至 $10^{-11}\unit s$ 给 $L\sim3\unit m$ 至 $3\unit{mm}$，仅为说明有限波列的量级，不等于任意光源固定的相干长度。}
+光程差与波长须配套：几何路程差 $r_2-r_1$ 乘 $2\pi/\lambda_{\mathrm{medium}}$；或光程差 $\delta$ 乘 $2\pi/\lambda_{\mathrm{vacuum}}$。空气中取折射率约1，两者数值近似相同。下文用光程差时，$\lambda$ 指真空波长。
+
+\subsection{合振幅、相位差与极大极小}
+\begin{infobox}[breakable=false]{课件公式及光强形式}
+\begin{gather*}
+ E_0^2=E_{10}^2+E_{20}^2+2E_{10}E_{20}\cos\varphi_{12},\\
+ \varphi_{12}=\varphi_1-\varphi_2+\frac{2\pi\delta}{\lambda},\\
+ I=I_1+I_2+2\sqrt{I_1I_2}\cos\varphi_{12}.
+\end{gather*}
+\end{infobox}
+\explain{$E_{10},E_{20}$ 为两束到达观察处的振幅，$I_1,I_2$ 为各自光强；$\varphi_1,\varphi_2$ 为源端初相位；$\delta=L_2-L_1$ 单位为 m，$\varphi_{12}$ 为相位差。}{同频、相位关系在检测时间内稳定且具有共同偏振分量；这里取同偏振标量模型。}{先把到达点的电场相加，再取时间平均；交叉项留下 $\cos\varphi_{12}$。初相位相等时，相位差只由传播及额外反射相位决定。}
+从余弦的上下界得
+\[
+ I_{\max}=(\sqrt{I_1}+\sqrt{I_2})^2\propto(E_{10}+E_{20})^2,
+ \quad I_{\min}=(\sqrt{I_1}-\sqrt{I_2})^2\propto(E_{10}-E_{20})^2.
+\]
+初相位相等、无额外相变时，$\delta=k\lambda$ 为增强，$\delta=(2k+1)\lambda/2$ 为减弱，$k\in\mathbb Z$。两束强度相等才可能完全相消。课件“不同独立光源不可能干涉”针对普通非相干源的稳定时间平均图样；不能排除相位锁定光源等例外。正交偏振的交叉项为零，同源分束也仍须满足相干范围。
+
+\subsection{几何光程差、明暗坐标与间距}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}
+ \delta=r_2-r_1\approx d\sin\theta\approx\frac{dx}{D},\\
+ x_{\mathrm{bright}}=\pm k\frac{D\lambda}{d}\quad(k=0,1,2,\ldots),\\
+ x_{\mathrm{dark}}=\pm(2k-1)\frac{D\lambda}{2d}\quad(k=1,2,\ldots),\\
+ \Delta x=x_{k+1}-x_k=\frac{D\lambda}{d}.
+\end{gather*}
+\end{infobox}
+\explain{$d$ 为双缝间距，$D$ 为缝屏距离，$x$ 为屏上距中心的有向坐标，$\theta$ 为观察角；长度统一用 m。$k$ 为条纹级次。}{空气中同相双缝，$D\gg d$ 且 $|x|\ll D$；忽略有限缝宽造成的强度包络。}{从两缝到观察点的路程差投影为 $d\sin\theta$，再取 $\sin\theta\approx\tan\theta=x/D$。将明暗的光程条件代入，解出坐标。相邻同类条纹光程相差 $\lambda$，所以间距为 $D\lambda/d$。}
+明暗纹之间相邻距离为 $\Delta x/2$，不能与相邻明纹间距混同。白光中央各波长同时加强；同一级 $|x|\propto\lambda$，内紫外红。按400至760 nm计算，完整第 $k$ 级光谱与第 $k+1$ 级分离要求 $760k<400(k+1)$，所以整数 $k$ 仅能取1作为非零完整分离级次；高阶光谱重叠不等于完全无条纹。
+
+\subsection{双缝课件两组距离计算}
+第一组 $d=0.20\unit{mm},D=1\unit m$，同侧 $k_1=1,k_4=4$ 间距离为 $7.5\unit{mm}$：
+\[
+ \lambda=\frac{d(x_4-x_1)}{D(k_4-k_1)}=500\unit{nm}.
+\]
+改用 $600\unit{nm}$，间距为3 mm。第二组 $\lambda=5461\unit{\mathring A}=546.1\unit{nm},D=2.00\unit m$，两侧第5级明纹间隔12.0 mm：
+\[
+ d=\frac{2kD\lambda}{\Delta x}\approx0.910\unit{mm},\qquad
+ l=20\frac{D\lambda}d=24.0\unit{mm}.
+\]
+这里 $\Delta x$ 在第二题局部表示跨越10个间距的总距离，$l$ 是20个间距的总长度；不应把它当作前面定义的单个条纹间距。$1\unit{\mathring A}=10^{-10}\unit m$。
+
+\Needspace{12\baselineskip}
+\subsection{单缝后插薄片：平移量和片厚}
+\begin{infobox}[breakable=false]{课件公式}
+\begin{gather*}
+ \Delta\delta=nl-l=(n-1)l,\qquad (n-1)l=N\lambda,\\
+ \delta=\frac{x'd}{D}+(n-1)l=k\lambda,\\
+ x'=\frac{kD\lambda}{d}-\frac{D(n-1)l}{d},\qquad
+ \Delta x=x'-x=-\frac{D(n-1)l}{d}.
+\end{gather*}
+\end{infobox}
+\explain{$l$ 为玻璃片厚度，$n$ 为折射率，$N$ 为平移间距数；$d,D$ 为缝距、屏距，$x,x'$ 是同一级明纹插片前后的位置。本组 $\Delta x$ 专指平移量。}{薄片近正入射，原光路为空气，片置于下缝 $S_2$ 后，屏坐标向上正；双缝小角度条件保持。}{薄片替代了同厚空气，新增光程 $nl-l$；把它加到下缝的光程，写出总差。解同一整数 $k$ 的前后位置，得负的平移量，即向下缝移动。插在上缝则反号。}
+条纹间距不变，整体向插片一侧平移。课件 $N=4,\lambda=500\unit{nm},n=1.50$，得 $l=4000\unit{nm}$；$N=7,\lambda=550\unit{nm},n=1.58$，得 $l\approx6.64\,\mu\mathrm m$。后一个例题把片厚也写成 $d$，与别处缝距 $d$ 同名，必须在局部区分。
+
+另一组 $D=3\unit m,d=3.3\unit{mm},\lambda=550\unit{nm},l=0.010\unit{mm}$ 给原间距 $0.500\unit{mm}$，平移为 $-9.09(n-1)\unit{mm}$。斜入射在小角近似中增加与 $x$ 无关的初始光程差，只移动零级位置，不改变 $\partial\delta/\partial x=d/D$，所以间距不变。
+
+\subsection{劳埃德镜的半波项与偏振限制}
+\begin{infobox}[breakable=false]{课件标量模型}
+\[
+ \delta\approx\frac{dx}{D}+\frac\lambda2.
+\]
+\end{infobox}
+这里 $d$ 为光源与镜像源的有效间距，$x$ 按课件接触边界起算，$D$ 是相应等效传播距离；与直接光相比，反射光多一次相对 $\pi$ 相变，因此几何路程差趋零处为暗纹。菲涅耳双镜两束反射相变相同，则彼此抵消，保留等效双源路程差。
+
+\begin{infobox}[breakable=false]{课件表述与适用范围}
+课件将“低到高有、高到低无”推广至一般斜入射，并称掠入射均有、透射均无半波损失。这些只用于其标量模型，不能作为任意偏振、全反射或吸收界面的通则。
+\end{infobox}
+近正入射、无吸收时 $r_E=(n_1-n_2)/(n_1+n_2)$，负值对应 $\pi$ 相变。一般斜入射按偏振分别使用菲涅耳系数，全反射相移随角度改变。半波项表示相位反转，不是能量减半或实际绕行。
+
+\chapterpage{薄膜光程差、等倾圆环与透射互补}
+\subsection{膜内路径与外部投影的相减}
+\begin{infobox}[breakable=false]{课件几何关系}
+\begin{gather*}
+ AC=BC=\frac e{\cos\gamma},\quad AB=2e\tan\gamma,
+ \quad AD=AB\sin i,\\
+ \Delta=n_2(AC+BC)-n_1AD,
+ \qquad n_1\sin i=n_2\sin\gamma.
+\end{gather*}
+\end{infobox}
+\explain{$e$ 为膜的垂直厚度，$n_1$ 为入射侧折射率，$n_2$ 为膜折射率；$i$ 为外部入射角，$\gamma$ 为膜内折射角；$AC,BC$ 为膜内路径，$AD$ 为比较到同一出射波面时外部路径的投影，所有长度为 m。$\Delta$ 此处是光程差，不是显微镜筒长。}{平行平面、均匀薄膜，两束主要反射光，尚未计入反射相变，出射光能传播；忽略吸收。}{膜内两段总光程并非全部差值，需减去另一路先走过的外部光程。由三角关系写路径，再以折射定律消角。}
+\begin{align*}
+ \Delta&=\frac{2e}{\cos\gamma}(n_2-n_1\sin\gamma\sin i)\\
+ &=\frac{2n_2e}{\cos\gamma}(1-\sin^2\gamma)
+ =2n_2e\cos\gamma\\
+ &=2e\sqrt{n_2^2-n_1^2\sin^2 i}.
+\end{align*}
+课件中间一行出现 $2e\sqrt{n_2^2-n_1^2\sin^2\gamma}$，其中角度应为外角 $i$。若用膜内角，正确形式为 $2e\sqrt{n_2^2-n_2^2\sin^2\gamma}$，即 $2n_2e\cos\gamma$。最终外角式与推导一致。
+
+\subsection{半波差、总光程差与级次}
+\begin{infobox}[breakable=false]{课件公式及统一的局部表达}
+\begin{gather*}
+ \delta=2n_2e\cos\gamma+\delta_0
+ =2e\sqrt{n_2^2-n_1^2\sin^2 i}+\delta_0,\\
+ \delta=k\lambda\quad\text{增强},\qquad
+ \delta=(k+1/2)\lambda\quad\text{减弱}.
+\end{gather*}
+\end{infobox}
+\explain{$\delta_0$ 是反射相对相位等效的光程，单位为 m；$\lambda$ 为真空波长，$k$ 为整数。课件在不同页面也用 $\Delta$ 表示已经包含半波项的总光程差，要根据是否出现 $\lambda/2$ 判断。}{两束反射光足够相干，偏振有共同分量；近正入射或适用的标量非全反射模型。}{两束相位差为 $2\pi\delta/\lambda$。只有两次反射的相变不同，才需加入相对 $\pi$；两个 $\pi$ 相变相互抵消。}
+设基底折射率为 $n_3$。$n_2$ 同时大于或同时小于 $n_1,n_3$ 时，恰有一次半波相变，$\delta_0=\lambda/2$；$n_1<n_2<n_3$ 或 $n_1>n_2>n_3$ 时，相变相同，$\delta_0=0$。若某界面折射率相同，相应反射振幅为零，不能仍假定存在两束同样可见的反射光。
+
+在 $\delta_0=\lambda/2$ 的课件示例中：
+\[
+ 2e\sqrt{n_2^2-n_1^2\sin^2i}+\frac\lambda2=k\lambda,
+ \quad k=1,2,\ldots\quad\text{（明）},
+\]
+\[
+ 2e\sqrt{n_2^2-n_1^2\sin^2i}+\frac\lambda2=(2k+1)\frac\lambda2,
+ \quad k=0,1,\ldots\quad\text{（暗）}.
+\]
+有传播路径差又有半波项时，二者只各计一次。不同半波项正负选择相差一个波长，仅重编号，不改变明暗。完全相消还要求两束振幅相等；两束近似不描述高反射率多光束条纹的完整强度轮廓。
+
+\subsection{等倾圆环半径、级次与间距}
+\begin{infobox}[breakable=false]{课件公式}
+\[
+ R_k=f_L\tan i_k,\qquad
+ 2e\sqrt{n_2^2-n_1^2\sin^2 i_k}+\delta_0=k\lambda,
+ \qquad |\Delta\delta|=\lambda.
+\]
+\end{infobox}
+\explain{$R_k$ 为后焦平面环半径，$f_L>0$ 为观察透镜焦距大小；课件记作“第 $k$ 级环半径 $=f\tan i_k$”。$i_k$ 为外部角，$\gamma$ 为膜内角。长度单位为 m。}{等厚平行薄膜、同一波长与相变类型，观察屏处于透镜后焦平面，轴对称照明。}{同一外部倾角对应相同光程差，不同方位光线成像为同一圆环；角度越大，光程差越小，所以外环级次较低。}
+课件按膜内角求导：
+\[
+ \mathrm d\delta=-2n_2e\sin\gamma\,\mathrm d\gamma,
+ \quad \mathrm d\gamma=-\frac{\lambda\,\Delta k}{2n_2e\sin\gamma}.
+\]
+该式表示有向微分；向外走时 $\Delta k=-1$，$\mathrm d\gamma>0$。它不是外部角的间距，亦不能在 $\gamma=0$ 直接代入。小角度下用 $n_1i\approx n_2\gamma$，有
+\[
+ R_k^2\approx\frac{f_L^2n_2}{en_1^2}(2n_2e+\delta_0-k\lambda),
+ \quad |R_{k+1}^2-R_k^2|\approx\frac{f_L^2n_2\lambda}{en_1^2}.
+\]
+因此相邻同类环的半径平方差近似相同，但径向间距向外减小。固定波长与同一级次时，膜增厚则环外移；固定视场位置，膜越厚条纹越密。中心级次最大，但中心不必刚好为整数级明纹。
+
+\subsection{透射光、白光与透镜相位的解释}
+\begin{infobox}[breakable=false]{课件公式}
+\[
+ \delta'=2n_2e\cos\gamma+\delta_0',\qquad
+ \delta=2n_2e\cos\gamma+\delta_0.
+\]
+\end{infobox}
+\explain{$\delta'$ 为两束透射光的有效光程差，$\delta_0'$ 为它们之间的相对反射相变项；$\delta,\delta_0$ 属于反射两束。不能把撇号理解成同一半波项自动相等。}{无吸收、平行薄膜、相干照明；互补图样是理想总反射与总透射的关系。}{两束透射光相差一次膜内往返，并多出两次内部反射，应据两次反射的相对相位另定 $\delta_0'$。能量守恒使反射增强处对应透射减弱。}
+白光时在折射率色散可忽略、相变类型不变的同一级次内，$2n_2e\cos\gamma=(k-\delta_0/\lambda)\lambda$；波长增大使 $\cos\gamma$ 增大，外角减小，所以同级可从内红到外紫。若考虑实际色散，不应把各折射率视为与波长无关的固定常数。
+
+课件“薄透镜不产生附加光程差”应按理想成像关系理解：来自同一入射方向的光经系统会聚到焦点，总相位关系得以保持。透镜实际利用厚度差调制相位，不能解释为任意两条光线穿过透镜均得到相同光程。计算时先在薄膜处选共同出射波面求差，再用 $R=f_L\tan i$ 映射到屏，避免既重复加透镜项又忽略传播段。
 
 \chapterpage{主要联系与符号辨析}
 
