@@ -7,7 +7,7 @@
 \usepackage{amsmath,amssymb,booktabs,tabularx,array,enumitem,fancyhdr,needspace,longtable,tikz}
 \usetikzlibrary{arrows.meta}
 \usepackage[hidelinks]{hyperref}
-\hypersetup{pdftitle={离散数学},pdfsubject={命题逻辑、一阶逻辑、集合代数、二元关系与函数讲义}}
+\hypersetup{pdftitle={离散数学},pdfsubject={命题逻辑、一阶逻辑、集合代数、二元关系、函数与集合基数讲义}}
 \ctexset{section={format=\large\bfseries,beforeskip=0pt,afterskip=14pt},subsection={format=\normalsize\bfseries,beforeskip=12pt,afterskip=6pt}}
 \setcounter{tocdepth}{1}
 \linespread{1.22}
@@ -1834,6 +1834,21 @@ $f:\mathbb R\to\mathbb R,f(x)=x^2$ 既非单射又非满射：$f(1)=f(-1)$，且
 \item $f:\mathbb R\to\mathbb R,f(x)=x^3$ 为双射。严格递增保证单射；任给 $y\in\mathbb R$，$x=\sqrt[3]{y}$ 为原像。
 \end{enumerate}
 
+\example{定义域、陪域与值域的逐项核对}
+下表补充课件 8.1 节中的几类函数。结论均针对表中指定的定义域与陪域。
+\begin{center}
+\begin{tabularx}{\linewidth}{l l Y}
+\toprule 函数与集合 & 值域 & 单满性及理由\\\midrule
+$-(x-1)^2:\mathbb R\to\mathbb R$ & $(-\infty,0]$ & 关于 $x=1$ 对称，非单；遗漏正数，非满\\
+$\ln n:\mathbb Z^+\to\mathbb R$ & $\{\ln1,\ln2,\ldots\}$ & 严格递增，单射；遗漏负数，非满\\
+$\lfloor x\rfloor:\mathbb R\to\mathbb Z$ & $\mathbb Z$ & $[k,k+1)$ 内均映到 $k$，非单而满\\
+$x+1/x:(0,\infty)\to(0,\infty)$ & $[2,+\infty)$ & $x$ 与 $1/x$ 常有同一输出，非单而非满\\\bottomrule
+\end{tabularx}
+\end{center}
+最后一行由 $(x-1)^2\ge0$ 得 $x+1/x\ge2$；任意 $y\ge2$ 对应方程 $x^2-yx+1=0$ 的正实根，故该值域没有遗漏。它与练习中的 $x/(x^2+1)$ 互为数值倒数，值域分别为 $[2,+\infty)$ 与 $(0,1/2]$。
+
+平方根 $\sqrt x$ 若采用实数值，定义域应包含于 $[0,+\infty)$；倒数 $1/x$ 的定义域必须排除 $0$。将它们直接写成 $\mathbb R\to\mathbb R$ 的全函数不符合定义，须先修正集合，再判断单满性。
+
 \term{有限等势集合上的判定定理：}若 $A,B$ 有限且 $|A|=|B|$，则 $f:A\to B$ 单射当且仅当满射。单射时 $|f(A)|=|A|=|B|$，而 $f(A)\subseteq B$，故 $f(A)=B$。满射时若有两个输入合并，至多得到 $|A|-1$ 个输出，与 $|B|=|A|$ 矛盾。更一般地，有限集间存在单射须 $|A|\le|B|$，存在满射须 $|A|\ge|B|$。
 
 “有限”不能删去。$n\mapsto n+1$ 是 $\mathbb N\to\mathbb N$ 的单射而非满射；$n\mapsto\lfloor n/2\rfloor$ 是满射而非单射。无限集合之间双射的存在也不能仅凭直观上的疏密判断。
@@ -1910,6 +1925,19 @@ f\circ g=\{(x,z)\mid\exists y\;((x,y)\in f\land(y,z)\in g)\}.
 (f\circ f)(x)&=4x+3,\qquad (g\circ g)(x)=x^4+2x^2+2.
 \end{align*}
 第一、二式不同，说明复合一般不可交换。另取 $f(x)=x-1$ 定义在 $\mathbb R$ 上，$g(t)=\sqrt t$ 定义在 $[0,+\infty)$ 上，则 $f\circ g$ 的定义域为 $[1,+\infty)$，值为 $\sqrt{x-1}$，不能直接沿用 $f$ 的定义域。
+
+\example{有限映射的逐点复合（课件例 8.9.1）}
+设 $A=\{x_1,x_2,x_3,x_4\}$、$B=\{y_1,\ldots,y_5\}$、$C=\{z_1,z_2,z_3\}$，给定 $f:A\to B$、$g:B\to C$。按先 $f$ 后 $g$ 的顺序逐行计算：
+\begin{center}
+\begin{tabular}{c c c}
+\toprule 输入 $x$ & 中间值 $f(x)$ & 最终值 $g(f(x))$\\\midrule
+$x_1$ & $y_2$ & $z_2$\\
+$x_2$ & $y_1$ & $z_1$\\
+$x_3$ & $y_3$ & $z_3$\\
+$x_4$ & $y_5$ & $z_2$\\\bottomrule
+\end{tabular}
+\end{center}
+另有 $g(y_4)=z_3$，但 $y_4\notin f(A)$，因此不出现在这张复合表的中间值列。所得 $f\circ g=\{(x_1,z_2),(x_2,z_1),(x_3,z_3),(x_4,z_2)\}$ 是满射而非单射。
 
 复合满足\term{结合律}：$(f\circ g)\circ h=f\circ(g\circ h)$。两边均在满足 $x\in\operatorname{dom}f$、$f(x)\in\operatorname{dom}g$、$g(f(x))\in\operatorname{dom}h$ 的输入上有定义，值同为 $h(g(f(x)))$。恒等函数满足 $I_A\circ f=f=f\circ I_B$，其中 $f:A\to B$。
 
@@ -2045,8 +2073,329 @@ q_3(0)=\mathbb Z,\quad q_4(0)=\mathbb R.
 \term{解：}令 $h=g^{-1}\circ f^{-1}:C\to A$。按结合律，$(f\circ g)\circ h=f\circ(g\circ g^{-1})\circ f^{-1}=I_A$，且 $h\circ(f\circ g)=g^{-1}\circ(f^{-1}\circ f)\circ g=I_C$。由双向逆的唯一性得结论。
 \end{enumerate}
 
+\example{分段函数的复合与可逆性（课件第 55--56 页）}
+设 $f,g:\mathbb R\to\mathbb R$，
+\[
+f(x)=\begin{cases}x^2,&x\ge3,\\-2,&x<3,\end{cases}
+\qquad g(x)=x+2.
+\]
+先作用 $f$ 时，分支由输入 $x$ 决定；先作用 $g$ 时，须由中间值 $x+2$ 决定：
+\[
+(f\circ g)(x)=\begin{cases}x^2+2,&x\ge3,\\0,&x<3,\end{cases}
+\qquad
+(g\circ f)(x)=\begin{cases}(x+2)^2,&x\ge1,\\-2,&x<1.\end{cases}
+\]
+第二式的分界点来自 $x+2\ge3\Longleftrightarrow x\ge1$，不能仍沿用 $3$。$f$ 在 $x<3$ 的整个区间上为常值，所以不单射，且值域为 $\{-2\}\cup[9,+\infty)$，不满射；$g$ 是双射，反函数 $g^{-1}(x)=x-2$。
+
 \note{判断函数先核对输出存在、输出唯一、输出属于陪域；单射检查输入是否合并，满射检查陪域是否遗漏；完全原像对任何函数都有意义；复合先核对作用顺序和定义域；反函数需双射，求逆后核对两个恒等函数所在的集合。}
 
+
+\chapterpage{集合的基数}
+有限集合可通过计数比较大小；无穷集合则要通过映射比较。双射给出“同样多”的精确定义，单射给出“不多于”的精确定义。本章在函数的单满性、反函数与复合的基础上，讨论集合等势、基数比较、可数性及康托对角线方法。自然数仍记为 $\mathbb N=\{0,1,2,\ldots\}$。
+
+\subsection{集合等势与基数的含义}
+若存在双射 $f:A\to B$，称 $A,B$ \term{等势}，记为 $A\approx B$。等势只比较元素能否一一配对，不要求集合相等、元素类型相同或几何形状相同。
+
+等势具有自反性、对称性与传递性。恒等映射给出 $A\approx A$；双射的反函数给出对称性；两个双射的复合给出传递性。因此证明等势的三种常用方法是：直接构造双射，利用已有等势结果连接，或分别构造两个方向的单射后使用后述的双射定理。
+
+集合的\term{基数}记作 $|A|$ 或 $\operatorname{card}A$，满足
+\[
+|A|=|B|\quad\Longleftrightarrow\quad A\approx B.
+\]
+有限集合的基数是元素数。无穷集合的基数也表示“元素有多少”，但不再由有限自然数表示。$\mathbb N$ 的基数记为 $\aleph_0$（阿列夫零），$\mathbb R$ 的基数记为 $\mathfrak c$，称为\term{连续统基数}。
+
+\example{真子集可以与全集等势}
+令 $E=\{0,2,4,\ldots\}$，$f:\mathbb N\to E$，$f(n)=2n$。每个偶数 $2k$ 有唯一原像 $k$，故 $f$ 是双射，$|E|=|\mathbb N|=\aleph_0$，尽管 $E\subsetneq\mathbb N$。
+
+由 $A\subsetneq B$ 直接推出 $|A|<|B|$，只对有限集合普遍成立。无穷集合也可能与真子集等势，但不是所有无穷集合都彼此等势。
+
+\subsection{自然数的集合表示、有限集与无穷集}
+在集合论的标准构造中，令 $0=\varnothing$，集合 $a$ 的\term{后继}为 $a^+=a\cup\{a\}$，从而
+\begin{align*}
+0&=\varnothing,\\
+1&=\{0\}=\{\varnothing\},\\
+2&=\{0,1\},\qquad 3=\{0,1,2\},\qquad n=\{0,1,\ldots,n-1\}.
+\end{align*}
+最后一式将自然数 $n$ 表示为所有较小自然数的集合，不是把 $n$ 作为自己的元素。
+
+包含 $0$ 且对后继运算封闭的集合称为\term{归纳集合}。$\mathbb N$ 是最小归纳集合；从任一归纳集合中取出属于所有归纳集合的元素，即可刻画它。集合论的这一构造解释了数学归纳法：含 $0$ 且从 $n$ 可推出 $n+1$ 的性质，覆盖全部自然数。
+
+对于这样表示的自然数，有
+\[
+m\in n\Longleftrightarrow m<n,\quad
+m\subseteq n\Longleftrightarrow m\le n,\quad
+m\approx n\Longleftrightarrow m=n.
+\]
+因此 $n\notin n$，但 $n\subseteq n$。$\in$、$\subseteq$、等势和相等不能混用。例如 $2\in3$、$2\subseteq3$ 均成立，而 $2\not\approx3$。
+
+若集合 $A$ 与某个自然数 $n$ 等势，称 $A$ 为\term{有限集}，该 $n$ 唯一，$|A|=n$；若不存在这样的 $n$，称 $A$ 为\term{无穷集}。空集对应 $n=0$。这里的 $n$ 可理解为标准的 $n$ 元集合，与日常有限计数一致。
+
+\subsection{基数比较与康托--伯恩斯坦定理}
+定义
+\[
+|A|\le|B|\quad\Longleftrightarrow\quad\text{存在单射 }A\to B.
+\]
+课件将此关系记为 $A\preceq B$，并称“$B$ 优势于 $A$”。本章用基数不等式，避免与上一章元素间的偏序记号混淆。若还不等势，记 $|A|<|B|$。子集的包含映射总是单射，所以 $A\subseteq B\Rightarrow|A|\le|B|$。
+
+单射的恒等映射与复合分别给出比较关系的自反性、传递性。它在\term{集合本身}上不是反对称的，因为相互可单射并不要求集合相等；在基数意义下则有反对称性：
+\[
+|A|\le|B|\ \land\ |B|\le|A|\quad\Longrightarrow\quad |A|=|B|.
+\]
+这就是\term{康托--伯恩斯坦定理}，也称施罗德--伯恩斯坦定理。两个方向的单射可以完全不同，不必互为反函数。
+
+\term{证明：}设 $f:A\to B$、$g:B\to A$ 都是单射。先取 $A_0=A\setminus g(B)$，再递推 $A_{n+1}=g(f(A_n))$，令 $A_*=\bigcup_{n\ge0}A_n$。定义
+\[
+h(a)=\begin{cases}
+f(a),&a\in A_*,\\
+g^{-1}(a),&a\in A\setminus A_*.
+\end{cases}
+\]
+第二支有意义：$a\notin A_*$ 必有 $a\notin A_0$，所以 $a\in g(B)$，而 $g$ 单射保证其原像唯一。
+
+两支内部都是单射。若两支输出相同，即 $f(a)=g^{-1}(a')$，其中 $a\in A_*$、$a'\notin A_*$，则 $a'=g(f(a))\in A_*$，矛盾，故 $h$ 单射。
+
+任取 $b\in B$。若 $g(b)\notin A_*$，则 $h(g(b))=b$。若 $g(b)\in A_*$，它不可能在 $A_0$ 中，故属于某个 $A_{n+1}=g(f(A_n))$；于是有 $a\in A_n$ 使 $g(b)=g(f(a))$，由 $g$ 单射得 $b=f(a)=h(a)$。所以 $h$ 也满射，得证。
+
+该定理常用于\term{夹逼}：已知 $A\subseteq B\subseteq C$ 且 $A\approx C$，则三个集合等势。构造两个容易的单射，往往比直接寻找一个复杂双射更简洁。
+
+\subsection{整数与自然数对的编号}
+上一章已给出 $\mathbb Z\approx\mathbb N$ 的双射
+\[
+z\longmapsto\begin{cases}2z,&z\ge0,\\-2z-1,&z<0.\end{cases}
+\]
+它按 $0,-1,1,-2,2,\ldots$ 的顺序列出整数。每个整数占据一个有限编号，没有遗漏，也没有重复。
+
+\term{配对函数：}将 $\mathbb N^2$ 中的点按坐标和 $s=m+n$ 分组，在组内按第一坐标 $m$ 递增排列，定义
+\[
+p(m,n)=\frac{(m+n)(m+n+1)}2+m.
+\]
+第 $s$ 组之前有 $1+2+\cdots+s=s(s+1)/2$ 个点，本组的偏移量为 $m$。前几个对应为
+\[
+(0,0),(0,1),(1,0),(0,2),(1,1),(2,0),\ldots
+\quad\longleftrightarrow\quad0,1,2,3,4,5,\ldots
+\]
+\begin{center}
+\begin{tikzpicture}[>=Stealth,x=1.25cm,y=1.0cm,every node/.style={font=\small}]
+\draw[->](-.4,0)--(4.4,0) node[right]{$m$};
+\draw[->](0,-.4)--(0,4.2) node[above]{$n$};
+\foreach \s in {1,...,4}\draw[dashed,gray] (0,\s)--(\s,0);
+\foreach \m in {0,...,4}{\foreach \n in {0,...,4}{\ifnum\numexpr\m+\n\relax<5
+\pgfmathtruncatemacro{\code}{(\m+\n)*(\m+\n+1)/2+\m}
+\fill (\m,\n) circle(1.6pt);\node[above right,inner sep=2pt]at(\m,\n){$\code$};\fi}}
+\draw[->,thick] (0,.93)--(.93,.07);
+\draw[->,thick] (0,1.93)--(1.93,.07);
+\draw[->,thick] (0,2.93)--(2.93,.07);
+\node[align=left,anchor=west] at (3.1,3.2) {虚线：相同的 $m+n$\\数字：从 $0$ 起的编号};
+\end{tikzpicture}
+\end{center}
+读图先按虚线的坐标和从小到大分组，再沿每组箭头从左上到右下编号；粗箭头仅表示枚举方向，不是偏序关系。
+
+反过来，对每个 $k\in\mathbb N$，唯一存在 $s$ 使
+\[
+\frac{s(s+1)}2\le k<\frac{(s+1)(s+2)}2.
+\]
+令 $m=k-s(s+1)/2$、$n=s-m$，即得唯一原像。因此 $p$ 为双射，$|\mathbb N^2|=\aleph_0$。不能按“先列完整个第一行，再列第二行”的方式枚举，因为第一行无限长，这样永远轮不到第二行。
+
+\subsection{有理数的可数性与去重枚举}
+本章沿用课件的广义约定：$|A|\le\aleph_0$ 的集合称为\term{可数集}，包括有限集与空集；与 $\mathbb N$ 等势的集合称为\term{可数无穷集}。部分教材将“可数”专指后者，使用结论前须确认约定。
+
+每个有理数可写成 $p/q$，其中 $p\in\mathbb Z,q\in\mathbb Z^+$，所以可将这些分数放入二维表，并沿有限组依次扫描。但 $1/2=2/4$，直接扫描所有分数会重复，不能立即声称已经得到双射。
+
+一种无重复的枚举为：按 $h=|p|+q$ 从小到大分组；组内按 $p$ 递增；只保留 $\gcd(|p|,q)=1$ 的分数。这样 $0$ 只以 $0/1$ 出现，正负有理数都有唯一的最简分数表示。前几组为
+\begin{center}
+\begin{tabular}{c l}
+\toprule $h$ & 本组按顺序保留的数\\\midrule
+$1$ & $0$\\
+$2$ & $-1,1$\\
+$3$ & $-2,-1/2,1/2,2$\\
+$4$ & $-3,-1/3,1/3,3$\\\bottomrule
+\end{tabular}
+\end{center}
+每组有限；任意有理数在它的 $h$ 所对应的有限组中被列出，且只出现一次。将整个列表依次编号就给出 $\mathbb N\to\mathbb Q$ 的双射，所以
+\[
+|\mathbb Z|=|\mathbb Q|=|\mathbb N^2|=\aleph_0.
+\]
+数轴上有理数稠密，不妨碍它可数。稠密性描述每段区间里是否存在元素，可数性描述能否逐个编号，两者不是同一个性质。
+
+\subsection{可数集的闭包性质与可数乘积的区别}
+可数集的任意子集可数：把子集元素映入原集合的编号即可。可数无穷集删去有限多个元素后仍可数无穷；否则原集合作为两个有限集合的并也会有限，矛盾。
+
+有限个可数集的并与笛卡尔积仍可数。并集可按“来自哪一集合、在该集合中的编号”编码到 $\mathbb N^2$；积集则用配对函数组合两个编号，再归纳到任意固定有限个因子。积集中若有空因子，结果为空集，仍属可数。
+
+更一般地，\term{可数个可数集的并仍可数}。给定各集合 $A_i$ 的枚举，把第 $i$ 个集合的第 $j$ 个元素放在表格 $(i,j)$ 处，按对角线扫描，跳过空位和已出现的元素。每个元素都在某个有限位置被取到。这里使用通常的集合论语境；若不给定各集合的枚举，其同时选择涉及可数选择。
+
+但\term{可数无穷多个非平凡因子的笛卡尔积未必可数}。典型反例是
+\[
+\prod_{n\in\mathbb N}\{0,1\}=\{0,1\}^{\mathbb N},
+\]
+它的一个元素是完整的无限二进制序列，而不是一个自然数对。假设所有序列可列为 $s_0,s_1,\ldots$，令 $t(n)=1-s_n(n)$，则 $t$ 在第 $n$ 位与第 $n$ 个序列不同，因而不在列表中。矛盾，故这个乘积不可数。
+
+课件第 26 页“可数个可数集的笛卡尔积仍可数”应改为“\term{有限个}可数集的笛卡尔积仍可数”；可数并与可数乘积不能互换。
+
+\subsection{区间之间及区间与实数集之间的双射}
+对 $a<b$，仿射映射 $x\mapsto a+(b-a)x$ 给出 $[0,1]\approx[a,b]$，也给出 $(0,1)\approx(a,b)$。端点是否取到应与定义域、陪域保持一致。
+
+\example{开区间与整个实数轴等势}
+定义
+\[
+f:(0,1)\to\mathbb R,\qquad f(x)=\tan\bigl(\pi(x-1/2)\bigr).
+\]
+区间 $(0,1)$ 先映到 $(-\pi/2,\pi/2)$，正切函数在此严格递增且取遍 $\mathbb R$。给定 $y\in\mathbb R$，唯一原像为
+\[
+x=\frac12+\frac1\pi\arctan y\in(0,1),
+\]
+所以该映射为双射。
+
+\example{闭区间与开区间也可以等势}
+令 $a_0=0,a_1=1,a_2=1/2,a_3=1/4,\ldots$，将这些点依次往后移动两位，其余点固定：
+\[
+H:[0,1]\to(0,1),\qquad
+H(x)=\begin{cases}a_{n+2},&x=a_n,\ n\ge0,\\x,&x\notin\{a_0,a_1,\ldots\}.\end{cases}
+\]
+\begin{center}
+\begin{tabular}{c c c c c c c}
+\toprule $x$ & $0$ & $1$ & $1/2$ & $1/4$ & $1/8$ & $\cdots$\\\midrule
+$H(x)$ & $1/2$ & $1/4$ & $1/8$ & $1/16$ & $1/32$ & $\cdots$\\\bottomrule
+\end{tabular}
+\end{center}
+所有输出都在 $(0,1)$。若 $y=a_n$ 且 $n\ge2$，唯一原像是 $a_{n-2}$；若 $y$ 不在这条序列中，唯一原像就是 $y$。两类输出不相混合，故 $H$ 为双射。无限多个点的移动为两个端点腾出了位置，这不同于有限集合删去两元素的情形。等势只要求一一对应，不要求这个双射连续或保序。
+
+由 $(0,1)\subseteq[0,1)\subseteq[0,1]$ 及两端等势，可得 $[0,1)\approx(0,1)$。结合仿射、平移、正切或指数映射，所有\term{非退化}实数区间均与 $\mathbb R$ 等势。单点区间 $[a,a]$ 的基数为 $1$，空区间的基数为 $0$，不在此结论范围内。
+
+\subsection{幂集、特征函数与无限二进制序列}
+上一章通过特征函数给出双射
+\[
+\mathcal P(A)\longleftrightarrow\{0,1\}^A,\qquad S\longmapsto\chi_S.
+\]
+这里 $\{0,1\}^A$ 是所有 $A\to\{0,1\}$ 的函数所组成的集合。因此对于任意集合，基数幂记号 $2^{|A|}$ 表示
+\[
+|\mathcal P(A)|=|\{0,1\}^A|=2^{|A|}.
+\]
+当 $A=\mathbb N$ 时，一个子集可用无限序列记录：第 $n$ 位为 $1$ 当且仅当 $n$ 属于该子集。例如 $\{0,2,4,\ldots\}$ 对应 $101010\cdots$。
+
+\example{无限序列为何不能直接当作不同的二进制实数}
+二进制表示存在 $0.01111\cdots=0.10000\cdots$，所以把任意 $0,1$ 序列当作二进制小数，不能得到单射。先要求实数使用\term{不以无限个 $1$ 结尾}的规范表示，可得单射
+\[
+[0,1)\longrightarrow\{0,1\}^{\mathbb N}.
+\]
+它不是满射，因为如 $01111\cdots$ 这样的序列被排除。
+
+反方向可将 $0,1$ 当作\term{十进制数字}：
+\[
+G:\{0,1\}^{\mathbb N}\to[0,1),\qquad
+G(t)=\sum_{n=0}^{\infty}\frac{t(n)}{10^{n+1}}.
+\]
+其值位于 $[0,1/9]$。若两个序列最早在第 $k$ 位不同，该位造成的差为 $10^{-(k+1)}$，所有后续位最多抵消其 $1/9$，故两实数之差至少为 $\tfrac89\,10^{-(k+1)}>0$，所以 $G$ 单射。
+
+由两个方向的单射和康托--伯恩斯坦定理，
+\[
+\{0,1\}^{\mathbb N}\approx[0,1)\approx\mathbb R,
+\qquad |\mathcal P(\mathbb N)|=2^{\aleph_0}=\mathfrak c.
+\]
+两个单射分别解决实数的规范表示与任意序列的编码问题，不应将它们误称为同一个双射的两个方向。
+
+\subsection{康托对角线法与实数的不可数性}
+假设 $(0,1)$ 的元素能被列表 $x_0,x_1,\ldots$ 全部覆盖。各实数取不以无限个 $9$ 结尾的规范十进制表示，写作
+\[
+x_n=0.d_{n0}d_{n1}d_{n2}\cdots.
+\]
+取每行的一个对角数字 $d_{nn}$，定义新数字
+\[
+b_n=\begin{cases}2,&d_{nn}=1,\\1,&d_{nn}\ne1,\end{cases}
+\qquad y=0.b_0b_1b_2\cdots.
+\]
+\begin{center}
+\begin{tikzpicture}[x=1.0cm,y=.72cm,every node/.style={font=\normalsize}]
+\node at (-1.2,0){列表};\foreach \j in {0,...,3}\node at(\j,0){第 $\j$ 位};
+\foreach \i in {0,...,3}{\node at(-1.2,-\i-1){$x_\i$};
+\foreach \j in {0,...,3}{\node at(\j,-\i-1){$d_{\i\j}$};}}
+\foreach \i in {0,...,3}\draw[rounded corners=2pt] (\i-.3,-\i-1.3) rectangle(\i+.3,-\i-.7);
+\node at(4.1,-2.5){$\cdots$};\node at(1.5,-5){$\vdots$};
+\node[anchor=west,align=left] at(5,-2){每行改变一位：\\第 $n$ 行改第 $n$ 位};
+\end{tikzpicture}
+\end{center}
+$y$ 的数字只有 $1,2$，故 $y\in(0,1)$，也不存在尾部全 $0$ 与全 $9$ 的二义性。对每个 $n$，$y$ 的第 $n$ 位不同于 $x_n$ 的第 $n$ 位，故 $y\ne x_n$。于是列表遗漏了 $y$，与“覆盖全部实数”矛盾。
+
+这里并非寻找一个“列表的最后一项”。反证针对任意假定的完整列表，同时在第 $n$ 位排除第 $n$ 项，构造出一个不在列表中的新元素。由此
+\[
+\aleph_0<\mathfrak c.
+\]
+可数无穷与不可数是两种不同的无穷规模；“都是无限多个”不能作为等势证明。
+
+\subsection{康托定理：集合小于其幂集}
+\term{康托定理：}对任意集合 $A$，有 $|A|<|\mathcal P(A)|$。
+
+首先，$a\mapsto\{a\}$ 是单射，所以 $|A|\le|\mathcal P(A)|$。要排除等势，只须证明任意 $F:A\to\mathcal P(A)$ 都不满射。针对给定的 $F$，构造
+\[
+D=\{a\in A\mid a\notin F(a)\}.
+\]
+显然 $D\subseteq A$，所以 $D$ 是幂集中的合法元素。若存在 $d\in A$ 使 $F(d)=D$，则
+\[
+d\in D\Longleftrightarrow d\notin F(d)\Longleftrightarrow d\notin D,
+\]
+矛盾。因此 $D$ 不在 $F$ 的值域中。对角线的作用是使 $D$ 在元素 $a$ 的隶属情况上与 $F(a)$ 不同。
+
+空集情形也成立：$\mathcal P(\varnothing)=\{\varnothing\}$，基数从 $0$ 增为 $1$。若 $A$ 无穷，则其幂集一定不可数：若 $A$ 已不可数，单射 $A\to\mathcal P(A)$ 即足够；若 $A$ 可数无穷，则 $\mathcal P(A)\approx\mathcal P(\mathbb N)$，其基数为 $\mathfrak c>\aleph_0$。
+
+不能把最后结论改成“任意集合的幂集都不可数”。有限 $n$ 元集合的幂集有 $2^n$ 个元素，仍为有限集。
+
+\subsection{常见基数与证明方法}
+\begin{center}
+\begin{tabularx}{\linewidth}{l Y}
+\toprule 基数 & 典型集合\\\midrule
+$0,1,2,\ldots$ & 对应元素数的有限集合\\
+$\aleph_0$ & $\mathbb N,\mathbb Z,\mathbb Q,\mathbb N^2$；任意固定正整数维的 $\mathbb N^k$\\
+$\mathfrak c=2^{\aleph_0}$ & $\mathbb R$、非退化实数区间、$\mathcal P(\mathbb N)$、$\{0,1\}^{\mathbb N}$\\
+$2^{\mathfrak c}$ & $\mathcal P(\mathbb R)$\\\bottomrule
+\end{tabularx}
+\end{center}
+康托定理给出严格增长
+\[
+\aleph_0<\mathfrak c<2^{\mathfrak c}<2^{2^{\mathfrak c}}<\cdots,
+\]
+所以不存在最大的基数。这是已知基数的一条增长链，不表示相邻两项之间一定没有其他基数。尤其不能仅由本章结论写出 $\mathfrak c=\aleph_1$；该等式是连续统假设的内容。
+
+证明\term{可数}时，给出无遗漏的枚举，或构造到 $\mathbb N$ 的单射，或利用可数并与有限积的封闭性。证明\term{可数无穷}时，还应排除有限情形。证明\term{不可数}时，可使用对角线法，或将已知不可数集合单射嵌入目标集合。仅说“集合很稠密”“元素形式复杂”“每个元素都能写出来”都不是基数证明。
+
+\clearpage
+\exercise
+\begin{enumerate}
+\item 求 $T=\{x\mid x\text{ 是单词 BASEBALL 中的字母}\}$、$B=\{x\in\mathbb R\mid x^2=9\land2x=8\}$，以及 $\mathcal P(\{1,3,7,11\})$ 的基数。\\
+\term{解：}$T=\{B,A,S,E,L\}$，故 $|T|=5$，重复字母只算一次。$x^2=9$ 给出 $x=\pm3$，$2x=8$ 要求 $x=4$，不能同时满足，故 $B=\varnothing$、$|B|=0$。最后一个集合的基数为 $2^4=16$。
+
+\item 设 $|A|=\aleph_0$，$B=\{b_0,\ldots,b_{r-1}\}$，$r\ge1$ 有限。构造 $A\times B\to\mathbb N$ 的双射。\\
+\term{解：}固定 $A=\{a_0,a_1,\ldots\}$ 的无重复枚举，令 $(a_i,b_j)\mapsto ri+j$。给定 $k\in\mathbb N$，除法算法唯一给出 $k=ri+j$、$0\le j<r$，即唯一原像。所以 $|A\times B|=\aleph_0$。条件 $B\ne\varnothing$ 不可删去；若 $B=\varnothing$，则 $A\times B=\varnothing$。
+
+\item 证明 $A\approx B\Rightarrow\mathcal P(A)\approx\mathcal P(B)$。\\
+\term{解：}取双射 $f:A\to B$，定义 $\Phi(S)=f(S)$。若两像相等，由 $f$ 单射得 $S$ 相等，故 $\Phi$ 单射。任给 $T\subseteq B$，取 $S=f^{-1}(T)$，由 $f$ 满射得 $\Phi(S)=T$，所以满射。其逆就是把子集取完全原像。
+
+\item 设 $A=\{n^7\mid n\in\mathbb N\}$，$B=\{n^{109}\mid n\in\mathbb N\}$。求 $A,B,A\cup B,A\cap B$ 的基数。\\
+\term{解：}$n\mapsto n^7$ 与 $n\mapsto n^{109}$ 分别为到 $A,B$ 的双射，二者均为可数无穷。并集可数且包含无穷集 $A$，故 $|A\cup B|=\aleph_0$。
+
+对正整数公共元素，若 $a^7=b^{109}$，比较每个素数的指数，因 $\gcd(7,109)=1$，该公共元素的素因数指数都能被 $7\cdot109=763$ 整除。加上公共元素 $0$，得到
+\[
+A\cap B=\{n^{763}\mid n\in\mathbb N\},\qquad |A\cap B|=\aleph_0.
+\]
+这里“集合等于某个幂集合”与“集合的基数为 $\aleph_0$”应分两步写，不能把集合表达式直接当成基数。
+
+\item 已知 $|A|=\aleph_0$、$|B|<|A|$，求 $|A\setminus B|$。\\
+\term{解：}$|B|<\aleph_0$ 意味着 $B$ 有限。因 $A\cap B$ 有限，而 $A=(A\setminus B)\cup(A\cap B)$，若 $A\setminus B$ 有限，则 $A$ 有限，矛盾。又 $A\setminus B\subseteq A$ 可数，故为可数无穷。这里不要求 $B\subseteq A$，只须从 $A$ 中删去 $A\cap B$。
+
+\newpage
+\item 判断并说明：可数个可数集的并、有限个可数集的积、可数个二元集合的积是否都可数。\\
+\term{解：}前两项可数；第三项不成立，$\{0,1\}^{\mathbb N}$ 的基数为 $\mathfrak c$。二维编号只处理有限元组，无穷序列不能直接用同一个有限配对过程编码成一个自然数。
+
+\item 证明 $\mathbb R\setminus\mathbb Q$ 不可数。\\
+\term{解：}若无理数集也可数，则它与可数集 $\mathbb Q$ 的并 $\mathbb R$ 可数，与对角线结论矛盾。该证明只需反证不可数，不应把“有理数稠密”当作理由。
+
+\item 设 $F:\mathbb N\to\mathcal P(\mathbb N)$，$F(n)=\{0,1,\ldots,n\}$。写出对角集 $D=\{n\mid n\notin F(n)\}$，并说明是否能推出空集不属于幂集。\\
+\term{解：}每个 $n\in F(n)$，所以 $D=\varnothing$。空集当然属于 $\mathcal P(\mathbb N)$，但不等于任何非空的 $F(n)$，所以它不在该 $F$ 的值域中。未被某函数取到与不属于陪域是不同结论。
+
+\item 判断有限二进制串的全体与无限二进制序列的全体是否等势。\\
+\term{解：}有限串按长度分组，每个长度 $n$ 只有 $2^n$ 个，故全体是可数并且无穷，基数为 $\aleph_0$。无限序列的全体基数为 $\mathfrak c$，二者不等势。“长度没有统一上界”不等于“每个元素自身有无限长度”。
+\end{enumerate}
+
+\note{等势要有双射，基数不等式要有单射；可数约定包含有限集；二维枚举要确保每个元素在有限步出现；有理数枚举须去重；区间等势须排除空集与单点情形；有限积、可数并和可数无穷积须区分；对角线构造应说明新元素属于目标集合且不在原列表中。}
 
 \chapterpage{补充：布尔可满足性与建模}
 本节保留此前讲义中的 SAT 与数独内容，作为命题逻辑和范式的应用补充，不替代逻辑、集合与关系部分的基本要求。
@@ -2084,8 +2433,8 @@ s_{r,c,d}=1\quad\Longleftrightarrow\quad
 是否存在解和解是否唯一是不同问题。若已有满足赋值，可增加阻断该完整解的子句后再次判断可满足性：若仍可满足，则还有其他解；若不可满足，则原解唯一。这说明形式化建模要同时明确变量、约束与所问性质。
 
 \chapterpage{综合复习、符号与课件索引}
-\subsection{逻辑、集合、关系与函数之间的联系}
-命题逻辑以真值建立联结词与公式的语义；等值演算把公式化成可比较、可计算的范式；推理理论区分有效性与形式证明。一阶逻辑增加对象、关系和量词，量词演算依赖变量绑定及对象任意性。集合代数则把逻辑条件转成对象的集合关系，并通过容斥进行有限计数。二元关系将对象间的联系表示为有序对集合；等价关系产生划分与商集，偏序关系则通过可比性和覆盖结构研究次序。函数是在关系中加入输入覆盖与单值性得到的结构；函数的纤维形成划分，单射、满射和双射分别约束输出的合并与覆盖，复合描述映射的顺次作用。
+\subsection{逻辑、集合、关系、函数与基数之间的联系}
+命题逻辑以真值建立联结词与公式的语义；等值演算把公式化成可比较、可计算的范式；推理理论区分有效性与形式证明。一阶逻辑增加对象、关系和量词，量词演算依赖变量绑定及对象任意性。集合代数则把逻辑条件转成对象的集合关系，并通过容斥进行有限计数。二元关系将对象间的联系表示为有序对集合；等价关系产生划分与商集，偏序关系则通过可比性和覆盖结构研究次序。函数是在关系中加入输入覆盖与单值性得到的结构；函数的纤维形成划分，单射、满射和双射分别约束输出的合并与覆盖，复合描述映射的顺次作用。基数比较进一步用单射、双射描述集合大小，并通过枚举与对角线法区分可数无穷和不可数。
 
 逻辑等值、有效推理、集合相等是不同层次的关系：等值保持全部真值；推理只要求前提真时结论真；集合相等要求元素完全一致。它们之间可通过“任取一个对象并判断属于关系”建立联系。
 
@@ -2121,6 +2470,11 @@ s_{r,c,d}=1\quad\Longleftrightarrow\quad
 \item 有限等势集合间单射等价于满射；无限集合上此结论不成立。
 \item 本课程 $(f\circ g)(x)=g(f(x))$；复合单射推出 $f$ 单射，复合满射推出 $g$ 满射。
 \item $f:A\to B$ 可逆当且仅当双射；$f\circ f^{-1}=I_A$，$f^{-1}\circ f=I_B$；复合求逆时次序反转。
+\item $A\approx B$ 当且仅当存在双射；$|A|\le|B|$ 当且仅当存在单射 $A\to B$；双向单射保证等势。
+\item $\mathbb N,\mathbb Z,\mathbb Q,\mathbb N^2$ 都为可数无穷集，基数为 $\aleph_0$。
+\item 可数并及有限积保持可数性；可数无穷积未必可数，$\{0,1\}^{\mathbb N}$ 即为反例。
+\item $|\mathcal P(\mathbb N)|=2^{\aleph_0}=\mathfrak c=|\mathbb R|$；康托定理给出 $|A|<|\mathcal P(A)|$。
+\item 无穷集与真子集可能等势；非退化实数区间均与 $\mathbb R$ 等势；不存在最大的基数。
 \end{enumerate}
 
 \subsection{常用符号及与课件记法的对应}
@@ -2157,11 +2511,15 @@ $\sup_A B,\inf_A B$ & 上确界、下确界\\
 $B^A,\operatorname{dom}f,\operatorname{ran}f$ & 函数集合、定义域、值域；陪域由 $f:A\to B$ 指定\\
 $f(S),f^{-1}(T)$ & 集合的像、完全原像；$f^{-1}(\{b\})$ 是纤维\\
 $\chi_S,q:A\to A/R$ & 子集的特征函数、自然映射\\
-$f^n,f^{-1}$ & 函数迭代、逆关系；双射的逆关系为整个陪域上的反函数\\\bottomrule
+$f^n,f^{-1}$ & 函数迭代、逆关系；双射的逆关系为整个陪域上的反函数\\
+$A\approx B$ & 集合等势，即存在双射 $A\to B$\\
+$|A|\le|B|$ & 基数比较，即存在单射 $A\to B$；课件记作 $A\preceq B$\\
+$\aleph_0,\mathfrak c$ & 自然数集基数、连续统基数；$\mathfrak c=2^{\aleph_0}$\\
+$2^{|A|}$ & 二元函数集合 $\{0,1\}^A$ 的基数，也等于幂集基数\\\bottomrule
 \end{longtable}
 
 \subsection{课件覆盖索引}
-本讲义以前六章课件、第七章 7.6--7.7 节及其习题课，以及第八章 8.1--8.2 节及其习题课为依据，页数指 PDF 中的页面顺序，包含习题页。行政信息、上课联系方式和仅用于课程导入的材料不作为数学正文。图像习题已按题目含义整理；明显的文字、括号或条件疏漏按数学定义规范表述。
+本讲义以前六章课件、第七章 7.6--7.7 节及其习题课，以及第八章 8.1--8.3 节及其习题课为依据，页数指 PDF 中的页面顺序，包含习题页。行政信息、上课联系方式和仅用于课程导入的材料不作为数学正文。图像习题已按题目含义整理；明显的文字、括号或条件疏漏按数学定义规范表述。
 \begin{longtable}{p{0.25\linewidth}p{0.68\linewidth}}
 \toprule 课件与页码 & 对应讲义内容\\\midrule\endhead
 第一章，4--16 页 & 命题与分类、五种联结词、相容或与排斥或、条件符号化\\
@@ -2197,7 +2555,12 @@ $f^n,f^{-1}$ & 函数迭代、逆关系；双射的逆关系为整个陪域上�
 同上，32--37 页 & 常函数、恒等函数、单调、特征函数、自然映射与双射构造\\
 同上，38--52 页 & 复合的定义域、作用顺序、结合律、迭代、单满性与消去律\\
 同上，53--61 页 & 逆关系、反函数存在条件、恒等式、复合求逆与计算例题\\
-同上，62--69 页 & 单满性、平面双射、平方差原像、纤维划分及哈斯图习题\\\bottomrule
+同上，62--69 页 & 单满性、平面双射、平方差原像、纤维划分及哈斯图习题\\
+第八章 8.3 文件，1--9 页 & 等势、整数与自然数对编号、有理数枚举、区间双射\\
+同上，10--17 页 & 对角线、幂集定理、基数比较、二元序列与连续统\\
+同上，18--24 页 & 自然数的集合构造、有限与无穷集、基数记号与比较\\
+同上，25--29 页 & 可数集、封闭性、有限计数、可数集与有限集的积\\
+同上，31--36 页 & 幂集等势、七次幂与一百零九次幂集合、差集基数习题\\\bottomrule
 \end{longtable}
 一阶逻辑中自由变量改名按对应赋值理解，避免将其误作固定赋值下的等值；空族广义交明确区分是否固定全集；硬币与着色的计数明确区分对象是否有编号、是否按旋转等同。这些条件用于保证课件中的演算与应用在相应语境下正确。
 
@@ -2209,11 +2572,17 @@ $f^n,f^{-1}$ & 函数迭代、逆关系；双射的逆关系为整个陪域上�
 第 70 页的良序对应 well-order；良基性一般只要求非空子集有极小元，不能与“有最小元”混同。第 73 页良序化定理讨论存在某种次序，不改变给定次序的性质。第 79 页积集分类题的商集承载对象应写成 $(A\times A)/R$。习题课合成运算沿用先左关系、后右关系的约定，避免与其他教材的相反记号混用。
 
 \subsection{第八章课件的条件与记号修正}
-课件第 5 页从“关系自身的定义域”定义函数，第 7--11 页再指定 $A\to B$；两种语境须区分。例如 $x+y=10$ 在自然数上给出有限定义域的函数，并不是整个 $\mathbb N$ 上的全函数。函数相等按关系图像判断，仍须保留定义域；约分不允许悄悄补入原先无定义的点。第 22--23 页中的平方根、对数与倒数若写成 $\mathbb R\to\mathbb R$，须先修正定义域：平方根限于非负实数，对数限于正实数，倒数排除 $0$。
+课件第 5 页从“关系自身的定义域”定义函数，第 7--11 页再指定 $A\to B$；两种语境须区分。例如 $x+y=10$ 在自然数上给出有限定义域的函数，并不是整个 $\mathbb N$ 上的全函数。函数相等按关系图像判断，仍须保留定义域；约分不允许悄悄补入原先无定义的点。第 22--23 页的 $\ln n$ 定义域为正整数，不能把其值域误认为整个实数集；第 37 页的平方根与倒数若写成 $\mathbb R\to\mathbb R$，须先修正定义域：平方根限于非负实数，倒数排除 $0$。
 
 第 17 页的完全原像 $f^{-1}(T)$ 不以可逆为前提；$f^{-1}(f(S))=S$ 需要单射等附加条件。第 19 页交、差公式的包含方向不同，不能互换。第 31 页有限等势定理的满射推出单射一向，正文用输出数不足的反证补足论证。第 34 页偏序幂集的集合大小函数只保留包含次序，不是单射，不能把实数全序上严格单调的结论用于不可比元素。
 
 第 42 页文字说明易使人误解复合顺序；以其定义与后续计算为准，本课程统一为先 $f$ 后 $g$，$(f\circ g)(x)=g(f(x))$。第 46--47 页函数幂指迭代，不是数值乘方；“等幂”统一称为“幂等”。第 53--57 页须区分在值域上存在逆函数与在整个指定陪域上存在反函数，后者要求双射，恒等函数的下标依作用起点确定。第 58--59 页分段例题明确采用含 $0$ 的自然数集，并完整写出复合在各分支的取值。第 65--66 页的自然映射输出是等价类，不能与原函数的数值输出混同。
+
+\Needspace{16\baselineskip}
+\subsection{基数课件的条件与记号修正}
+8.3 节第 9 页关于实数区间的等势结论应限于非退化区间，排除空区间与单点。第 11 页对角线构造须避免十进制表示的尾 $9$ 二义性，本章固定规范表示并只用数字 $1,2$ 构造新数。第 15--16 页证明二元序列与区间等势时，规范二进制展开只给出一个方向的单射，任意序列的十进制编码给出另一方向，最后使用康托--伯恩斯坦定理。
+
+第 24 页列出的基数是已知严格增长链，不应理解为完整列举了全部相邻基数；连续统基数统一记作 $\mathfrak c$。第 26 页“可数个可数集的笛卡尔积仍可数”不成立，应限定为有限个因子；可数并则仍可数。幂集不可数的结论须以原集合无穷为条件。第 35 页幂集合习题中的映射 $n\mapsto n^{109}$ 的陪域应为 $B$；交集本身是 $\{n^{763}\mid n\in\mathbb N\}$，其基数再写为 $\aleph_0$。
 
 \subsection{综合练习与解答}
 \begin{enumerate}
