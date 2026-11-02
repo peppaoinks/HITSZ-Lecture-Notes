@@ -33,7 +33,7 @@
 \fancyfoot[C]{\small\thepage}
 \renewcommand{\headrulewidth}{0.3pt}
 \renewcommand{\sectionmark}[1]{\markboth{#1}{}}
-\hypersetup{pdftitle={概率论与数理统计},pdfsubject={随机事件、条件概率、随机变量与多维分布}}
+\hypersetup{pdftitle={概率论与数理统计},pdfsubject={随机事件、条件概率、随机变量、数字特征与极限定理}}
 \allowdisplaybreaks[2]\raggedbottom
 \begin{document}
 \begin{titlepage}\thispagestyle{empty}\vspace*{0.28\textheight}
@@ -1038,6 +1038,467 @@ f(x,y)=f_X(x)f_{Y\mid X}(y\mid x)
 \]
 （在相应定义成立处）；离散型对应 $p_{ij}=p_{i\cdot}P(Y=y_j\mid X=x_i)$。
 
+\chapterpage{随机变量的数字特征与极限定理}
+分布描述随机变量的全部概率结构，\term{数字特征}则用少量数值概括其位置、离散程度以及变量间的联系。数学期望与方差不一定存在；使用数字特征及极限定理时，必须检查可积性、独立性和分布条件。本章沿用课件记号 $E(X)$、$D(X)$ 分别表示数学期望和方差。
+
+\subsection{数学期望的定义与存在条件}
+若对离散变量 $X$ 观察 $N$ 次，取值 $x_i$ 出现 $n_i$ 次，则观测均值为 $\sum_i x_i n_i/N$。频率 $n_i/N$ 接近概率 $p_i$ 时，自然对应以概率为权重的平均值 $\sum_i x_ip_i$。
+\begin{infobox}{定义：数学期望}
+离散型随机变量 $X$ 的分布列为 $P(X=x_i)=p_i$。若 $\sum_i|x_i|p_i<\infty$，定义其\term{数学期望}（expectation）或\term{均值}为
+\[
+E(X)=\sum_i x_ip_i.
+\]
+连续型随机变量 $X$ 有密度 $f_X$。若 $\int_{-\infty}^{\infty}|x|f_X(x)\,dx<\infty$，则
+\[
+E(X)=\int_{-\infty}^{\infty}x f_X(x)\,dx.
+\]
+本讲义说“期望存在”，均指有限期望，即 $E|X|<\infty$。
+\end{infobox}
+绝对收敛保证求和或积分结果不依赖重排及截断方式。非负变量的期望还可以在扩展意义下等于 $+\infty$，这不属于有限期望。期望是概率加权平均，不一定是可能取值，也不一定等于概率最大的取值。例如公平骰子的点数期望为 $3.5$，却不会出现 $3.5$ 点。
+\example{甲、乙独立进行公平比赛，无平局，先胜三局者取得总奖金 $100$。比赛在甲胜两局、乙胜一局时中止，如何按最终获胜概率分配奖金？}
+\solution 甲再胜一局即可获胜；乙必须连胜两局。可预先设定余下两局的结果，即使第一局后比赛已经结束也补设第二局，其四种结果等可能。甲最终获胜的概率为 $3/4$，乙为 $1/4$。甲的最终奖金 $X$ 取 $100$ 或 $0$，故
+\[
+E(X)=100\times\frac34+0\times\frac14=75.
+\]
+据此分给甲 $75$、乙 $25$。按已胜局数的 $2:1$ 分配没有反映当前局势下的最终胜率。
+\example{标准柯西分布的密度为 $f_X(x)=1/[\pi(1+x^2)]$，$x\in\mathbb R$。判断其期望是否存在。}
+\solution 密度关于原点对称，但
+\[
+\int_0^R\frac{x}{\pi(1+x^2)}\,dx
+=\frac1{2\pi}\log(1+R^2)\longrightarrow+\infty.
+\]
+因此 $E|X|=\infty$，正、负半轴积分不能以 $+\infty-\infty$ 相消，$E(X)$ 不存在。对称截断的积分为 $0$ 只是柯西主值，不能当作数学期望。“分布对称则期望等于对称中心”还需要有限期望条件。
+
+\subsection{随机变量函数的期望}
+\begin{infobox}{定理：由原分布直接求函数期望}
+令 $Y=g(X)$，$g$ 为可测函数。若 $E|g(X)|<\infty$，则
+\[
+E[g(X)]=\sum_i g(x_i)p_i
+\quad\text{或}\quad
+E[g(X)]=\int_{-\infty}^{\infty}g(x)f_X(x)\,dx,
+\]
+分别适用于离散型或连续型 $X$。不必先求 $Y$ 的分布。
+
+对二维随机向量，在 $E|g(X,Y)|<\infty$ 时，
+\[
+E[g(X,Y)]=\sum_i\sum_j g(x_i,y_j)p_{ij}
+\quad\text{或}\quad
+\iint_{\mathbb R^2}g(x,y)f(x,y)\,dx\,dy.
+\]
+\end{infobox}
+课件以连续函数表述该定理；连续性是充分条件，可推广为可测性。离散情形可按 $g$ 的相同取值分组求和，绝对收敛保证分组合法；连续情形是相应的积分变换公式。计算 $E(XY)$ 一般需要联合分布，不能仅凭两个边缘分布确定。
+\example{沿用第三章的变量：$X$ 在 $-1,0,1,2$ 处的概率为 $0.1,0.2,0.3,0.4$。求 $E(X)$ 和 $E(X^2)$。}
+\solution
+\[
+E(X)=-0.1+0+0.3+0.8=1,
+\qquad E(X^2)=0.1+0+0.3+1.6=2.
+\]
+因而 $E(X^2)\ne[E(X)]^2$。一般不能把函数移到期望符号外。
+\example{公交车每小时在 $10,30,50$ 分发车，乘客到达时刻 $X\sim U[0,60]$，车辆准点且可立即乘坐，求等待时间 $Y$ 的期望，单位为分钟。}
+\solution 到达时刻的有限个端点不影响期望。在四个区间上，等待时间分别为 $10-X$、$30-X$、$50-X$、$70-X$。最后一段要等下一小时的首班，故
+\begin{align*}
+E(Y)=\frac1{60}\bigg[&\int_0^{10}(10-x)\,dx+\int_{10}^{30}(30-x)\,dx\\
+&+\int_{30}^{50}(50-x)\,dx+\int_{50}^{60}(70-x)\,dx\bigg]
+=10.
+\end{align*}
+“到达时间随机”不足以推出均匀分布，此处均匀到达是模型假设。
+\example{联合密度在 $0<x<1,\ |y|<x$ 内为 $f(x,y)=1$，其余为零。求 $E(X)$、$E(Y)$ 与 $E(XY)$。}
+\solution 区域面积 $\int_0^1 2x\,dx=1$，密度已归一化。直接按联合密度积分，
+\[
+E(X)=\int_0^1\int_{-x}^x x\,dy\,dx=\frac23,
+\]
+\[
+E(Y)=\int_0^1\int_{-x}^x y\,dy\,dx=0,
+\qquad E(XY)=\int_0^1\int_{-x}^x xy\,dy\,dx=0.
+\]
+后两式使用关于 $y$ 的奇函数在对称区间上积分为零。
+
+\subsection{期望的性质与示性变量方法}
+\begin{infobox}{定理：线性性与独立乘积}
+设各变量具有有限期望，$a_i,c$ 为常数，则
+\[
+E(c)=c,\qquad E\left(c+\sum_{i=1}^n a_iX_i\right)
+=c+\sum_{i=1}^n a_iE(X_i).
+\]
+\term{期望的线性性不要求独立}。若 $X,Y$ 独立且均可积，则 $XY$ 可积，并有 $E(XY)=E(X)E(Y)$。
+\end{infobox}
+线性性来自积分或绝对收敛级数的线性运算。独立的连续变量满足联合密度分解，于是
+\[
+E(XY)=\iint xyf_X(x)f_Y(y)\,dx\,dy
+=\left[\int xf_X(x)\,dx\right]\left[\int yf_Y(y)\,dy\right].
+\]
+绝对可积性可由 $E|XY|=E|X|E|Y|<\infty$ 保证；离散情形把积分改为求和。仅有 $E(XY)=E(X)E(Y)$ 不能反推独立。
+
+对事件 $A$ 的示性变量，$E(I_A)=P(A)$。如果 $X$ 是 $n$ 次试验中的成功次数，可写成 $X=\sum_{i=1}^n I_{A_i}$，于是
+\[
+E(X)=\sum_{i=1}^n P(A_i).
+\]
+各次成功概率均为 $p$ 时即为 $np$。这个期望结论不要求成功事件独立；只有进一步计算二项分布或方差时才需要相应条件。
+
+\subsection{方差、标准差与二阶矩}
+可积变量满足 $E[X-E(X)]=0$，平均带符号偏差会相消，不能衡量分散程度。使用平方偏差可以避免正负抵消。
+\begin{infobox}{定义：方差与标准差}
+若 $E(X^2)<\infty$，记 $\mu=E(X)$，定义\term{方差}（variance）与\term{标准差}为
+\[
+D(X)=E[(X-\mu)^2],\qquad \sigma_X=\sqrt{D(X)}.
+\]
+离散型时 $D(X)=\sum_i(x_i-\mu)^2p_i$；连续型时
+$D(X)=\int_{-\infty}^{\infty}(x-\mu)^2f_X(x)\,dx$。
+\end{infobox}
+由 $|x|\le1+x^2$，有限二阶矩保证有限期望。期望存在并不保证方差有限。方差的单位是原变量单位的平方，标准差与原变量同单位；比较离散程度时应在相同单位和背景下进行。
+\begin{infobox}{公式：计算方差与线性变换}
+对有限二阶矩变量，
+\[
+D(X)=E(X^2)-[E(X)]^2,\qquad D(aX+b)=a^2D(X).
+\]
+特别地 $D(c)=0$，平移不改变方差。
+\end{infobox}
+\proof 展开平方并使用线性性：
+\begin{align*}
+D(X)&=E(X^2)-2\mu E(X)+\mu^2=E(X^2)-\mu^2,\\
+D(aX+b)&=E\{[aX+b-(a\mu+b)]^2\}=a^2D(X).
+\end{align*}
+因此 $E(X^2)\ge[E(X)]^2$。若 $D(X)=0$，对任意 $\varepsilon>0$，非负性给出
+\[
+0=E[(X-\mu)^2]\ge\varepsilon^2P(|X-\mu|\ge\varepsilon),
+\]
+故 $X=\mu$ 几乎必然。反之常量几乎必然显然给出零方差。该结论是 $P(X=\mu)=1$，不要求每个样本点上都相等。
+\example{两项目收益分别满足：$X$ 以概率 $0.6,0.3,0.1$ 取 $5,2,-1$；$Y$ 以概率 $0.7,0.3$ 取 $6,-2$，单位为万元。比较其期望与方差。}
+\solution
+\begin{align*}
+E(X)&=5(0.6)+2(0.3)-1(0.1)=3.5,\\
+E(Y)&=6(0.7)-2(0.3)=3.6,\\
+D(X)&=[25(0.6)+4(0.3)+1(0.1)]-3.5^2=4.05,\\
+D(Y)&=[36(0.7)+4(0.3)]-3.6^2=13.44.
+\end{align*}
+标准差约为 $2.01$ 与 $3.67$ 万元。$Y$ 的均值略大而分散程度更高；仅凭这两个数字，不能在缺少风险偏好与决策准则时断言哪个项目一定更优。方差不能直接与以万元计的期望作数值大小比较。
+
+\subsection{常用分布的期望与方差}
+\textbf{1. 两点与二项分布。}对 $I\sim B(1,p)$，$I^2=I$，所以
+\[
+E(I)=p,\qquad D(I)=p-p^2=p(1-p).
+\]
+若 $X\sim B(n,p)$，把 $X$ 写为 $n$ 个独立两点变量之和，得到 $E(X)=np$；由后文的独立方差可加性，$D(X)=np(1-p)$。
+
+\textbf{2. 泊松分布。}若 $X\sim P(\lambda)$，移位求和得
+\begin{align*}
+E(X)&=\sum_{k=1}^{\infty}k e^{-\lambda}\frac{\lambda^k}{k!}
+=\lambda\sum_{j=0}^{\infty}e^{-\lambda}\frac{\lambda^j}{j!}=\lambda,\\
+E[X(X-1)]&=\sum_{k=2}^{\infty}k(k-1)e^{-\lambda}\frac{\lambda^k}{k!}=\lambda^2.
+\end{align*}
+由 $X^2=X(X-1)+X$，$E(X^2)=\lambda^2+\lambda$，故 $D(X)=\lambda$。
+
+\textbf{3. 几何分布。}若 $X\sim G(p)$，取值从 $1$ 开始，令 $q=1-p$。对 $|q|<1$ 的幂级数逐项求导，
+\[
+\sum_{k=1}^{\infty}kq^{k-1}=\frac1{(1-q)^2},\qquad
+\sum_{k=2}^{\infty}k(k-1)q^{k-2}=\frac2{(1-q)^3}.
+\]
+于是
+\[
+E(X)=\frac p{(1-q)^2}=\frac1p,\quad
+E[X(X-1)]=\frac{2pq}{(1-q)^3}=\frac{2q}{p^2},
+\]
+\[
+D(X)=\frac{2q}{p^2}+\frac1p-\frac1{p^2}=\frac{1-p}{p^2}.
+\]
+若改计成功前失败次数 $X-1$，期望变为 $(1-p)/p$，方差不变。
+
+\textbf{4. 均匀分布。}若 $X\sim U[a,b]$，直接积分得
+\[
+E(X)=\frac1{b-a}\int_a^b x\,dx=\frac{a+b}{2},\quad
+E(X^2)=\frac{a^2+ab+b^2}{3}.
+\]
+相减可得 $D(X)=(b-a)^2/12$。
+
+\textbf{5. 指数分布。}若 $X\sim E(\lambda)$，分部积分给出
+\[
+E(X)=\int_0^{\infty}x\lambda e^{-\lambda x}\,dx=\frac1\lambda,\qquad
+E(X^2)=\int_0^{\infty}x^2\lambda e^{-\lambda x}\,dx=\frac2{\lambda^2}.
+\]
+边界项 $x^re^{-\lambda x}$ 在 $x\to\infty$ 时趋于零（固定正整数 $r$），因此 $D(X)=1/\lambda^2$。
+
+\textbf{6. 正态分布。}若 $Z\sim N(0,1)$，由奇函数对称性 $E(Z)=0$；又 $\varphi'(z)=-z\varphi(z)$，分部积分得
+\[
+E(Z^2)=-\int_{-\infty}^{\infty}z\varphi'(z)\,dz
+=[-z\varphi(z)]_{-\infty}^{\infty}+\int_{-\infty}^{\infty}\varphi(z)\,dz=1.
+\]
+所以 $X=\mu+\sigma Z\sim N(\mu,\sigma^2)$ 满足 $E(X)=\mu$、$D(X)=\sigma^2$，说明正态分布参数的数字特征含义。
+
+\Needspace{10\baselineskip}
+\subsection{协方差与和的方差}
+\begin{infobox}{定义：协方差}
+设 $X,Y$ 均有有限二阶矩，定义\term{协方差}（covariance）为
+\[
+\operatorname{Cov}(X,Y)=E\{[X-E(X)][Y-E(Y)]\}.
+\]
+其计算公式为
+\[
+\operatorname{Cov}(X,Y)=E(XY)-E(X)E(Y).
+\]
+协方差正、负分别表示正、负的线性联系；协方差为零称\term{不相关}。
+\end{infobox}
+由 $2|XY|\le X^2+Y^2$，有限二阶矩保证 $E|XY|<\infty$。展开定义中的乘积即可得到计算公式。协方差满足对称性和双线性：
+\begin{align*}
+\operatorname{Cov}(X,Y)&=\operatorname{Cov}(Y,X),&
+\operatorname{Cov}(X,X)&=D(X),\\
+\operatorname{Cov}(X,c)&=0,&
+\operatorname{Cov}(aX,bY)&=ab\operatorname{Cov}(X,Y),\\
+\operatorname{Cov}(X_1+X_2,Y)&=\operatorname{Cov}(X_1,Y)+\operatorname{Cov}(X_2,Y).
+\end{align*}
+例如 $\operatorname{Cov}(X+2Y,3X-4)=3D(X)+6\operatorname{Cov}(X,Y)$，不必另求变换后的联合分布。
+\begin{infobox}{定理：线性组合的方差}
+\[
+D(aX+bY)=a^2D(X)+b^2D(Y)+2ab\operatorname{Cov}(X,Y).
+\]
+一般地，
+\[
+D\left(\sum_{i=1}^n a_iX_i\right)
+=\sum_{i=1}^n a_i^2D(X_i)
++2\sum_{1\le i<j\le n}a_ia_j\operatorname{Cov}(X_i,X_j).
+\]
+两两不相关时交叉项消失；相互独立是充分条件。
+\end{infobox}
+\proof 对中心化变量 $\widetilde X_i=X_i-E(X_i)$，展开 $E[(\sum_i a_i\widetilde X_i)^2]$，平方项给出 $a_i^2D(X_i)$，两两交叉项给出 $2a_ia_j\operatorname{Cov}(X_i,X_j)$。特别地
+\[
+D(X-Y)=D(X)+D(Y)-2\operatorname{Cov}(X,Y).
+\]
+即使独立，差的方差仍是两方差之和，而不是相减。独立且有限二阶矩时，还有
+\[
+D(XY)=D(X)D(Y)+D(X)[E(Y)]^2+D(Y)[E(X)]^2,
+\]
+因为 $E(X^2Y^2)=E(X^2)E(Y^2)$，再减去 $[E(X)E(Y)]^2$ 即得。
+\example{$X\sim N(1,2)$，$Y\sim N(0,1)$ 且独立，求 $Z=2X-Y+3$ 的分布与密度。}
+\solution 独立正态变量的线性组合仍正态；参数的第二项为方差。因此
+\[
+E(Z)=2(1)-0+3=5,\qquad D(Z)=4(2)+1=9,
+\]
+\[
+Z\sim N(5,9),\qquad f_Z(z)=\frac1{3\sqrt{2\pi}}
+\exp\left[-\frac{(z-5)^2}{18}\right],\quad z\in\mathbb R.
+\]
+
+\subsection{相关系数、完全线性关系与不相关}
+\begin{infobox}{定义与性质：相关系数}
+若 $0<D(X)<\infty$、$0<D(Y)<\infty$，定义\term{相关系数}（correlation coefficient）
+\[
+\rho_{XY}=\frac{\operatorname{Cov}(X,Y)}{\sqrt{D(X)D(Y)}}.
+\]
+它无量纲，满足 $-1\le\rho_{XY}\le1$。且 $|\rho_{XY}|=1$ 当且仅当存在常数 $a$ 及 $b\ne0$，使 $P(Y=a+bX)=1$；$b>0$ 时 $\rho_{XY}=1$，$b<0$ 时为 $-1$。
+\end{infobox}
+\proof 令 $U=[X-E(X)]/\sigma_X$、$V=[Y-E(Y)]/\sigma_Y$，则 $E(U^2)=E(V^2)=1$，$E(UV)=\rho_{XY}$。对任意实数 $t$，
+\[
+0\le E[(V-tU)^2]=1-2t\rho_{XY}+t^2.
+\]
+取 $t=\rho_{XY}$ 得 $1-\rho_{XY}^2\ge0$。等号成立恰好要求 $V=\rho_{XY}U$ 几乎必然，换回 $X,Y$ 就是非零斜率的线性关系；反向代入即可验证。
+
+$|\rho|$ 衡量线性联系，不衡量所有形式的依赖。若任一变量方差为零，相关系数未定义，不能简单说为 $0$。独立的有限二阶矩变量不相关，反向一般不成立；联合二维正态时，两者才等价。
+\example{设 $X$ 的密度为 $f_X(x)=e^{-|x|}/2$，$x\in\mathbb R$，令 $Y=|X|$。证明 $X,Y$ 不相关但不独立。}
+\solution 由对称性，$E(X)=E(X|X|)=0$，且这些绝对矩均有限，所以 $\operatorname{Cov}(X,Y)=0$。对任意 $a>0$，事件 $\{Y\le a\}$ 包含于 $\{X\le a\}$，于是
+\[
+P(X\le a,Y\le a)=P(Y\le a)=1-e^{-a}.
+\]
+而 $P(X\le a)=1-e^{-a}/2<1$，$P(Y\le a)>0$，交概率不等于两边缘概率之积，故不独立。
+\example{沿用第四章产品等级例：$X_1,X_2$ 分别表示取到一等、二等品的示性变量，概率为 $0.8,0.1$。求相关系数。}
+\solution 一件产品不能同时属于两等，故 $X_1X_2=0$。于是
+\[
+D(X_1)=0.8(0.2)=0.16,\quad D(X_2)=0.1(0.9)=0.09,
+\]
+\[
+\operatorname{Cov}(X_1,X_2)=0-0.8(0.1)=-0.08,
+\quad \rho_{X_1X_2}=\frac{-0.08}{\sqrt{0.16(0.09)}}=-\frac23.
+\]
+
+\subsection{原点矩、中心矩与混合矩}
+\begin{infobox}{定义：矩}
+对正整数 $k$，若 $E|X|^k<\infty$，称
+\[
+\alpha_k=E(X^k),\qquad \beta_k=E[(X-E(X))^k]
+\]
+分别为 $X$ 的 $k$ 阶\term{原点矩}与\term{中心矩}。特别地 $\alpha_1=E(X)$、$\beta_1=0$、$\beta_2=D(X)$。
+
+对正整数 $k,l$，在相应绝对可积条件下，
+\[
+\alpha_{k,l}=E(X^kY^l),\quad
+\beta_{k,l}=E\{[X-E(X)]^k[Y-E(Y)]^l\}
+\]
+称为 $k+l$ 阶\term{混合原点矩}与\term{混合中心矩}。协方差为 $\beta_{1,1}$。
+\end{infobox}
+有限高阶绝对矩保证低阶矩有限，因为 $|x|^r\le1+|x|^k$（$0<r\le k$）。中心矩与原点矩通过二项式展开联系。例如
+\[
+\beta_2=\alpha_2-\alpha_1^2,\qquad
+\beta_3=\alpha_3-3\alpha_1\alpha_2+2\alpha_1^3.
+\]
+计算 $g(X,Y)$ 的矩时，可直接把 $g$ 的幂代入联合求和或积分公式。
+
+\subsection{依概率收敛与切比雪夫不等式}
+\begin{infobox}{定义：依概率收敛}
+设 $Z_1,Z_2,\ldots$ 为随机变量序列，$a$ 为常数。若对每个 $\varepsilon>0$，
+\[
+\lim_{n\to\infty}P(|Z_n-a|\ge\varepsilon)=0,
+\]
+称 $Z_n$ \term{依概率收敛}于 $a$，记为 $Z_n\xrightarrow{P}a$。等价地，$P(|Z_n-a|<\varepsilon)\to1$。
+\end{infobox}
+这里收敛的是“偏差超过固定阈值的概率”，不能把随机变量当作普通数列，也不表示每一次实际观测的误差都单调缩小。以 $>$ 代替定义中的 $\ge$ 得到等价定义，可通过把 $\varepsilon$ 换为较小的正数验证。
+\begin{infobox}{定理：切比雪夫不等式}
+若 $E(X)=\mu$、$D(X)=\sigma^2<\infty$，则对任意 $\varepsilon>0$，
+\[
+P(|X-\mu|\ge\varepsilon)\le\frac{\sigma^2}{\varepsilon^2},\qquad
+P(|X-\mu|<\varepsilon)\ge1-\frac{\sigma^2}{\varepsilon^2}.
+\]
+右侧界超出 $[0,1]$ 时应结合概率本身的范围解释，不能当作负概率或大于 $1$ 的概率。
+\end{infobox}
+\proof 令 $A=\{|X-\mu|\ge\varepsilon\}$。逐点有 $(X-\mu)^2\ge\varepsilon^2 I_A$，两边取期望，得 $\sigma^2\ge\varepsilon^2P(A)$。取补事件得到第二式。该证明同时适用于离散型、连续型及其他分布。
+\example{公平硬币独立抛掷 $n$ 次，正面次数为 $X$。用切比雪夫不等式确定一个充分次数，使正面频率在 $0.4$ 与 $0.6$ 之间的概率不低于 $0.9$。}
+\solution $X\sim B(n,1/2)$，$E(X/n)=1/2$、$D(X/n)=1/(4n)$，所以
+\[
+P\left(\left|\frac Xn-\frac12\right|<0.1\right)
+\ge1-\frac{1/(4n)}{0.1^2}=1-\frac{25}{n}.
+\]
+令 $1-25/n\ge0.9$，得 $n\ge250$。这是由该不等式给出的充分次数，不是实际二项概率所要求的最小次数。
+\example{设 $E(X)=-2$、$E(Y)=2$，$D(X)=1$、$D(Y)=4$，$\rho_{XY}=-0.5$，估计 $P(|X+Y|\ge6)$。}
+\solution $E(X+Y)=0$，$\operatorname{Cov}(X,Y)=-0.5\sqrt{1\cdot4}=-1$，于是
+\[
+D(X+Y)=1+4-2=3,\quad
+P(|X+Y|\ge6)\le\frac3{6^2}=\frac1{12}.
+\]
+给定的数字特征只足以产生上界，不能据此求出该概率的精确值。
+
+\subsection{伯努利大数定律与频率的稳定性}
+\begin{infobox}{定理：伯努利大数定律}
+在独立重复的伯努利试验中，每次成功概率为 $p$，$Y_n$ 为前 $n$ 次成功总数，则
+\[
+\frac{Y_n}{n}\xrightarrow{P}p.
+\]
+即对任意 $\varepsilon>0$，$P(|Y_n/n-p|\ge\varepsilon)\to0$。
+\end{infobox}
+\proof $E(Y_n/n)=p$，$D(Y_n/n)=p(1-p)/n$。由切比雪夫不等式，
+\[
+P\left(\left|\frac{Y_n}{n}-p\right|\ge\varepsilon\right)
+\le\frac{p(1-p)}{n\varepsilon^2}\longrightarrow0.
+\]
+该定理为第一章的频率稳定性提供严格解释：固定条件下的独立重复试验中，频率偏离概率一个固定量的可能性趋于零；并不要求每次增加试验都使频率更接近 $p$。
+
+\subsection{切比雪夫与辛钦大数定律}
+随机变量序列 $X_1,X_2,\ldots$ \term{独立同分布}（i.i.d.）指任意有限子组相互独立，且各变量具有相同分布函数。相同分布不表示各次观测值相同。
+\begin{infobox}{定理：切比雪夫大数定律}
+设 $X_1,X_2,\ldots$ 相互独立，每个变量有有限方差，并存在常数 $C<\infty$ 使 $D(X_i)\le C$。则
+\[
+\frac1n\sum_{i=1}^n[X_i-E(X_i)]\xrightarrow{P}0.
+\]
+特别地，独立同分布且 $E(X_i)=\mu$、$D(X_i)=\sigma^2<\infty$ 时，样本均值 $\overline X_n=n^{-1}\sum_iX_i$ 依概率收敛于 $\mu$。
+\end{infobox}
+\proof 独立性给出
+\[
+D\left(\frac1n\sum_{i=1}^nX_i\right)
+=\frac1{n^2}\sum_{i=1}^nD(X_i)\le\frac Cn.
+\]
+对中心化均值用切比雪夫不等式，偏差概率不超过 $C/(n\varepsilon^2)$，因而趋于零。这里可进一步放宽为两两不相关，并用 $n^{-2}\sum_iD(X_i)\to0$ 替代共同上界条件。
+\begin{infobox}{定理：辛钦大数定律}
+若 $X_1,X_2,\ldots$ 独立同分布，且具有有限期望 $E(X_i)=\mu$，则
+\[
+\overline X_n=\frac1n\sum_{i=1}^nX_i\xrightarrow{P}\mu.
+\]
+不要求方差有限。数学期望的有限性仍不可省略。
+\end{infobox}
+可用截断说明其为何不需要有限方差。令 $X_i^{(M)}=X_iI_{\{|X_i|\le M\}}$，其均值为 $\mu_M$。固定 $M$ 后，截断变量有界且独立同分布，故其样本均值依概率收敛于 $\mu_M$。另一方面，令 $r_M=E[|X_1|I_{\{|X_1|>M\}}]$，由可积性 $r_M\to0$，且 $|\mu-\mu_M|\le r_M$。
+
+对非负变量 $W$，由 $W\ge tI_{\{W\ge t\}}$ 可得 $P(W\ge t)\le E(W)/t$。将它用于两种样本均值之差的绝对值，得到
+\[
+P\left(\left|\frac1n\sum_{i=1}^n(X_i-X_i^{(M)})\right|\ge\frac\varepsilon3\right)
+\le\frac{3r_M}{\varepsilon}.
+\]
+先取大 $M$ 使 $r_M<\varepsilon/3$，由三角不等式与并事件上界，再令 $n\to\infty$，可得
+\[
+\limsup_{n\to\infty}P(|\overline X_n-\mu|\ge\varepsilon)\le\frac{3r_M}{\varepsilon}.
+\]
+最后令 $M\to\infty$，即得结论。
+\example{$X_i$ 独立同分布且 $X_i\sim E(2)$，求 $n^{-1}\sum_{i=1}^nX_i^2$ 的依概率极限。}
+\solution 令 $Y_i=X_i^2$，可测函数作用于独立同分布变量后仍独立同分布。由指数分布数字特征，
+\[
+E(Y_i)=E(X_i^2)=D(X_i)+[E(X_i)]^2
+=\frac14+\frac14=\frac12.
+\]
+$Y_i\ge0$ 且期望有限，由辛钦大数定律，$n^{-1}\sum_iX_i^2\xrightarrow{P}1/2$。所求是平方的平均，不是平均的平方；后者依概率趋于 $1/4$。
+
+\subsection{独立同分布中心极限定理}
+\begin{infobox}{定理：林德伯格—莱维中心极限定理}
+设 $X_1,X_2,\ldots$ 独立同分布，$E(X_i)=\mu$、$D(X_i)=\sigma^2$，其中 $0<\sigma^2<\infty$。令 $S_n=\sum_{i=1}^nX_i$，则对任意实数 $x$，
+\[
+\lim_{n\to\infty}P\left(\frac{S_n-n\mu}{\sigma\sqrt n}\le x\right)=\Phi(x).
+\]
+等价地，$\sqrt n(\overline X_n-\mu)/\sigma$ 的分布函数趋于标准正态分布函数。这称为\term{中心极限定理}（CLT）。
+\end{infobox}
+本定理描述标准化变量的\term{分布收敛}，即在极限分布函数的连续点上，分布函数值收敛。它不同于样本均值依概率趋于常数。有限 $n$ 时一般只可作正态近似，不能把和直接写成精确服从正态分布；如果各 $X_i$ 本来就为正态，则由第四章可得到任意 $n$ 下的精确结论。
+\begin{infobox}{方法：和与平均值的正态近似}
+在上述条件下，当 $n$ 足够大时，
+\[
+S_n\ \text{近似服从}\ N(n\mu,n\sigma^2),\qquad
+\overline X_n\ \text{近似服从}\ N(\mu,\sigma^2/n).
+\]
+因此
+\[
+P(a\le S_n\le b)\approx
+\Phi\left(\frac{b-n\mu}{\sigma\sqrt n}\right)
+-\Phi\left(\frac{a-n\mu}{\sigma\sqrt n}\right).
+\]
+先计算和的期望与标准差，再标准化；分母是 $\sigma\sqrt n$，不是 $n\sigma$。近似精度取决于原分布与 $n$，不存在适用于所有分布的统一“小样本阈值”。
+\end{infobox}
+\example{把 $1500$ 个数分别四舍五入后相加，假设取整误差相互独立且均服从 $U(-0.5,0.5)$，求总误差绝对值不超过 $15$ 的概率近似值。}
+\solution 设第 $i$ 个误差为 $X_i$，$S=\sum_{i=1}^{1500}X_i$。单项期望为 $0$，方差为 $1/12$，故 $E(S)=0$、$D(S)=125$。由中心极限定理，
+\[
+P(|S|\le15)\approx
+2\Phi\left(\frac{15}{\sqrt{125}}\right)-1
+\approx0.8203.
+\]
+这里单项误差是连续变量，无需整数型变量的连续性修正。
+
+\subsection{二项分布的正态近似与连续性修正}
+\begin{infobox}{定理：棣莫弗—拉普拉斯极限定理}
+若 $Y_n\sim B(n,p)$，$0<p<1$ 固定，$q=1-p$，则
+\[
+\lim_{n\to\infty}P\left(\frac{Y_n-np}{\sqrt{npq}}\le x\right)=\Phi(x),
+\quad x\in\mathbb R.
+\]
+这是把中心极限定理应用于独立两点变量之和得到的特例。
+\end{infobox}
+二项变量只取整数。用连续的正态曲线近似其点概率时，整数 $k$ 对应区间 $[k-1/2,k+1/2]$，称为\term{连续性修正}。因此对整数 $a\le b$，
+\[
+P(a\le Y_n\le b)\approx
+\Phi\left(\frac{b+1/2-np}{\sqrt{npq}}\right)
+-\Phi\left(\frac{a-1/2-np}{\sqrt{npq}}\right).
+\]
+同理 $P(Y_n\le b)$ 用上界 $b+1/2$，$P(Y_n\ge a)$ 用下界 $a-1/2$；严格不等式应先转换成包含端点的整数事件，再修正。
+
+正态近似需要成功与失败的期望次数都足够大，不能只看 $n$。课件的 $0.1<p<0.9$、$npq>9$ 是经验判断，不是定理的必要或充分精度保证。当 $p$ 很小而 $np$ 适中，泊松近似通常更适合；$p$ 接近 $1$ 时可改数失败次数。实际需要精确概率时，优先计算二项求和。
+\example{在随机抽查的 $100$ 个索赔户中，假设各户独立且被盗索赔概率均为 $0.2$。令 $X$ 为被盗索赔户数，求 $P(14\le X\le30)$。}
+\solution $X\sim B(100,0.2)$，$E(X)=20$、$D(X)=16$，标准差为 $4$。连续性修正给出
+\begin{align*}
+P(14\le X\le30)&\approx
+\Phi\left(\frac{30.5-20}{4}\right)
+-\Phi\left(\frac{13.5-20}{4}\right)\\
+&=\Phi(2.625)-\Phi(-1.625)\approx0.9436.
+\end{align*}
+二项精确求和为 $\sum_{k=14}^{30}\com{100}k(0.2)^k(0.8)^{100-k}\approx0.9470$。近似值不等于精确值；连续性修正也不保证任意参数下误差都可忽略。
+
+\subsection{概率约束中的模型假设与整数边界}
+\example{课件给出：某地区每日平均观影人数 $1600$，新影院预计吸引其中 $3/4$；要求空座至少 $200$ 的概率不超过 $0.1$，求允许的最大座位数。为演示计算，补充假设每日总观众固定为 $1600$，每人独立以概率 $3/4$ 选择新影院。}
+\solution 仅有日均总人数不能确定新影院观众数分布；若每日总人数本身随机，还需要其分布及选择机制。以下答案只针对补充的固定人数二项模型。
+
+设新影院观众数 $X\sim B(1600,3/4)$，座位数为整数 $s$。由 $E(X)=1200$、$D(X)=300$，空座至少 $200$ 对应 $X\le s-200$，所以约束为
+\[
+P(X\le s-200)\le0.1.
+\]
+按连续性修正，左侧近似为 $\Phi((s-199.5-1200)/\sqrt{300})$。令 $z_{0.1}$ 为满足 $\Phi(z_{0.1})=0.1$ 的标准正态分位数，$z_{0.1}\approx-1.2816$，则
+\[
+s\lesssim1399.5+\sqrt{300}\,z_{0.1}\approx1377.30.
+\]
+取整数候选 $s=1377$。再用二项精确概率核验：
+\[
+P(X\le1177)\approx0.09751\le0.1,\quad
+P(X\le1178)\approx0.10771>0.1.
+\]
+分布函数单调非减，故在该补充模型下，最大允许座位数确为 $1377$。正态近似用于产生候选值，整数边界及概率约束由精确概率确认。
+
 \chapterpage{要点与符号}
 \renewcommand{\arraystretch}{1.15}
 \subsection{主要符号}
@@ -1054,8 +1515,9 @@ $p_{ij},p_{i\cdot},p_{\cdot j}$&联合点概率及两种边缘点概率\\
 $F(x,y),f(x,y)$&二维联合分布函数、联合密度\\
 $f_{X\mid Y}(x\mid y)$&给定 $Y=y$ 时 $X$ 的条件密度\\
 $\varphi,\Phi$&标准正态密度、标准正态分布函数\\
-$\mu,\sigma^2,\rho$&正态位置参数、方差参数、二维正态相关参数\\\bottomrule
+$\mu,\sigma^2,\rho$&正态位置参数、方差参数、相关系数\\\bottomrule
 \end{tabularx}\end{center}
+期望与方差分别记为 $E(X),D(X)$，标准差为 $\sigma_X=\sqrt{D(X)}$；$\operatorname{Cov}(X,Y)$ 为协方差，$\rho_{XY}$ 为相关系数；$\alpha_k,\beta_k$ 为原点矩与中心矩，$\overline X_n$ 为样本均值，$\xrightarrow{P}$ 表示依概率收敛。
 \subsection{常用分布与模型条件}
 \begin{longtable}{p{0.19\linewidth}p{0.37\linewidth}p{0.35\linewidth}}
 \toprule 分布&概率或密度&模型与参数\\\midrule\endhead
@@ -1084,6 +1546,32 @@ P(A_j\mid B)&=\frac{P(A_j)P(B\mid A_j)}{P(B)}.
 事件及其概率是基础；随机变量把事件转为数值条件；分布列、分布函数与密度分别从点概率、累计概率和局部积分描述分布。联合分布包含变量间的依赖结构，边缘分布通过求和或积分消去另一变量，条件分布通过对固定条件归一化得到。
 
 解题时先判断模型与取值范围，再选择计数、条件分解、求和或积分。变换问题优先从事件 $\{g(X,Y)\le z\}$ 出发；和用卷积，最值用交事件或对立事件；独立性必须依据联合与边缘的乘积关系，不能只凭直觉。
+\subsection{数字特征与极限定理速查}
+\begin{center}\begin{tabularx}{\linewidth}{Y c c}
+\toprule 分布&$E(X)$&$D(X)$\\\midrule
+$B(1,p)$&$p$&$p(1-p)$\\
+$B(n,p)$&$np$&$np(1-p)$\\
+$P(\lambda)$&$\lambda$&$\lambda$\\
+$G(p)$（从 $1$ 起计）&$1/p$&$(1-p)/p^2$\\
+$U[a,b]$&$(a+b)/2$&$(b-a)^2/12$\\
+$E(\lambda)$（率参数）&$1/\lambda$&$1/\lambda^2$\\
+$N(\mu,\sigma^2)$&$\mu$&$\sigma^2$\\\bottomrule
+\end{tabularx}\end{center}
+\begin{infobox}{核心公式与条件}
+\begin{align*}
+D(X)&=E(X^2)-[E(X)]^2,\\
+\operatorname{Cov}(X,Y)&=E(XY)-E(X)E(Y),\\
+D(aX+bY)&=a^2D(X)+b^2D(Y)+2ab\operatorname{Cov}(X,Y),\\
+\rho_{XY}&=\frac{\operatorname{Cov}(X,Y)}{\sqrt{D(X)D(Y)}}.
+\end{align*}
+各式要求二阶矩有限；相关系数还要求两方差为正。
+\end{infobox}
+期望线性性不要求独立；独立可积时有期望乘积公式，独立且二阶矩有限时方差可加。
+
+切比雪夫不等式给出有限方差变量的偏差上界 $P(|X-E(X)|\ge\varepsilon)\le D(X)/\varepsilon^2$。独立同分布且有限期望时，样本均值依概率趋于期望；进一步有正的有限方差时，中心化并除以 $\sigma/\sqrt n$ 的样本均值具有标准正态极限。
+
+大数定律说明均值的稳定性，中心极限定理描述其波动尺度和极限分布。不相关只排除线性联系，不能替代独立；对整数计数作正态近似时，先明确端点，再考虑 $1/2$ 的连续性修正。
+
 \subsection{易混概念辨析}
 \begin{center}\begin{tabularx}{\linewidth}{l Y}\toprule
 比较&区别\\\midrule
@@ -1098,5 +1586,5 @@ $P(A\mid B)$ 与 $P(B\mid A)$&条件方向不同，分母分别为 $P(B)$ 与 $P
 几何分布两种计数&本讲义从 $1$ 起计试验次数；失败次数从 $0$ 起计\\\bottomrule
 \end{tabularx}\end{center}
 \subsection{参考资料与范围}
-本讲义依据《概率一1》至《概率一4》四份课程课件整理，参照周永春等编《大学数学：概率论与数理统计》第三版（高等教育出版社，2020年）核对定义与记号。原题条件明确时重新计算，另设的补充例题用于展示方法。
+本讲义依据《概率一1》至《概率一5》五份课程课件整理，参照周永春等编《大学数学：概率论与数理统计》第三版（高等教育出版社，2020年）核对定义与记号。原题条件明确时重新计算，另设的补充例题用于展示方法。
 \end{document}
