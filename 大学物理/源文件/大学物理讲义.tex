@@ -31,7 +31,7 @@
 \pgfplotsset{compat=1.18}
 \usetikzlibrary{arrows.meta}
 \usepackage[hidelinks]{hyperref}
-\hypersetup{pdftitle={大学物理},pdfsubject={热学、几何光学、光学仪器与光的干涉中文讲义}}
+\hypersetup{pdftitle={大学物理},pdfsubject={热学与光学完整讲义：几何成像、干涉、镀膜、劈尖与牛顿环}}
 % ---------- 主题色与信息框：集中设置 ----------
 \definecolor{ThemeMain}{HTML}{35566E}
 \definecolor{ThemeBack}{HTML}{F2F6F8}
@@ -72,6 +72,428 @@
 \newcommand{\unit}[1]{\,\mathrm{#1}}
 \newcommand{\sol}{\par\noindent\textbf{解}\quad}
 \newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\usetikzlibrary{calc,angles,quotes,decorations.markings}
+\definecolor{RayBlue}{HTML}{126987}
+\definecolor{RayGold}{HTML}{A8551C}
+\definecolor{RayGreen}{HTML}{31735D}
+\definecolor{GlassFill}{HTML}{DEEDF3}
+\definecolor{SoftGold}{HTML}{FBEDD9}
+\definecolor{FringeDark}{HTML}{182C40}
+\definecolor{FringeLight}{HTML}{FAE2A2}
+\tikzset{opt ray/.style={RayBlue,line width=.9pt,postaction={decorate},
+ decoration={markings,mark=at position .60 with {\arrow{Stealth}}}},
+ opt ray alt/.style={opt ray,RayGold},opt dash/.style={RayGold,densely dashed,line width=.7pt},
+ opt axis/.style={gray!78,dash pattern=on 4pt off 2pt,line width=.45pt},
+ opt glass/.style={fill=GlassFill,draw=ThemeMain,line width=.75pt},
+ opt lens/.style={ThemeMain,line width=1.3pt,{Stealth}-{Stealth}}}
+\newenvironment{optfigure}[1]{\par\smallskip\noindent\begin{minipage}{\linewidth}\centering
+\def\optcaption{#1}}{\par\smallskip\refstepcounter{figure}{\small\color{ThemeMain}\textbf{图 \thefigure}\quad\optcaption}\par
+\end{minipage}\par\smallskip}
+\newcommand{\FigRefraction}{%
+\begin{optfigure}{入射、反射与折射：三个角都从法线量起}
+\begin{tikzpicture}[x=1cm,y=1cm]
+\fill[GlassFill](-4.4,-1.8)rectangle(4.4,0);
+\draw[ThemeMain,thick](-4.4,0)--(4.4,0);
+\draw[opt axis](0,-1.72)--(0,1.88)node[above]{法线};
+\coordinate (O) at(0,0);\coordinate (U) at(0,1.6);\coordinate (D) at(0,-1.6);
+\coordinate (A) at(-2.55,1.65);\coordinate (B) at(2.55,1.65);\coordinate (C) at(1.15,-1.65);
+\draw[opt ray](A)node[above]{入射光}--(O);
+\draw[opt ray](O)--(B)node[above]{反射光};
+\draw[opt ray alt](O)--(C)node[right]{折射光};
+\pic[draw,ThemeMain,"$i_1$",angle radius=6mm,angle eccentricity=1.53]{angle=U--O--A};
+\pic[draw,ThemeMain,"$i_1$",angle radius=6mm,angle eccentricity=1.53]{angle=B--O--U};
+\pic[draw,RayGold,"$i_2$",angle radius=7mm,angle eccentricity=1.50]{angle=D--O--C};
+\node[anchor=east]at(4.25,.35){$n_1$};
+\node[anchor=east]at(4.25,-.35){$n_2>n_1$};
+\end{tikzpicture}
+\end{optfigure}}
+\newcommand{\FigCritical}{%
+\begin{optfigure}{从光密介质射向光疏介质：临界光线沿界面，全反射无传播折射光}
+\begin{tikzpicture}[x=1cm,y=1cm]
+\foreach \x/\labeltext in {0/小于临界角,4.2/等于临界角,8.4/大于临界角}{
+ \begin{scope}[shift={(\x,0)}]
+ \fill[GlassFill](-1.8,-1.25) rectangle(1.8,0);
+ \draw[ThemeMain](-1.8,0)--(1.8,0);
+ \draw[opt axis](0,-1.15)--(0,1.05);
+ \node at(0,-1.55){\labeltext};
+ \end{scope}}
+\draw[opt ray](-.65,-1.1)--(0,0);
+\draw[opt ray alt](0,0)--(.93,.85);
+\draw[opt ray,opacity=.45](0,0)--(.65,-1.1);
+\draw[opt ray](3.15,-1.1)--(4.2,0);
+\draw[opt ray alt](4.2,0)--(5.85,0);
+\draw[opt ray](4.2,0)--(5.25,-1.1);
+\draw[opt ray](6.90,-.91)--(8.4,0);
+\draw[opt ray](8.4,0)--(9.90,-.91);
+\end{tikzpicture}
+\end{optfigure}}
+\newcommand{\FigFiber}{%
+\begin{optfigure}{阶跃折射率光纤：入射角在端面量，反射角在侧壁量}
+\begin{tikzpicture}
+\fill[GlassFill](0,-1)rectangle(8,1);
+\fill[white](0,-.56)rectangle(8,.56);
+\draw[ThemeMain](0,-1)rectangle(8,1);
+\draw[ThemeMain](0,.56)--(8,.56) (0,-.56)--(8,-.56);
+\draw[opt axis](-2,0)--(8.2,0);
+\draw[opt ray](-1.85,-1.12)--(0,0);
+\draw[opt ray alt](0,0)--(1.36,.56)--(4.08,-.56)--(6.8,.56)--(8,.066);
+\draw[opt axis](1.36,-.06)--(1.36,1.29)node[above]{侧壁法线};
+\node[RayBlue]at(-1.05,-.21){$i$};
+\node[RayGold]at(.63,.12){$i'$};
+\node[RayGold]at(1.63,.31){$i_1$};
+\node at(4.9,.79){包层 $n_2$};\node at(4.9,.18){纤芯 $n_1>n_2$};
+\node[below]at(0,-1){端面};
+\end{tikzpicture}
+\end{optfigure}}
+\newcommand{\FigFermat}{%
+\begin{optfigure}{在交界面改变交点 $D$，比较从 $A$ 到 $B$ 的总光程}
+\begin{tikzpicture}
+\fill[GlassFill](-4.65,-1.68)rectangle(4.65,0);
+\draw[ThemeMain](-4.65,0)--(4.65,0);
+\coordinate(A)at(-3.6,1.47);\coordinate(B)at(3.7,-1.37);\coordinate(P)at(1,0);
+\draw[opt dash](A)--(-1.1,0)node[below left]{$D_1$}--(B);
+\draw[opt ray](A)--(P)node[above right]{$D$}--(B);
+\draw[opt axis](1,-1.45)--(1,1.25);
+\fill[ThemeMain](A)circle(1.8pt)node[above]{$A$};
+\fill[ThemeMain](B)circle(1.8pt)node[below]{$B$};
+\node at(-4,.33){$n_1$};\node at(-4,-.37){$n_2$};
+\end{tikzpicture}
+\end{optfigure}}
+\newcommand{\FigPlane}{%
+\begin{optfigure}{平面镜虚像：反向延长线交于镜后，实际光线在镜前传播}
+\begin{tikzpicture}
+\fill[GlassFill](0,-1.52)rectangle(.15,1.66);
+\draw[ThemeMain,thick](0,-1.52)--(0,1.66);
+\draw[opt axis](-4.4,0)--(3.6,0);
+\coordinate(A)at(-2.25,0);\coordinate(B)at(2.25,0);
+\foreach \h in {.52,1.07}{
+ \draw[opt ray](A)--(0,\h);
+ \draw[opt ray alt](0,\h)--(-2.15,{1.9556*\h});
+ \draw[opt dash](0,\h)--(B);}
+\fill[RayBlue](A)circle(2pt)node[below]{物点 $S$};
+\fill[RayGold](B)circle(2pt)node[below]{虚像 $S'$};
+\node[below]at(0,-1.55){镜面};
+\end{tikzpicture}
+\end{optfigure}}
+\newcommand{\FigMirror}{%
+\begin{optfigure}{凹面镜的傍轴成像：物在球心之外时，实像位于焦点和球心之间}
+\begin{tikzpicture}
+\draw[opt axis](-5.6,0)--(1,0);
+\draw[ThemeMain,line width=1.1pt](-.18,-1.55) .. controls (.05,-.7) and (.05,.7) .. (-.18,1.55);
+\draw[thick,->](-4.9,0)--(-4.9,1.18)node[above]{物};
+\draw[thick,->](-2.03,0)--(-2.03,-.49)node[below]{像};
+\draw[opt ray](-4.9,1.18)--(-.1,1.18);
+\draw[opt ray alt](-.1,1.18)--(-2.67,-1.05);
+\draw[opt ray](-4.9,1.18)--(0,0);
+\draw[opt ray alt](0,0)--(-3.8,-.915);
+\foreach \x/\s in {0/O,-1.46/F,-2.92/C}{\fill(\x,0)circle(1.5pt)node[above right]{$\s$};}
+\end{tikzpicture}
+\end{optfigure}}
+\newcommand{\FigDiverge}{%
+\begin{optfigure}{发散透镜：平行入射光的反向延长线经过像方焦点}
+\begin{tikzpicture}
+\draw[opt axis](-4.8,0)--(4.4,0);
+\draw[ThemeMain,line width=1.25pt] (0,-1.8)--(0,1.8);
+\draw[ThemeMain,line width=1pt](-.24,2)--(0,1.8)--(.24,2) (-.24,-2)--(0,-1.8)--(.24,-2);
+\draw[thick,->](-4,0)--(-4,1.05)node[above]{物};
+\draw[opt ray](-4,1.05)--(0,1.05);
+\draw[opt ray alt](0,1.05)--(1.65,1.916);
+\draw[opt dash](0,1.05)--(-2,0);
+\draw[opt ray](-4,1.05)--(2.4,-.63);
+\draw[RayGold,thick,->](-1.333,0)--(-1.333,.70)node[above left]{虚像};
+\foreach \x/\s in {-2/F',0/O,2/F}{\fill(\x,0)circle(1.5pt)node[below]{$\s$};}
+\end{tikzpicture}
+\end{optfigure}}
+\newcommand{\FigDoubleLens}{%
+\begin{optfigure}{两透镜逐次成像：第二透镜截获会聚束，最终像由出射线反延长确定}
+\begin{tikzpicture}[x=.91cm,y=1cm]
+\draw[opt axis](-5.6,0)--(5.5,0);
+\draw[opt lens](0,-1.7)--(0,1.7);
+\draw[ThemeMain,line width=1.2pt](3,-1.7)--(3,1.7);
+\draw[ThemeMain](2.77,1.89)--(3,1.7)--(3.23,1.89) (2.77,-1.89)--(3,-1.7)--(3.23,-1.89);
+\draw[thick,->](-5,0)--(-5,1)node[above]{物};
+\draw[opt ray](-5,1)--(0,1)--(3,-.2);
+\draw[opt ray](-5,1)--(0,0)--(3,-.6);
+\draw[opt ray alt](3,-.2)--(5.25,-1.55);
+\draw[opt ray alt](3,-.6)--(4.35,-1.68);
+\draw[opt dash](3,-.2)--(1,1) (3,-.6)--(1,1);
+\draw[opt axis](3,-.2)--(5,-1) (3,-.6)--(5,-1);
+\draw[RayGold,thick,->](1,0)--(1,1)node[above right]{最终虚像};
+\draw[gray,->](5,0)--(5,-1)node[right,align=left]{无第二透镜\\时的中间像};
+\node[above]at(0,1.72){$O_1$};\node[above]at(3,1.93){$O_2$};
+\end{tikzpicture}
+\end{optfigure}}
+\newcommand{\FigCamera}{%
+\begin{optfigure}{照相机的简化光路：镜头形成实像，光圈限束，快门控制时间}
+\begin{tikzpicture}[x=.92cm]
+\fill[ThemeBack](-.6,-1.32)rectangle(4.6,1.32);
+\draw[ThemeMain,thick](-.6,-1.32)rectangle(4.6,1.32);
+\draw[opt axis](-4.8,0)--(4.85,0);
+\draw[opt lens](0,-1.16)--(0,1.16);
+\draw[ThemeMain,thick](1.22,-1.30)--(1.22,-.45) (1.22,.44)--(1.22,1.3);
+\draw[RayGreen,line width=2pt](3.65,-1.05)--(3.65,1.05);
+\draw[thick,->](-4.3,0)--(-4.3,1)node[above]{物};
+\draw[opt ray](-4.3,1)--(0,.63)--(3.65,-.85);
+\draw[opt ray alt](-4.3,1)--(0,0)--(3.65,-.85);
+\draw[RayGreen,thick,->](3.65,0)--(3.65,-.85);
+\node[below]at(0,-1.38){镜头};\node[below]at(1.22,-1.38){光圈};\node[below]at(3.65,-1.38){感光面};
+\end{tikzpicture}
+\end{optfigure}}
+\newcommand{\FigMicroscope}{%
+\begin{optfigure}{复合显微镜：物镜先成倒立实像，目镜再增大视角（放松眼观察）}
+\begin{tikzpicture}[x=.93cm]
+\draw[opt axis](-4.7,0)--(7.25,0);
+\draw[opt lens](0,-1.4)--(0,1.4);\draw[opt lens](5.4,-1.83)--(5.4,1.5);
+\draw[thick,->](-2.4,0)--(-2.4,.58)node[above]{物};
+\draw[RayGreen,thick,->](3.6,0)--(3.6,-.87);
+\draw[opt ray](-2.4,.58)--(0,.58)--(3.6,-.87)--(5.4,-1.595);
+\draw[opt ray alt](-2.4,.58)--(0,0)--(3.6,-.87)--(5.4,-1.305);
+\draw[opt ray](5.4,-1.595)--(7.0,-.822);
+\draw[opt ray alt](5.4,-1.305)--(7.0,-.532);
+\draw[opt axis](3.6,-1.15)--(3.6,1.02);
+\node[above]at(0,1.4){物镜};\node[above]at(5.4,1.5){目镜};
+\node[align=center,above]at(3.6,1.01){中间像在\\目镜物方焦平面};
+\end{tikzpicture}
+\end{optfigure}}
+\newcommand{\FigTelescope}{%
+\begin{optfigure}{开普勒望远镜正常调焦：两组平行束之间有共同焦平面}
+\begin{tikzpicture}[x=.92cm]
+\draw[opt axis](-3.6,0)--(8.1,0);
+\draw[opt lens](0,-1.5)--(0,1.5);\draw[opt lens](5.7,-1.5)--(5.7,1.5);
+\draw[opt axis](4.2,-1.32)--(4.2,1.22);
+\draw[opt ray](-3.4,1.45)--(0,.88)--(4.2,-.7)--(5.7,-1.264);
+\draw[opt ray alt](-3.4,.57)--(0,0)--(4.2,-.7)--(5.7,-.95);
+\draw[opt ray](5.7,-1.264)--(7.95,-.214);
+\draw[opt ray alt](5.7,-.95)--(7.95,.10);
+\node[above]at(0,1.5){物镜};\node[above]at(5.7,1.5){目镜};
+\node[above]at(4.2,1.22){$F'_1=F_2$};
+\end{tikzpicture}
+\end{optfigure}}
+\newcommand{\FigIntensity}{%
+\begin{optfigure}{相同强度的双束干涉：每增加一个波长的光程差，光强重复一次}
+\begin{tikzpicture}
+\begin{axis}[width=12cm,height=4.35cm,axis lines=left,clip=false,
+ xmin=-1.58,xmax=1.68,ymin=0,ymax=4.55,
+ xtick={-1.5,-1,-.5,0,.5,1,1.5},xticklabels={$-3/2$,$-1$,$-1/2$,$0$,$1/2$,$1$,$3/2$},
+ ytick={0,2,4},xlabel={$\delta/\lambda$},ylabel={$I/I_0$},
+ grid=major,grid style={ThemeBorder,densely dotted},tick label style={font=\small}]
+\addplot[RayBlue,very thick,samples=160,domain=-1.5:1.5]{4*cos(deg(pi*x))^2};
+\end{axis}
+\end{tikzpicture}
+\end{optfigure}}
+\newcommand{\FigShift}{%
+\begin{optfigure}{下缝插入薄片后：零级亮纹下移，条纹间距保持不变}
+\begin{tikzpicture}
+\foreach \x/\d/\T in {0/0/插片前,5.1/-.29/下缝插片后}{
+ \begin{scope}[shift={(\x,0)}]
+ \fill[FringeDark](-.3,-1.35) rectangle(3.62,1.35);
+ \begin{scope}\clip(-.3,-1.35) rectangle(3.62,1.35);
+ \foreach \j in {-3,...,3}{
+ \fill[FringeLight,opacity=.30](-.3,{.43*\j+\d-.091})rectangle(3.62,{.43*\j+\d+.091});
+ \fill[FringeLight](-.3,{.43*\j+\d-.035})rectangle(3.62,{.43*\j+\d+.035});}
+ \end{scope}
+ \draw[white,dashed,line width=.5pt](-.27,0)--(2.68,0);
+ \fill[RayGold](2.91,\d)circle(2pt)node[right,text=white]{$k=0$};
+ \node[above]at(1.65,1.38){\T};
+ \end{scope}}
+\draw[RayGold,thick,->](9.04,0)--(9.04,-.29);
+\end{tikzpicture}
+\end{optfigure}}
+\newcommand{\FigLloyd}{%
+\begin{optfigure}{劳埃德镜：直达光与反射光叠加，反射光可用虚源作图}
+\begin{tikzpicture}
+\draw[ThemeMain,line width=1.25pt](-2.45,0)--(3.5,0);
+\draw[ThemeMain,line width=1.1pt](3.5,0)--(3.5,2.15)node[above]{屏};
+\coordinate(S)at(-3,1.35);\coordinate(V)at(-3,-1.35);
+\coordinate(P)at(3.5,1.60);\coordinate(M)at(-.0254,0);
+\draw[opt ray](S)--(P);
+\draw[opt ray alt](S)--(M)--(P);
+\draw[opt dash](V)--(M);
+\fill[RayBlue](S)circle(1.9pt)node[left]{$S$};
+\fill[RayGold](V)circle(1.9pt)node[left]{$S'$};
+\fill[ThemeMain](P)circle(1.9pt)node[right]{$P$};
+\node[below]at(1.4,0){平面镜};\node[above]at(.2,1.52){直达光};
+\node[RayGold]at(1.83,.62){反射光};
+\end{tikzpicture}
+\end{optfigure}}
+\newcommand{\FigEqualInclination}{%
+\begin{optfigure}{等倾观察：相同外部倾角映射到焦平面上的同一圆周}
+\begin{tikzpicture}
+\draw[opt axis](-.5,0)--(7.85,0);
+\draw[opt lens](2.7,-1.45)--(2.7,1.45);
+\draw[ThemeMain,thick](6.1,-1.55)--(6.1,1.6);
+\draw[opt ray](-.4,-.84)--(2.7,-.03)--(6.1,.89);
+\draw[opt ray](-.4,-.13)--(2.7,.68)--(6.1,.89);
+\draw[opt ray alt](-.4,.84)--(2.7,.03)--(6.1,-.89);
+\draw[opt ray alt](-.4,.13)--(2.7,-.68)--(6.1,-.89);
+\node[above]at(2.7,1.47){观察透镜};
+\node[above]at(6.1,1.61){后焦平面};
+\draw[<->,RayBlue](6.34,0)--(6.34,.89)node[midway,right]{$R_k$};
+\begin{scope}[shift={(9.27,0)}]
+\fill[FringeDark](0,0)circle(1.29);
+\foreach \j in {1,...,7}{
+ \draw[FringeLight,line width=1.05pt] (0,0)circle({.45*sqrt(\j)});}
+\node[below]at(0,-1.37){焦面俯视};
+\end{scope}
+\end{tikzpicture}
+\end{optfigure}}
+\newcommand{\FigOilSpectrum}{%
+\begin{optfigure}{海面油膜例题的可见增强波长：两侧光谱分布不同，标记不表示强度}
+\begin{tikzpicture}[x=.025cm,y=1cm]
+\foreach \y/\side in {1.3/反射,0/透射}{
+ \draw[ThemeMain,->](390,\y)--(787,\y);
+ \node[left]at(387,\y){\side};
+ \foreach \wl in {400,500,600,700,760}{
+ \draw[ThemeMain](\wl,\y)--(\wl,{\y-.09})node[below,font=\scriptsize]{\wl};}}
+\foreach \wl/\y/\name/\col in {552/1.3/552/RayGreen,441.6/0/441.6/violet!80!black,736/0/736/red!75!black}{
+ \draw[\col,line width=1.2pt](\wl,\y)--(\wl,{\y+.51})node[above]{$\name$};}
+\node[right]at(790,0){$\lambda/\mathrm{nm}$};
+\end{tikzpicture}
+\end{optfigure}}
+\newcommand{\FigCoating}{%
+\begin{optfigure}{四分之一波膜的反射相位：以共同出射波面上的两束光比较}
+\begin{tikzpicture}
+\foreach \x/\labeltext/\baseText in {0/增透设计/高折射率基底,5.8/增反的一种排列/低于膜的基底}{
+\begin{scope}[shift={(\x,0)}]
+ \fill[GlassFill](0,-1.45) rectangle(4,-.7);
+ \fill[SoftGold](0,-.7) rectangle(4,0);
+ \draw[ThemeMain](0,0)--(4,0) (0,-.7)--(4,-.7);
+ \draw[opt ray](.45,1.0)--(1.2,0);
+ \draw[opt ray](1.2,0)--(1.95,1);
+ \draw[opt ray alt](1.2,0)--(1.54,-.7)--(1.88,0)--(2.63,1);
+ \node[anchor=west,font=\scriptsize]at(2.37,-.35){膜 $n_f$};
+ \node at(2,-1.09){\baseText};
+ \node[above]at(2,1.16){\labeltext};
+\end{scope}}
+\node[font=\scriptsize]at(1.99,-1.77){相同反射相变，传播相差 $\pi$};
+\node[font=\scriptsize]at(7.8,-1.77){反射相变差 $\pi$，再加传播相差 $\pi$};
+\end{tikzpicture}
+\end{optfigure}}
+\newcommand{\FigWedge}{%
+\begin{optfigure}{空气劈尖的侧视与俯视：等厚线平行于接触棱边}
+\begin{tikzpicture}
+\fill[GlassFill](0,-.31)rectangle(6,0);
+\draw[ThemeMain](0,-.31)rectangle(6,0);
+\fill[SoftGold](0,0)--(6,1.1)--(6,0)--cycle;
+\draw[opt glass](0,0)--(6,1.1)--(6,1.42)--(0,.32)--cycle;
+\draw[opt ray](3.0,2.18)--(3.0,.87);
+\draw[opt ray alt](3.3,.84)--(3.3,2.03);
+\draw[<->](6.22,0)--(6.22,1.10)node[midway,right]{$d$};
+\draw[<->](0,-.63)--(6,-.63)node[midway,below]{$L$};
+\node[left]at(0,0){棱边};\node at(4,.29){空气膜};
+\node[above]at(4.85,1.72){侧视（角度夸张）};
+\begin{scope}[shift={(7.0,-.15)}]
+\fill[FringeDark](0,0)rectangle(4.05,1.58);
+\foreach \j in {1,...,8}{
+ \fill[FringeLight,opacity=.38]({.46*\j-.087},0)rectangle({.46*\j+.087},1.58);
+ \fill[FringeLight]({.46*\j-.039},0)rectangle({.46*\j+.039},1.58);}
+\node[above]at(2.03,1.61){反射条纹俯视};
+\draw[<->](.92,-.25)--(1.38,-.25)node[midway,below]{$\Delta x$};
+\draw[RayGold,->](.25,-.56)--(3.76,-.56)node[midway,below]{膜厚增加};
+\end{scope}
+\end{tikzpicture}
+\end{optfigure}}
+\newcommand{\FigSurface}{%
+\begin{optfigure}{被测下表面局部凸起使间隙变小，定级条纹向厚端弯；凹陷相反}
+\begin{tikzpicture}[x=.95cm]
+\foreach \off/\sgn/\tagtext in {0/1/凸起,5.5/-1/凹陷}{
+\begin{scope}[shift={(\off,0)}]
+ \fill[ThemeBack](0,-.95)rectangle(4.1,.95);
+ \draw[ThemeBorder](0,-.95)rectangle(4.1,.95);
+ \foreach \x in {.55,1.22,1.89,2.56,3.23}{
+  \draw[RayBlue,line width=.85pt] (\x,-.95) .. controls (\x,-.27) and ({\x+\sgn*.54},-.25) .. ({\x+\sgn*.54},0)
+   .. controls ({\x+\sgn*.54},.25) and (\x,.27) .. (\x,.95);}
+ \draw[RayGold,->](.5,-1.2)--(3.8,-1.2)node[midway,below]{名义厚度增加};
+ \node[above]at(2.05,1){\tagtext};
+\end{scope}}
+\end{tikzpicture}
+\end{optfigure}}
+\newcommand{\FigNewtonSetup}{%
+\begin{optfigure}{牛顿环反射观察装置：半反镜把入射束折向样品，显微镜接收返回光}
+\begin{tikzpicture}
+\draw[opt glass](-2.3,-1.56)rectangle(2.3,-1.34);
+\path[opt glass](-2,-.63)--(2,-.63)--(2,-.95)
+ .. controls(1,-1.47)and(-1,-1.47)..(-2,-.95)--cycle;
+\draw[opt axis](0,-1.56)--(0,2.48);
+\fill[GlassFill](-.97,1.80)--(-.87,1.90)--(.97,.06)--(.87,-.04)--cycle;
+\draw[ThemeMain,thick](-.92,1.85)--(.92,.01);
+\draw[opt ray](-4.05,1)--(-.07,1)--(-.07,-1.32);
+\draw[opt ray alt](.18,-1.32)--(.18,2.04);
+\draw[opt glass](-.62,2.04)rectangle(.62,2.38);
+\node[above]at(0,2.43){观察显微镜};
+\node[left]at(-4.07,1){准直照明};
+\node[right]at(.95,.35){半反镜};
+\node[right]at(2.03,-.78){平凸透镜};
+\node[right]at(2.31,-1.44){平玻璃板};
+\node[left]at(-2.04,-1.18){空气隙};
+\end{tikzpicture}
+\end{optfigure}}
+\newcommand{\FigNewtonGeometry}{%
+\begin{optfigure}{牛顿环几何与反射图样（几何示意）：离中心越远，空气隙越厚，级次越高}
+\begin{tikzpicture}[x=.92cm]
+\fill[SoftGold](-3,0)--(-3,.85) .. controls(-1.6,.28) and(-.8,0)..(0,0)
+ ..controls(.8,0)and(1.6,.28)..(3,.85)--(3,0)--cycle;
+\draw[ThemeMain,thick](-3,.85)..controls(-1.6,.28)and(-.8,0)..(0,0)..controls(.8,0)and(1.6,.28)..(3,.85);
+\draw[opt glass](-3,-.32)rectangle(3,0);
+\draw[opt axis](0,-.32)--(0,2.5);
+\draw[opt axis](0,2.26)node[above]{$C$}--(2.48,.60)node[right]{$P$};
+\node[above]at(1.27,1.44){$R$};
+\draw[<->,RayGold](2.48,0)--(2.48,.60)node[midway,left]{$e$};
+\draw[<->](0,-.65)--(2.48,-.65)node[midway,below]{$r$};
+\node[below left]at(0,0){$O$};
+\begin{scope}[shift={(6.16,.64)}]
+\fill[FringeDark](0,0)circle(1.68);
+\foreach \j in {0,...,8}{
+ \draw[FringeLight,line width=2.0pt](0,0)circle({.54*sqrt(\j+.5)});}
+\draw[white,dashed,->](0,0)--(1.28,.73);
+\node[below]at(0,-1.75){反射暗心；外圈更密};
+\end{scope}
+\end{tikzpicture}
+\end{optfigure}}
+\newcommand{\FigRingMeasurement}{%
+\begin{optfigure}{用两个同类环的半径平方差测曲率：不必知道绝对级次}
+\begin{tikzpicture}
+\begin{scope}
+\fill[ThemeBack](0,0)circle(1.43);
+\foreach \a in {.45,.65,.80,.93,1.07,1.20,1.32}{\draw[ThemeBorder](0,0)circle(\a);}
+\draw[RayBlue,thick](0,0)circle(.93);
+\draw[RayGold,thick](0,0)circle(1.32);
+\draw[RayBlue,->](0,0)--(.80,.474)node[above]{$r_k$};
+\draw[RayGold,->](0,0)--(1.242,-.451)node[below]{$r_{k+m}$};
+\end{scope}
+\begin{scope}[shift={(3.1,-1.28)}]
+\draw[ThemeMain,->](0,0)--(5.8,0)node[right]{$k$};
+\draw[ThemeMain,->](0,0)--(0,2.76)node[above]{$r_k^2$};
+\draw[RayBlue,thick](.3,.13)--(5.35,2.45);
+\draw[opt axis](1.72,0)--(1.72,.782)--(4.42,.782);
+\draw[opt axis](4.42,0)--(4.42,2.023)--(0,2.023);
+\fill[RayBlue](1.72,.782)circle(1.8pt);
+\fill[RayGold](4.42,2.023)circle(1.8pt);
+\draw[<->,RayGold](4.65,.782)--(4.65,2.023)node[midway,right]{$\Delta r^2$};
+\node[below]at(1.72,0){$k$};\node[below]at(4.42,0){$k+m$};
+\node[RayBlue,above,rotate=24.7]at(3.1,1.43){斜率 $\lambda R/n$};
+\end{scope}
+\end{tikzpicture}
+\end{optfigure}}
+\newcommand{\FigDroplet}{%
+\begin{optfigure}{油滴的等厚亮环：膜从中心向外变薄，内部三条亮环的级次依次为 3、2、1}
+\begin{tikzpicture}
+\fill[GlassFill](-3.2,-.43)rectangle(3.2,0);
+\draw[ThemeMain,thick](-3.2,0)--(3.2,0);
+\fill[SoftGold](-2.75,0)..controls(-1.40,1.68)and(1.40,1.68)..(2.75,0)--cycle;
+\draw[RayGold,thick](-2.75,0)..controls(-1.40,1.68)and(1.40,1.68)..(2.75,0);
+\draw[<->,ThemeMain](0,0)--(0,1.26)node[midway,left]{$h$};
+\node at(0,-.25){玻璃};\node at(1.1,.38){油膜};
+\node[below]at(0,-.53){截面（竖向放大）};
+\begin{scope}[shift={(6.1,.46)}]
+\fill[FringeDark](0,0)circle(1.53);
+\draw[ThemeBorder,densely dashed](0,0)circle(1.53);
+\foreach \r in {.383,.937,1.269}{\draw[FringeLight,line width=2.1pt](0,0)circle(\r);}
+\draw[white,->](0,0)--(1.53,0);
+\node[below]at(0,-1.61){俯视：虚线为几何边界};
+\end{scope}
+\end{tikzpicture}
+\end{optfigure}}
 \begin{document}
 \begin{titlepage}
 \thispagestyle{empty}
@@ -1120,13 +1542,20 @@ $\dot S_{\mathrm{exchange}}$ 包含热量与物质交换引起的熵流，$\dot 
 \]
 能量退降讨论的是可用性损失，能量总量仍守恒；必须指明环境与比较条件，不能无条件地把任意系统熵增称为同样大小的能量损失。
 
+\begingroup
+\widowpenalty=9000
+\clubpenalty=9000
+\displaywidowpenalty=9000
+\tikzset{every picture/.append style={font=\small,>=Stealth}}
 \chapterpage{几何光学的基本原理}
-\term{几何光学}用光线描述光的传播方向，研究反射、折射和成像。当光学器件的尺度远大于波长，且不需要分辨干涉、衍射细节时，这种近似能给出有效的传播路径。波动光学研究干涉、衍射等现象；涉及光与物质交换能量时，还需考虑光的量子性质。本章只讨论新资料实际涉及的几何光学内容。
+\term{几何光学}用光线描述光的传播方向，研究反射、折射和成像。当光学器件的尺度远大于波长，且不需要分辨干涉、衍射细节时，这种近似能给出有效的传播路径。波动光学研究干涉、衍射等现象；涉及光与物质交换能量时，还需考虑光的量子性质。光学部分先讨论光线传播、成像与光学仪器，再用光程与相位联系双缝干涉、镀膜、劈尖和牛顿环。
 
 \subsection{光线、反射与折射}
 在\term{均匀各向同性介质}中，光线沿直线传播。“均匀”表示介质性质不随位置变化，“各向同性”表示性质不随方向变化。折射率随位置改变时，光路一般弯曲，不能继续假定为一条直线。
 
 入射光线与界面法线确定\term{入射面}。反射光线处于该平面内，并与入射光线分居法线两侧；反射角 $i'$ 等于入射角 $i$。角度均从法线量起，不能从界面量起。
+\FigRefraction
+
 \begin{infobox}{定律：折射与折射率}
 \[
  n_1\sin i_1=n_2\sin i_2,\qquad
@@ -1153,6 +1582,8 @@ $n_1,n_2$ 是入射侧、折射侧的绝对折射率，$i_1,i_2$ 是相应光线
 \]
 若 $i>i_{\mathrm c}$，折射定律要求 $\sin i_2>1$，不存在向第二介质传播的折射光线，发生\term{全反射}。在理想无吸收、单一界面模型中，入射能量全部反射。$i=i_{\mathrm c}$ 是折射光沿界面传播的临界情形；全反射条件严格写作 $i>i_{\mathrm c}$。第二介质近界面仍可有倏逝场，这不等于存在离开界面的传播折射光线。
 
+\FigCritical
+
 \begin{infobox}{例题：水中的全反射}
 水的折射率取 $1.33$，空气取 $1$。
 \sol $i_{\mathrm c}=\arcsin(1/1.33)\approx48.75^\circ$。水中光以 $50^\circ$ 射向空气时全反射；以 $40^\circ$ 入射时仍有折射光。光从空气进入水时不满足光密到光疏的条件，不能发生这里讨论的全反射。
@@ -1175,6 +1606,8 @@ NA 无量纲，适用于直的阶跃折射率光纤及上述光线模型。等�
 
 课件取 $n_1=1.8,n_2=1.4$，于是 $\mathrm{NA}=\sqrt{1.28}\approx1.131$。空气中 $n_0=1$ 时，不能计算 $\arcsin1.131$；其含义是该理想模型的侧壁全反射条件不再给空气中的入射角增加上限。实际耦合仍受端面反射、有限尺寸、弯曲及光纤模式等限制。
 
+\FigFiber
+
 \subsection{光程与费马原理}
 \term{光程}把不同介质中的几何路程换算为等传播时间的真空路程。在均匀介质中 $L=nl$；分段均匀或连续介质中分别为
 \[
@@ -1190,7 +1623,10 @@ $l,L,\Delta l_j$ 的单位为 m，$t$ 的单位为 s。积分沿所考察路径�
 \end{infobox}
 驻值可以表现为极小、极大或等光程，不能一律解释成全局最短时间。均匀介质中的直线是最短路径；椭球面两焦点间经表面反射的路径因两段距离之和不变而等光程。反射面改变后，允许比较的路径族也改变，不能把一个例子的极值类型直接用于另一个系统。
 
+\Needspace{13\baselineskip}
 \subsection{由费马原理推导反射和折射定律}
+\FigFermat
+
 取平面界面为横轴，$A=(x_A,a)$，$B=(x_B,-b)$，$a,b>0$，界面交点为 $D=(x,0)$。从介质1到介质2的光程为
 \[
  L(x)=n_1\sqrt{(x-x_A)^2+a^2}
@@ -1232,6 +1668,8 @@ $l,L,\Delta l_j$ 的单位为 m，$t$ 的单位为 s。积分沿所考察路径�
 \subsection{平面镜与最小镜高}
 平面镜反射后，实物点发出的光线的反向延长线交于镜后对称点。故物像到镜面的几何距离相等，像为正立、等大的虚像。该结论不要求傍轴近似。
 
+\FigPlane
+
 设人站在竖直镜前，头顶高度为 $H$，眼睛高度为 $h_e$，脚底为零。根据反射定律，看到头顶所需的镜面上边缘高度是 $(H+h_e)/2$，看到脚底所需的下边缘高度是 $h_e/2$。两者之差为
 \[
  H_{\mathrm{mirror},\min}=\frac H2.
@@ -1243,18 +1681,18 @@ $l,L,\Delta l_j$ 的单位为 m，$t$ 的单位为 s。积分沿所考察路径�
 
 以下先固定入射光从左向右，取球面顶点 $O$ 为原点、向右为正。物点 $S$、像点 $S'$、球心 $C$ 的坐标分别记作 $s,s',r$。左侧为负，右侧为正；这三个量均以 m 计，是\term{有向距离}。折射时左侧实物 $s<0$，右侧实像 $s'>0$；球心在右时 $r>0$。课件对角度另规定顺时针为正、逆时针为负；推导中角度必须与所取光线方向配套。
 
-\begin{center}
+\begin{optfigure}{单球面折射：球心与入射点的连线是该点的法线}
 \begin{tikzpicture}[>=Stealth,scale=.9]
 \draw[->](-4,0)--(5,0) node[right]{光轴};
-\draw[ThemeMain,thick] (0,-1.4) .. controls (.45,-.5) and (.45,.5) .. (0,1.4);
-\coordinate (A) at (.27,.8);
+\draw[ThemeMain,thick] plot[domain=-1.38:1.38,samples=40] ({2-sqrt(4-\x*\x)},\x);
+\coordinate (A) at (.167,.8);
 \draw[->,thick,ThemeMain](-3,0)--(A);
 \draw[->,thick,ThemeMain](A)--(4,0);
 \draw[dashed](A)--(2,0);
 \foreach \x/\t in {-3/S,0/O,2/C,4/S'}{\fill(\x,0)circle(1.5pt);\node[below]at(\x,0){$\t$};}
 \node at(-2,1.2){$n_1$};\node at(3,1.2){$n_2$};
 \end{tikzpicture}
-\end{center}
+\end{optfigure}
 
 \subsection{单球面折射公式及推导}
 \begin{infobox}{公式：单球面傍轴折射}
@@ -1319,7 +1757,7 @@ $f,f'$ 是各焦点相对顶点的有向坐标。上一例中 $\Phi=5\unit{m^{-1
 \]
 后一式称为\term{牛顿公式}。$x,x'$ 仍沿固定轴向取正，并非正的几何距离；不能把从顶点和从焦点量起的距离混用。
 
-\begin{infobox}{例题：两种成像公式互相核对}
+\begin{infobox}[before skip=4pt,after skip=2pt]{例题：两种成像公式互相核对}
 沿用前例，$s=-0.30\unit m,s'=+0.90\unit m$。
 \sol 高斯式左侧为 $(-0.20)/(-0.30)+0.30/0.90=1$。牛顿距离为 $x=-0.10\unit m,x'=+0.60\unit m$，于是 $xx'=-0.060\unit{m^2}=ff'$。
 \end{infobox}
@@ -1351,6 +1789,8 @@ $f,f'$ 是各焦点相对顶点的有向坐标。上一例中 $\Phi=5\unit{m^{-1
 \]
 这是同一成像关系的两套记号；不能把其中一个距离换成正值、其余量仍保留另一套约定。
 
+\FigMirror
+
 \begin{infobox}{例题：凹镜和凸镜}
 实物均位于顶点左侧 $0.30\unit m$。
 \sol 凹镜有向半径 $r=-0.20\unit m$，则 $1/s'=-10+10/3=-20/3\unit{m^{-1}}$，$s'=-0.15\unit m$，为镜前实像。凸镜取 $r=+0.20\unit m$，则 $1/s'=10+10/3=40/3\unit{m^{-1}}$，$s'=+0.075\unit m$，为镜后虚像。
@@ -1381,6 +1821,7 @@ $f,f'$ 是各焦点相对顶点的有向坐标。上一例中 $\Phi=5\unit{m^{-1
 \item 费马原理是否要求所有实际光路都比任意其他路径用时短？傍轴成像是否保证大孔径光线也交于同一点？分别说明理由。
 \end{enumerate}
 
+\Needspace{20\baselineskip}
 \subsection{练习参考解答}
 \begin{enumerate}
 \item $i_{\mathrm c}=\arcsin(1.33/1.50)\approx62.46^\circ$。$60^\circ<i_{\mathrm c}$，不发生全反射。
@@ -1429,7 +1870,7 @@ $p,p',r_1,r_2$ 单位为 m，$\Phi$ 单位为 $\mathrm{m^{-1}}$；各折射率�
 \subsection{三条特殊光线与焦平面作图}
 空气中薄透镜的傍轴作图采用以下光线：平行于主轴的入射线，出射线通过像方焦点或其反向延长线通过该点；通过物方焦点或指向该点的入射线，出射后平行主轴；通过光心的光线近似不偏折。最后一条要求透镜足够薄且两侧介质相同。
 
-\begin{center}
+\begin{optfigure}{会聚透镜：平行光线与过光心的光线相交成实像}
 \begin{tikzpicture}[>=Stealth,scale=.85]
 \draw[->](-4,0)--(4.6,0)node[right]{光轴};
 \draw[<->,thick,ThemeMain](0,-1.6)--(0,1.6);
@@ -1440,9 +1881,11 @@ $p,p',r_1,r_2$ 单位为 m，$\Phi$ 单位为 $\mathrm{m^{-1}}$；各折射率�
 \draw[ThemeMain,->](-3,1.2)--(3,-1.2);
 \foreach \x/\t in {-1.5/F,0/O,1.5/F'}{\fill(\x,0)circle(1.4pt);\node[below]at(\x,0){$\t$};}
 \end{tikzpicture}
-\end{center}
+\end{optfigure}
 
 对会聚透镜，左侧实物在两倍焦距外时，像为缩小倒立实像；位于一倍与两倍焦距之间时，为放大倒立实像；在物方焦点内时，为放大正立虚像。物在焦点处时出射平行光，像在无穷远。发散透镜对左侧实物通常成正立、缩小的虚像。所有判断都可由 $p'=f'p/(p+f')$ 和 $\beta=p'/p$ 验证。
+
+\FigDiverge
 
 任意光线不必恰好经过上述三个位置。对一条已知方向的入射线，作一条过光心且与它平行的辅助线，与像方焦平面交于 $F_1'$；原光线出射后通过 $F_1'$，或其反向延长线通过该点。原因是方向相同的入射平行光束成像于同一焦平面点。反过来，可用物方焦平面上的辅助点构造出射平行光线。轴上物点的两条主轴重合线不能单独确定像距，必须另选一条离轴光线。
 
@@ -1459,6 +1902,8 @@ $p,p',r_1,r_2$ 单位为 m，$\Phi$ 单位为 $\mathrm{m^{-1}}$；各折射率�
 \]
 最终像在第二透镜左侧 $8\unit{cm}$，即第一透镜右侧 $4\unit{cm}$，是出射光反向延长线的交点，为虚像。$\beta_1=-1,\beta_2=-1$，总放大率为 $\beta=\beta_1\beta_2=+1$，相对原物正立等大。
 \end{infobox}
+\FigDoubleLens
+
 最终像位于两透镜之间，不代表出射光线真的在那里相交。判断虚实，应沿光实际通过整个系统后的传播方向检查；中间像和最终像的性质不能混同。
 
 \subsection{透镜与平面镜往返成像}
@@ -1489,6 +1934,8 @@ $f_{\mathrm{cam}}$ 为镜头焦距大小，$D_{\mathrm{ap}}$ 为有效入瞳直�
 \]
 $t$ 为曝光时间（s），照度、曝光量在光度学中常分别用 lx、$\mathrm{lx\,s}$。光圈数按 $\sqrt2$ 倍递增，通光能力约减半；曝光时间加倍则可补偿。$f/4$ 配 $1/500\unit s$、$f/5.6$ 配 $1/250\unit s$、$f/8$ 配 $1/125\unit s$ 因光圈数的舍入而近似等曝光。固定焦距时，光圈数越小，开口越大，不能把“$f$ 数大”理解为进光多。
 
+\FigCamera
+
 \subsection{角放大率与放大镜}
 仪器使物体“看起来变大”主要指增大观察视角。设裸眼在\term{明视距离} $D_0=25\unit{cm}$ 处观察高度 $h$，小角度下 $\omega\approx h/D_0$；通过仪器的视角为 $\omega'$，\term{角放大率}为 $M=\omega'/\omega$，无量纲。
 
@@ -1504,6 +1951,8 @@ $t$ 为曝光时间（s），照度、曝光量在光度学中常分别用 lx、
 
 \Needspace{12\baselineskip}
 \subsection{复合显微镜}
+\FigMicroscope
+
 \term{物镜}焦距很短，使焦点外侧附近的物体形成倒立放大实像；\term{目镜}把该中间像作为物，增大其对眼的视角。课件显微镜局部用 $s_1,s_1'>0$ 表示物镜的物距、像距\textbf{大小}，于是
 \[
  \beta_0=\frac{h_2}{h_1}=-\frac{s_1'}{s_1}\approx-\frac\Delta{f_1}.
@@ -1518,7 +1967,10 @@ $f_1,f_2>0$ 在本仪器段表示焦距大小，$\Delta$ 为物镜像方焦点�
 \end{infobox}
 例如 $f_1=4\unit{mm},f_2=25\unit{mm},\Delta=160\unit{mm}$，放松眼观察时 $M\approx-400$。较大放大率不自动等于更高分辨能力，后者还受波长、数值孔径与像差等限制，本批不展开分辨率公式。
 
+\Needspace{22\baselineskip}
 \subsection{开普勒望远镜}
+\FigTelescope
+
 课件图示由两组会聚透镜组成。远处物体的近似平行光经物镜在焦平面形成倒立实像；该平面与目镜物方焦平面重合，目镜把光重新变成平行束。两镜间距近似为 $f_1+f_2$。
 \[
  \omega\approx-\frac h{f_1},\qquad
@@ -1534,7 +1986,7 @@ $f_1,f_2$ 为正的焦距大小，$h$ 为中间像有向高度。负号表示倒
  E=E_0\cos\left(\omega t-\frac{2\pi r}{\lambda}+\varphi\right),
  \qquad I\propto E_0^2.
 \]
-$E,E_0$ 是电场及其振幅（$\mathrm{V\,m^{-1}}$），$\omega$ 为角频率（$\mathrm{s^{-1}}$），$r,\lambda$ 单位为 m，$\varphi$ 为初相位。此波动段的 $E$ 表示电场，不是热学内能；比例关系须比较同一介质。若 $r$ 是几何路程，$\lambda$ 是该介质波长；改用光程时，应配真空波长。
+$E,E_0$ 是电场及其振幅（$\mathrm{V\,m^{-1}}$），$\omega$ 为角频率（$\mathrm{s^{-1}}$），$r,\lambda$ 单位为 m，$\varphi$ 为初相位。光强与振幅平方的比例关系须比较同一介质。若 $r$ 是几何路程，$\lambda$ 是该介质波长；改用光程时，应配真空波长。
 
 普通光源可按激发方式分为热发光、电致发光、光致发光和化学发光。课件以 $\Delta t\sim10^{-8}$ 至 $10^{-11}\unit s$ 的有限发光时间说明光波列概念，真空中波列长度量级为 $L=c\Delta t$，约从 $3\unit m$ 到 $3\unit{mm}$。这些是课件模型中的量级，不能当作所有光源固定的相干时间；实际相干性还由光谱、空间结构及检测时间决定。
 
@@ -1559,8 +2011,10 @@ $E,E_0$ 是电场及其振幅（$\mathrm{V\,m^{-1}}$），$\omega$ 为角频率�
 
 初相位相等且无额外反射相变时，明纹满足 $\delta=k\lambda$，暗纹满足 $\delta=(k+1/2)\lambda$，$k\in\mathbb Z$。有初相差或反射相变时，应先写总相位，再决定明暗。
 
+\FigIntensity
+
 \subsection{杨氏双缝与条纹分布}
-\begin{center}
+\begin{optfigure}{杨氏双缝：在同一观察点比较从两缝出发的光程}
 \begin{tikzpicture}[>=Stealth,scale=.75]
 \draw[thick](0,-1.4)--(0,1.4);\draw[thick](5,-1.4)--(5,1.4);
 \draw[dashed](-.4,0)--(5.3,0);
@@ -1574,7 +2028,7 @@ $E,E_0$ 是电场及其振幅（$\mathrm{V\,m^{-1}}$），$\omega$ 为角频率�
 \draw[<->](0,-1.7)--(5,-1.7)node[midway,below]{$D$};
 \node[right]at(5,0){$O$};
 \end{tikzpicture}
-\end{center}
+\end{optfigure}
 设双缝间距 $d$，屏到缝面距离 $D$，屏坐标 $x$ 向上为正，上缝为 $S_1$、下缝为 $S_2$。近轴观察时 $r_2-r_1>0$ 对应上侧点，有
 \[
  \delta=r_2-r_1\approx d\sin\theta\approx\frac{dx}{D}.
@@ -1606,6 +2060,8 @@ $d,D,x,\Delta x,\lambda$ 均以相同长度单位代入，$k$ 无量纲。条纹
 
 课件另一例给 $D=3\unit m,d=3.3\unit{mm},\lambda=550\unit{nm}$，故条纹间距 $0.500\unit{mm}$；若下缝片厚 $l=0.010\unit{mm}$，平移量为 $-9.09(n-1)\unit{mm}$。
 \end{infobox}
+\FigShift
+
 平面波斜入射双缝时，给两缝增加一个固定入射相位差，等价于在 $\delta$ 中增加与 $x$ 无关的常量。小角度屏面近似下条纹平移，间距仍为 $D\lambda/d$；若远离轴线，屏上间距则须用完整几何关系判断。
 
 \subsection{白光条纹、菲涅耳双镜与劳埃德镜}
@@ -1616,29 +2072,33 @@ $d,D,x,\Delta x,\lambda$ 均以相同长度单位代入，$k$ 无量纲。条纹
 \]
 因此只有第一级完整光谱与相邻级次分离；较高阶有重叠。这是按两端波长估计光谱重叠，不等于高阶所有彩色结构都不可见。
 
+\Needspace{17\baselineskip}
+
 \term{菲涅耳双镜}让同一源分别经两面小夹角平面镜反射，形成两个相干虚光源，在重叠区产生类似双缝的条纹。两镜对相应光束的反射相变相同时，额外相位差相消。\term{劳埃德镜}让直接光与一次反射光相干，反射相变使几何零光程差边界附近成为暗纹；可等效为真实光源与镜中虚源的干涉。
+
+\FigLloyd
 
 \term{半波损失}是反射电场相位发生 $\pi$ 改变，可等效增加 $\lambda/2$ 的光程，并非实际走过半个波长或损失一半能量。无吸收介质的近正入射模型中，电场反射系数 $r_E=(n_1-n_2)/(n_1+n_2)$：从低折射率到高折射率时为负，对应 $\pi$ 相变；反向时为正。一般斜入射要区分偏振，全反射时还会出现随角度变化的相移，不能将近正入射口诀套到任意情况。劳埃德镜按课件的标量反射模型处理。
 
-\chapterpage{薄膜等倾干涉}
+\chapterpage{薄膜等倾干涉与光学镀膜}
 \subsection{两束反射光的光程差}
 薄膜上、下两表面对入射光分振幅，获得两束有共同来源的光。设入射侧、膜、基底的折射率依次为 $n_1,n_2,n_3$，膜厚为 $e$，外部入射角为 $i$，膜内折射角为 $\gamma$，满足 $n_1\sin i=n_2\sin\gamma$。波长 $\lambda$ 以下均指真空波长，膜内波长为 $\lambda/n_2$。
 
-\begin{center}
-\begin{tikzpicture}[>=Stealth,scale=.85]
-\fill[ThemeBack](-3,-1.1)rectangle(3,0);
-\draw[thick](-3,0)--(3,0);\draw[thick](-3,-1.1)--(3,-1.1);
-\draw[dashed](-1,1.4)--(-1,-1.4);
-\draw[ThemeMain,->](-2.1,1.1)--(-1,0);
-\draw[ThemeMain,->](-1,0)--(.1,1.1);
-\draw[ThemeMain,->](-1,0)--(.1,-1.1);
-\draw[ThemeMain,->](.1,-1.1)--(1.2,0);
-\draw[ThemeMain,->](1.2,0)--(2.3,1.1);
-\node[left]at(-1,0){$A$};\node[below]at(.1,-1.1){$C$};\node[right]at(1.2,0){$B$};
+\begin{optfigure}{平行薄膜反射：以垂直出射方向的共同波面比较两束光}
+\begin{tikzpicture}[scale=.88]
+\fill[GlassFill](-3,-1.1)rectangle(3,0);
+\draw[ThemeMain,thick](-3,0)--(3,0) (-3,-1.1)--(3,-1.1);
+\draw[opt axis](-1,1.4)--(-1,-1.4);
+\draw[opt ray](-2.2,1.2)--(-1,0);
+\draw[opt ray](-1,0)--(.1,1.1);
+\draw[opt ray alt](-1,0)--(-.35,-1.1)--(.3,0)--(1.4,1.1);
+\draw[opt axis](.3,0)--(-.35,.65);
+\node[left]at(-1,0){$A$};\node[below]at(-.35,-1.1){$C$};
+\node[right]at(.3,0){$B$};\node[above left]at(-.35,.65){$D$};
 \node at(2.6,.5){$n_1$};\node at(2.6,-.55){$n_2$};\node at(2.6,-1.5){$n_3$};
 \draw[<->](3.3,0)--(3.3,-1.1)node[midway,right]{$e$};
 \end{tikzpicture}
-\end{center}
+\end{optfigure}
 
 要比较两条出射平行光，应比较到同一出射波面为止的光程，不能只把膜内两段路径相加。课件几何给出 $AC=BC=e/\cos\gamma$、$AB=2e\tan\gamma$，外部需要扣除的投影 $AD=AB\sin i$，因此传播光程差为
 \begin{align*}
@@ -1702,12 +2162,168 @@ $n_1>n_2>n_3$ & $0$ & 上下都无\\
 
 保持同一整数级次和固定波长时，膜变厚会使对应倾角增大，条纹向外移动；在同一视场位置比较，厚膜的径向条纹更密。膜变薄则向内移动并变疏。中心未必恰好是整数级明纹，须由实际厚度和相变条件决定。
 
+\FigEqualInclination
+
 \subsection{透射干涉与透镜的作用}
 无吸收薄膜的总反射率与总透射率满足能量守恒；在理想平行薄膜模型中，反射增强处对应透射减弱，图样互补。课件把两束透射光的光程差写成 $\delta'=2n_2e\cos\gamma+\delta_0'$，其中 $\delta_0'$ 来自附加的两次内部反射，与反射光的 $\delta_0$ 分开判断。不能把反射光的半波项原封不动用于透射光。
 
 白光入射时，各波长的增强角度不同，可出现彩色圆环。在折射率色散可忽略、$\delta_0/\lambda$ 的相变类型固定、同一整数级次可存在的范围内，波长越大，对应 $i$ 越小，故该级次可由内向外呈红到紫。
 
 课件“薄透镜不产生附加光程差”的表述应理解为理想成像系统把来自同一入射方向的光会聚到同一焦点，不改变该干涉比较中两路的相对相位结论。透镜本身通过不同厚度引入相位变化，不能理解成透镜对任意两条路径都不改变光程。通常先在膜附近选择同一波面求两路光程差，再按焦平面关系确定条纹位置。
+
+\subsection{海面油膜：反射与透射的颜色}
+\begin{infobox}{例题：从空中和水下看同一层油膜}
+空气、油、水的折射率分别为 $1.00,1.20,1.30$，膜厚 $e=460\unit{nm}$，日光近似垂直入射。比较从空气侧看到的反射光和从水下看到的透射光。
+\sol 两束反射光各经历一次由低折射率向高折射率的反射，相对反射相位为零。传播光程差 $2n_2e=1104\unit{nm}$，故反射增强波长为
+\[
+ \lambda_k=\frac{1104\unit{nm}}k,\qquad k=1,2,\ldots
+\]
+按课件采用的可见范围 $400$--$760\unit{nm}$，仅 $k=2$ 的 $552\unit{nm}$ 落在其中，属于绿光。透射增强对应反射减弱，有
+\[
+ \lambda_j=\frac{1104\unit{nm}}{j+1/2},\qquad j=0,1,2,\ldots
+\]
+可见范围内有 $736\unit{nm}$（深红）和 $441.6\unit{nm}$（蓝紫）。这是按增强波长得到的定性判断：课件给出反射偏绿、透射偏紫红；实际综合色彩还取决于入射光谱、增强幅度、水的吸收和视觉响应。
+\end{infobox}
+\FigOilSpectrum
+
+\subsection{增透膜、增反膜与四分之一波厚度}
+\term{增透膜}把设计波长的两束反射光调成近反相，使反射减弱。空气、薄膜、玻璃满足 $n_1<n_2<n_3$ 时，两束反射各有 $\pi$ 相变，彼此抵消。正入射下要求传播相位差为奇数倍 $\pi$，故
+\[
+ 2n_2e=(j+1/2)\lambda_0,\qquad
+ e_{\min}=\frac{\lambda_0}{4n_2},\qquad j=0,1,2,\ldots .
+\]
+$\lambda_0$ 是设计的真空波长。最薄的一层在膜内恰为四分之一波长。若还要求理想单层膜在该波长上反射为零，除满足相位条件外还须使反射振幅匹配；在无吸收、正入射模型中要求 $n_2^2=n_1n_3$。这是由两界面的电场反射系数匹配得到的，单靠调厚度不能保证零反射。
+\FigCoating
+\begin{infobox}{例题：氟化镁镀膜}
+玻璃 $n_3=1.50$，氟化镁膜 $n_2=1.38$，设计波长 $\lambda_0=550\unit{nm}$。最小膜厚 $550/(4\times1.38)\unit{nm}\approx99.6\unit{nm}$。由于 $1.38\ne\sqrt{1.50}$，这使设计波长反射减弱，不能据此声称反射消失。
+\end{infobox}
+\term{增反膜}则使返回的主要反射分量近同相。在 $n_1<n_2$ 且 $n_3<n_2$ 的单层示例中，两界面的相对反射相位为 $\pi$；若传播再增加 $\pi$，总相位差为 $2\pi$，反射增强。实际反射镜还可采用高、低折射率交替的多层膜；其设计需共同考虑振幅、相位、波长和入射角。
+
+\begin{infobox}{例题：空气中的肥皂膜}
+膜折射率 $1.33$，厚度 $0.32\,\mu\mathrm m$。上表面反射有一次 $\pi$ 相变，反射增强满足
+\[
+ \lambda_k=\frac{4ne}{2k-1},\qquad k=1,2,3,\ldots .
+\]
+前三个值约为 $1702,567,340\unit{nm}$，在课件的可见范围内只有 $567\unit{nm}$，对应黄绿色附近的增强。白光照明下可据此判断主要反射色；观察角变大时，传播项 $2ne\cos\gamma$ 也会改变。
+\end{infobox}
+
+\chapterpage{等厚干涉与劈尖测量}
+\subsection{由条纹读取膜厚}
+\term{等厚干涉}是在照明和观察倾角近似固定时，由膜厚随位置变化而产生的干涉。以近正入射为例，同一条明纹或暗纹对应相同膜厚。用 $n$ 表示膜折射率，$e$ 表示局部厚度，$\lambda$ 表示真空波长：
+\[
+ \delta=2ne+\delta_0,\qquad
+ \begin{cases}
+ \delta=k\lambda & \text{明纹},\\
+ \delta=(k+1/2)\lambda & \text{暗纹}.
+ \end{cases}
+\]
+比较相邻两条明纹或相邻两条暗纹，反射相位项相同，因此
+\[
+ \Delta e=\frac{\lambda}{2n}.
+\]
+这一厚度差不受零级定在哪条纹的影响；绝对膜厚仍需确定附加反射相位和条纹级次。非正入射而膜内角恒定时，分母改为 $2n\cos\gamma$。
+
+\subsection{劈尖：平行条纹与端部厚度}
+两平面以很小的夹角 $\theta$ 相交，构成\term{劈尖膜}。以接触棱边为 $x=0$，沿垂直棱边、指向厚端取 $x$，则 $e=x\tan\theta$。空气劈尖夹在两块玻璃板间，比较的是空气隙上下表面的反射：上界面是玻璃到空气，下界面是空气到玻璃，恰有一次 $\pi$ 相变。故反射暗纹为 $2ne=k\lambda$，棱边 $e=0$ 是零级暗纹。
+\FigWedge
+相邻同类条纹在 $x$ 方向的间距 $\Delta x$ 与端部厚度 $d$ 满足
+\[
+ \Delta x=\frac{\lambda}{2n\tan\theta}\approx\frac{\lambda}{2n\theta},
+ \qquad d=L\tan\theta=\frac{L\lambda}{2n\Delta x}.
+\]
+$L$ 是从棱边到测厚位置的距离，$\theta$ 用弧度。若 $N=L/\Delta x$ 表示这段长度跨越的\textbf{条纹间隔数}，则 $d=N\lambda/(2n)$。从第一条同类纹中心量到第30条中心，只跨29个间隔。若没有同类条纹正好落在端点，应按坐标和间距计算，不把可见条数直接当作 $N$。
+
+\begin{infobox}[breakable=false]{例题：空气劈尖测金属丝直径}
+金属丝距棱边 $L=2.888\times10^{-2}\unit m$。用 $\lambda=589.3\unit{nm}$ 的光正入射，第一条至第30条明纹相距 $4.295\times10^{-3}\unit m$。
+\sol $\Delta x=(4.295\times10^{-3})/29\unit m\approx1.481\times10^{-4}\unit m$。取 $n=1$，则金属丝直径
+\[
+ D=\frac{L\lambda}{2\Delta x}\approx5.746\times10^{-5}\unit m
+   =57.46\,\mu\mathrm m.
+\]
+\end{infobox}
+
+\begin{infobox}{例题：二氧化硅薄膜与空气劈尖的级次不同}
+空气、二氧化硅、硅的折射率在课件模型中取 $1,1.46,3.42$。以 $589.3\unit{nm}$ 的光垂直照射，斜坡端点是从薄端数的第9条暗纹。
+\sol 两次反射的相变相同，故 $\delta_0=0$。第一条暗纹对应 $j=0$ 的半整数厚度，第9条对应 $j=8$：
+\[
+ e=\frac{(2j+1)\lambda}{4n}
+   =\frac{17\times589.3}{4\times1.46}\unit{nm}
+   \approx1.72\,\mu\mathrm m.
+\]
+这里使用课件的实折射率、无吸收近似；真实镀膜测量若基底吸收显著，应重新核对反射相位。
+\end{infobox}
+对材料未知的劈尖，也可由间距反推 $n$。例如玻璃劈尖 $\theta=8.0\times10^{-5}\unit{rad}$，$\lambda=0.589\,\mu\mathrm m$，$\Delta x=2.4\unit{mm}$，给出 $n\approx\lambda/(2\theta\Delta x)\approx1.53$。
+
+\subsection{光学平面的检查}
+把参考平面轻微倾斜置于被测面上方，理想空气隙产生直条纹。令未畸变的间隙为 $e_0(x)$，局部变化为 $\Delta e$。固定某一名义坐标比较条纹相位，等效级次变化为 $\Delta k=2n\Delta e/\lambda$。因此条纹偏移量若相当于一个间距，间隙变化的大小为 $\lambda/(2n)$，空气中为 $\lambda/2$。条纹偏移不足一个间距时，也可用偏移量与间距之比估算。
+\FigSurface
+图中的参考面在上，被测面在下，名义膜厚向右增加。被测面局部凸起使间隙减小，要维持原定级厚度，条纹须向较厚的一侧偏移；凹陷相反。判断凸凹前，先标明厚端并确定哪一面是被测面。
+
+\chapterpage{牛顿环与曲率测量}
+\subsection{从球面间隙到明暗圆环}
+将平凸透镜的凸面放在平玻璃板上，接触点附近形成厚度只与径向距离有关的薄空气层。在近正入射的反射观察中，两束光取自空气隙的上、下界面，恰有一次 $\pi$ 相变，因而形成中心通常为暗的\term{牛顿环}。
+\FigNewtonSetup
+设凸面的曲率半径为 $R$，离接触点的径向距离为 $r$，局部膜厚为 $e$。球面几何给出
+\[
+ (R-e)^2+r^2=R^2,\qquad
+ r^2=2Re-e^2,\qquad e\approx\frac{r^2}{2R}\quad(e\ll R).
+\]
+\FigNewtonGeometry
+若间隙由折射率为 $n$ 的均匀介质填充，且两反射仍恰有一个半波相变，利用 $\delta=2ne+\lambda/2$ 得
+\begin{infobox}{公式：反射牛顿环的半径}
+\[
+ \begin{aligned}
+ r_{\text{暗},k}^2&=\frac{k\lambda R}{n}, &k&=0,1,2,\ldots,\\
+ r_{\text{明},k}^2&=\frac{(k-\tfrac12)\lambda R}{n}, &k&=1,2,\ldots .
+ \end{aligned}
+\]
+$\lambda$ 是真空波长；空气中取 $n=1$。$k=0$ 的反射暗纹是接触暗点，不是一条有限半径的环。若折射率排列改变，先重新判断半波项，再写明暗条件。
+\end{infobox}
+由 $e$ 随 $r$ 增大可知，牛顿环级次向外递增；相邻同类环的半径平方差相同，实际径向间距却向外变小。与等倾圆环相比，两者都可呈现内疏外密，但牛顿环的级次向外增加，等倾圆环的级次向外减小。
+
+\subsection{用环半径平方差测量}
+由两个同类环的半径之差消去绝对级次：
+\[
+ r_{k+m}^{\,2}-r_k^2=\frac{m\lambda R}{n},
+ \qquad R=\frac{n(r_{k+m}^{\,2}-r_k^2)}{m\lambda}.
+\]
+$m$ 是两同类环的级次差。已知 $R$ 时也可反求 $\lambda$。若实际记录的是直径 $D_k=2r_k$，应将平方差除以4。若中心未完全贴合但存在均匀的初始间隙 $e_0$，公式中的常量偏置可由两环相减消去，前提是两环处于同一球面近似范围且不存在额外局部变形。
+\FigRingMeasurement
+
+\begin{infobox}{例题：测球面曲率半径与测波长}
+空气中钠灯的波长为 $589.3\unit{nm}$，第 $k$ 和第 $k+5$ 暗环的半径分别为 $4.00\unit{mm}$ 与 $6.00\unit{mm}$，得
+\[
+ R=\frac{(6.00^2-4.00^2)\times10^{-6}}{5\times589.3\times10^{-9}}\unit m
+   \approx6.79\unit m.
+\]
+理想接触时 $k=r_k^2/(\lambda R)=4$。另一例中，明环相隔16级、半径分别为 $3.00\unit{mm}$ 与 $5.00\unit{mm}$，且 $R=2.50\unit m$，故 $\lambda=400\unit{nm}$。相减时使用的是 $r_{k+m}^2-r_k^2$，不是 $(r_{k+m}-r_k)^2$。
+\end{infobox}
+
+\Needspace{25\baselineskip}
+\subsection{圆形油滴：同为等厚圆环，膜厚变化方向相反}
+玻璃上轴对称油膜从中心向边缘变薄。以空气、油膜、玻璃折射率 $1.00,1.20,1.50$，真空波长 $600\unit{nm}$、中心厚度 $h=800\unit{nm}$ 为例，两处反射相变均为 $\pi$，相对相位不变。反射明纹厚度为
+\[
+ e_k=\frac{k\lambda}{2n}=250k\unit{nm}.
+\]
+油膜内部 $0<e\le800\unit{nm}$，只有 $250,500,750\unit{nm}$ 三个有限厚度的明环。由中心向外依次为 $k=3,2,1$；$k=4$ 的厚度 $1000\unit{nm}$ 超出范围。
+\FigDroplet
+课件把 $k=0$ 的 $e=0$ 外边界计入，得到“四条明纹”；严格区分图样时，这是\textbf{膜内三条亮环加一条零厚度边界}。边界外已没有油膜，是否呈现独立亮线取决于反射背景及空间分辨率。中心 $e=800\unit{nm}$ 也不满足整数级明纹条件，不能再单独算作一条明纹。
+
+\chapterpage{图样辨析与综合练习}
+\subsection{先确定变化的量，再判断明暗}
+\begin{center}
+\begin{tabularx}{\linewidth}{l Y Y Y}
+\toprule
+图样 & 决定相位变化的量 & 同类条纹的间距 & 级次方向\\
+\midrule
+杨氏双缝 & 两条传播路径的光程差 & 近轴时 $\Delta x=D\lambda/d$ & 正负级次以中心为参考\\
+等倾圆环 & 等厚膜内角 $\gamma$ & 近轴时相邻环的半径平方差恒定 & 向外降低\\
+劈尖条纹 & 厚度 $e$ 随横坐标线性变化 & $\Delta x\approx\lambda/(2n\theta)$ & 向厚端增加\\
+反射牛顿环 & 间隙厚度 $e\approx r^2/(2R)$ & $\Delta r^2=\lambda R/n$ & 向外增加\\
+\bottomrule
+\end{tabularx}
+\end{center}
+干涉计算的共同顺序是：选定比较的两条路径，求传播光程差，判断附加相变，最后应用明暗条件。观察到同心圆只说明图样具有轴对称性，不能单凭形状判定是等倾还是等厚干涉。曲率 $R$、焦平面环半径 $R_k$ 与牛顿环半径 $r_k$ 应按各自定义区分。
 
 \subsection{综合练习}
 \begin{enumerate}
@@ -1741,6 +2357,29 @@ $n_1>n_2>n_3$ & $0$ & 上下都无\\
 \item $\lambda/2$ 已经等效表示一次相对 $\pi$ 相变，再另加同一相变就是重复计算，错误地把明暗条件交换回来。
 \end{enumerate}
 
+\subsection{等厚干涉自检}
+\begin{enumerate}
+\item 正入射光的波长为 $600\unit{nm}$，空气劈尖相邻暗纹相距 $0.50\unit{mm}$。求劈角与 $L=15\unit{mm}$ 处的膜厚。
+\item 若基底和膜依次为 $n_3=1.52,n_2=1.38$，空气正入射，说明 $e=0$ 时的反射明暗类型，并求最小正反射减弱厚度（$\lambda=552\unit{nm}$）。
+\item 空气牛顿环测得第 $k$ 与 $k+10$ 条暗环的\textbf{直径}分别为 $4.0\unit{mm}$ 与 $6.0\unit{mm}$，$\lambda=500\unit{nm}$。求 $R$。
+\item 膜面检验中一条纹在凸起处向厚端移了原间距的四分之一。用 $\lambda=600\unit{nm}$ 的光观察空气隙，估计凸起高度。
+\item 同一波长、相同介质中，为什么牛顿环和等倾环都可能外密内疏，却有相反的级次变化？
+\end{enumerate}
+\Needspace{12\baselineskip}
+\subsection{自检解答}
+\begin{enumerate}
+\item $\theta\approx\lambda/(2\Delta x)=6.0\times10^{-4}\unit{rad}$，$e=L\tan\theta\approx9.0\,\mu\mathrm m$。
+\item 两次反射都发生 $\pi$ 相变，$e=0$ 对应反射增强；最小正减弱厚度为 $\lambda/(4n_2)=100\unit{nm}$。
+\item 用半径平方差：$R=[(6.0^2-4.0^2)\times10^{-6}/4]/(10\times500\times10^{-9})\unit m=1.0\unit m$。
+\item $|\Delta e|=(1/4)\lambda/2=75\unit{nm}$。在参考面固定的模型中，间隙减少量等于下表面凸起高度。
+\item 两者近轴时相邻同类环的半径平方差均为常量，故外圈半径越大，实际间距越小。牛顿环的膜厚随半径增大，光程差增大；等倾环的膜厚不变，膜内倾角随半径增大，传播项 $2ne\cos\gamma$ 减小。
+\end{enumerate}
+
+\subsection{资料与适用范围}
+光学部分沿用原讲义的几何光学、光学仪器、双缝与等倾干涉内容，并根据第13章第6份课件补充镀膜、等厚干涉与牛顿环。等厚干涉按近正入射及相应反射相位处理。图中光路、条纹、膜厚和劈角为解释几何及物理关系的示意，除标明数值的坐标图外，不按器件实际尺度绘制。范围截至牛顿环和圆形油膜示例。
+
+
+\clearpage\endgroup
 \chapterpage{要点与符号}
 \subsection{主要结论及适用条件}
 \begin{enumerate}
@@ -1818,8 +2457,12 @@ $\Omega$ 与普通概率 & 微观态计数与归一化概率 & $P=\Omega/\Omega_
 \subsection{仪器与干涉的符号联系}
 薄透镜物像距用 $p,p'$，干涉观察点的路程用 $r_1,r_2$，不能与球面曲率半径混同。仪器中的 $f_1,f_2$ 按局部表示正的焦距大小，$M$ 为无量纲角放大率；双缝 $d$ 为缝距，$D$ 为屏距；薄膜 $e$ 为厚度，$i$ 为外角，$\gamma$ 为膜内角。以光程差 $\delta$ 写相位时，$\lambda$ 为真空波长。明暗由总相位决定，附加反射相位不能重复计算。各量的单位与具体适用条件在对应章节说明。
 
+\subsection{等厚条纹与测量}
+正入射时相邻同类条纹对应厚度差 $\lambda/(2n)$。劈尖的条纹间距为 $\lambda/(2n\tan\theta)$，其中 $\theta$ 是劈角；条纹间隔数与条纹条数须分开。牛顿环中 $R$ 为曲率半径，$r_k$ 为环半径，同类环的平方差为 $m\lambda R/n$。测得直径时应先换算为半径。等厚牛顿环级次向外增大，等倾圆环级次向外减小。
+
+\clearpage
 \subsection{资料依据与记号说明}
-此前一批根据第13章前两份光学课件增补至球面镜傍轴反射成像。本次根据新提供的后续两份课件，补入薄透镜公式与作图、组合成像、光学仪器、相干叠加、杨氏双缝及薄膜等倾干涉。薄透镜部分从本批公式总结出发补全必要的两面折射推导；未取得的中间课件不作为已核对资料。折射率色散关系限定正常色散区；全反射区分临界边界；光纤数值孔径超出外部折射率时按角度定义域解释；球面镜两套距离约定分别说明。
+此前一批根据第13章前两份光学课件增补至球面镜傍轴反射成像。随后根据第13章第4、5份课件，补入薄透镜公式与作图、组合成像、光学仪器、相干叠加、杨氏双缝及薄膜等倾干涉。薄透镜部分从第4份课件的公式总结出发补全必要的两面折射推导；未取得的中间课件不作为已核对资料。折射率色散关系限定正常色散区；全反射区分临界边界；光纤数值孔径超出外部折射率时按角度定义域解释；球面镜两套距离约定分别说明。合订时将图解光学分册并入同一正文；第13章第6份课件新增的镀膜、等厚干涉、劈尖测量及牛顿环已纳入相应章节。
 
 {\raggedright
 本讲义的首版范围对应所提供六份课件的热学内容：\texttt{2026 Chp\_09-1.pdf}、\texttt{2026 Chp\_09-2.pdf}、\texttt{2026 Chp\_09-3.pdf}、\texttt{2026 Chp\_10-1.pdf}、\texttt{2026 Chp\_10-2.pdf} 和 \texttt{2026 Chp\_10-3.pdf}。重复出现的第一定律、过程公式和卡诺循环已合并。信息熵、自组织、能量退降和真空应用仅按课件涉及程度作必要说明。\par}
