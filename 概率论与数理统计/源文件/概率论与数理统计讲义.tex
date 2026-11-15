@@ -33,7 +33,7 @@
 \fancyfoot[C]{\small\thepage}
 \renewcommand{\headrulewidth}{0.3pt}
 \renewcommand{\sectionmark}[1]{\markboth{#1}{}}
-\hypersetup{pdftitle={概率论与数理统计},pdfsubject={随机事件、条件概率、随机变量、数字特征与极限定理}}
+\hypersetup{pdftitle={概率论与数理统计},pdfsubject={概率、随机变量、极限定理、抽样分布与参数估计}}
 \allowdisplaybreaks[2]\raggedbottom
 \begin{document}
 \begin{titlepage}\thispagestyle{empty}\vspace*{0.28\textheight}
@@ -1499,6 +1499,348 @@ P(X\le1178)\approx0.10771>0.1.
 \]
 分布函数单调非减，故在该补充模型下，最大允许座位数确为 $1377$。正态近似用于产生候选值，整数边界及概率约束由精确概率确认。
 
+\chapterpage{数理统计的基本概念}
+概率模型给出从总体分布到样本结果的概率规律。统计推断利用这一规律，从观测到的样本反推总体的分布或参数。
+
+\subsection{总体、个体与简单随机样本}
+\begin{infobox}{定义：总体与简单随机样本}
+\term{总体}是研究对象的全体，每个成员称为\term{个体}。给定研究指标，例如同一型号汽车的油耗，可用一个随机变量 $X$ 的分布表示该指标在总体中的取值规律。
+
+若 $X_1,\ldots,X_n$ 相互独立且各自与总体 $X$ 同分布，则称它们是来自 $X$ 的一个\term{简单随机样本}，$n$ 称为\term{样本容量}。观测得到的 $(x_1,\ldots,x_n)$ 是一组\term{样本值}，全体可能的样本值组成样本空间。
+\end{infobox}
+有限总体包含有限个个体。对它均匀有放回抽取时，各次抽取相互独立且边缘分布相同。均匀无放回抽取仍可使每次抽取的边缘分布相同，但抽取结果之间通常存在依赖，例如某个个体一旦被抽中，之后便不能再次抽中。
+
+若总体分布函数为 $F$，则样本的联合分布函数为
+\[
+P(X_1\le x_1,\ldots,X_n\le x_n)=\prod_{i=1}^n F(x_i).
+\]
+离散总体的联合点概率是各边缘点概率之积。连续总体的联合密度是各边缘密度之积。
+
+\example{（课件例题）设加工一件零件所需时间服从均值为 $1/\lambda$ 的指数分布，独立观测 $n$ 次，写出样本的联合密度。}
+\solution 每次观测的密度为 $\lambda e^{-\lambda x}$（$x>0$）。所以
+\[
+f_{X_1,\ldots,X_n}(x_1,\ldots,x_n)=
+\begin{cases}
+\lambda^n\exp\!\left(-\lambda\displaystyle\sum_{i=1}^n x_i\right),
+  & x_i>0\ (i=1,\ldots,n),\\
+0,&\text{其他}.
+\end{cases}
+\]
+这也是第七章构造连续总体似然函数时所用的联合密度。
+
+\subsection{\texorpdfstring{$\chi^2$、$t$ 与 $F$ 分布}{卡方、t 与 F 分布}}
+记 $\Gamma(a)=\int_0^\infty s^{a-1}e^{-s}\,\mathrm ds$（$a>0$）。三个分布都可以通过相互独立的标准正态变量构造。
+
+\begin{infobox}{定义：三个常用抽样分布}
+\begin{itemize}
+\item \term{卡方分布}。若 $Z_1,\ldots,Z_\nu$ 独立且均服从 $N(0,1)$，则 $V=\sum_{i=1}^\nu Z_i^2\sim\chi^2(\nu)$，$\nu$ 为自由度。
+\item \term{学生氏 $t$ 分布}。若 $Z\sim N(0,1)$、$V\sim\chi^2(\nu)$，且 $Z,V$ 独立，则 $T=Z/\sqrt{V/\nu}\sim t(\nu)$。
+\item \term{$F$ 分布}。若 $V_1\sim\chi^2(\nu_1)$、$V_2\sim\chi^2(\nu_2)$ 且两者独立，则 $(V_1/\nu_1)/(V_2/\nu_2)\sim F(\nu_1,\nu_2)$。两个自由度依次对应分子与分母。
+\end{itemize}
+\end{infobox}
+卡方分布与 $F$ 分布的密度在 $x>0$ 给出，$t$ 分布的密度定义在整个实轴。三者的密度依次为
+\begin{align*}
+f_{\chi^2(\nu)}(x)&=\frac{x^{\nu/2-1}e^{-x/2}}{2^{\nu/2}\Gamma(\nu/2)},\\
+f_{t(\nu)}(x)&=\frac{\Gamma((\nu+1)/2)}{\sqrt{\nu\pi}\,\Gamma(\nu/2)}
+  \left(1+\frac{x^2}{\nu}\right)^{-(\nu+1)/2},\\
+f_{F(\nu_1,\nu_2)}(x)&=
+  \frac{\Gamma((\nu_1+\nu_2)/2)}{\Gamma(\nu_1/2)\Gamma(\nu_2/2)}
+  \frac{(\nu_1/\nu_2)^{\nu_1/2}\,x^{\nu_1/2-1}}
+  {(1+\nu_1 x/\nu_2)^{(\nu_1+\nu_2)/2}}.
+\end{align*}
+标准正态变量 $Z$ 有 $E(Z^2)=1$、$E(Z^4)=3$，所以 $E(V)=\nu$、$D(V)=2\nu$。独立卡方变量相加，自由度相加，因为各平方和可视为由互不重叠的独立标准正态变量组构成。若 $X_i$ 独立且均为 $N(\mu,\sigma^2)$，标准化后可得 $\sum_i(X_i-\mu)^2/\sigma^2\sim\chi^2(n)$。
+
+$t(\nu)$ 关于 $0$ 对称，$t(1)$ 是标准柯西分布。自由度增大时，$V/\nu$ 的均值为 $1$，方差 $2/\nu$ 趋于 $0$，因此 $t(\nu)$ 趋近于标准正态分布。若 $T\sim t(\nu)$，则 $T^2\sim F(1,\nu)$；若 $W\sim F(\nu_1,\nu_2)$，取倒数得到 $1/W\sim F(\nu_2,\nu_1)$。
+
+\subsection{上侧分位数与查表}
+\begin{infobox}{定义：上侧分位数}
+设连续分布的随机变量为 $W$。若 $P(W\ge q_\alpha)=\alpha$，则 $q_\alpha$ 为\term{上侧 $\alpha$ 分位数}。本讲义用 $u_\alpha$、$\chi^2_\alpha(\nu)$、$t_\alpha(\nu)$、$F_\alpha(\nu_1,\nu_2)$ 分别记标准正态、卡方、$t$ 与 $F$ 分布的上侧分位数。
+\end{infobox}
+例如 $u_{0.025}\approx1.9600$，$t_{0.025}(12)\approx2.1788$，$\chi^2_{0.025}(3)\approx9.3484$。若表格或计算工具按左尾概率 $P(W\le q)$ 查值，应使用 $1-\alpha$。对称性给出 $u_{1-\alpha}=-u_\alpha$ 和 $t_{1-\alpha}(\nu)=-t_\alpha(\nu)$。$F$ 分布取倒数时尾部方向反转且自由度交换，因此
+\[
+F_{1-\alpha}(\nu_1,\nu_2)=\frac{1}{F_\alpha(\nu_2,\nu_1)}.
+\]
+
+\example{（课件例题）设 $X_1,X_2,X_3,X_4$ 为来自 $N(0,4)$ 的简单随机样本，求下列三个变量的分布：
+\[
+T_1=\frac{X_1^2+X_2^2}{4},\qquad
+T_2=\frac{\sqrt{2}\,X_3}{\sqrt{X_1^2+X_2^2}},\qquad
+T_3=\frac{2X_3^2}{X_1^2+X_2^2}.
+\]}
+\solution $X_i/2\sim N(0,1)$ 且相互独立，故 $T_1\sim\chi^2(2)$。$X_3/2$ 与 $T_1$ 由互不重叠的观测量构成，彼此独立，因而
+\[
+T_2=\frac{X_3/2}{\sqrt{T_1/2}}\sim t(2),\qquad
+T_3=T_2^2=\frac{(X_3/2)^2/1}{T_1/2}\sim F(1,2).
+\]
+
+\subsection{统计量及其分布}
+\term{统计量}是由样本和已知常数确定的函数。给定样本值可计算它的观测值。统计量在抽样前是随机变量，其概率分布称为\term{抽样分布}。例如，$\overline X-\mu$ 在 $\mu$ 已知时是统计量，在 $\mu$ 未知时仍依赖未知参数，可用于理论推导。
+
+\begin{center}\begin{tabularx}{\linewidth}{l Y}
+\toprule 统计量 & 计算式\\\midrule
+样本均值 & $\overline X=\dfrac{1}{n}\displaystyle\sum_{i=1}^n X_i$\\
+样本方差与标准差 & $S^2=\dfrac{1}{n-1}\displaystyle\sum_{i=1}^n(X_i-\overline X)^2$，$S=\sqrt{S^2}$（$n\ge2$）\\
+样本 $k$ 阶原点矩 & $A_k=\dfrac{1}{n}\displaystyle\sum_{i=1}^n X_i^k$\\
+样本 $k$ 阶中心矩 & $B_k=\dfrac{1}{n}\displaystyle\sum_{i=1}^n(X_i-\overline X)^k$\\
+\bottomrule
+\end{tabularx}\end{center}
+有 $A_1=\overline X$、$B_1=0$、$B_2=A_2-\overline X^2=\dfrac{n-1}{n}S^2$。课件也把 $B_2$ 记作 $S^{*2}$。
+
+将样本从小到大排序得到\term{顺序统计量} $X_{(1)}\le\cdots\le X_{(n)}$。样本极差是 $R=X_{(n)}-X_{(1)}$；样本中位数在 $n$ 为奇数时是 $X_{((n+1)/2)}$，在 $n$ 为偶数时是 $\bigl(X_{(n/2)}+X_{(n/2+1)}\bigr)/2$。由第四章的最值方法，对总体分布函数 $F$ 有
+\[
+P(X_{(n)}\le x)=F(x)^n,\qquad P(X_{(1)}>x)=[1-F(x)]^n.
+\]
+
+\subsection{样本均值与样本方差的数字特征}
+设 $X_1,\ldots,X_n$ 独立同分布，$E(X_i)=\mu$，$D(X_i)=\sigma^2<\infty$。由期望线性性与独立变量方差可加，
+\[
+E(\overline X)=\mu,\qquad D(\overline X)=\frac{\sigma^2}{n}.
+\]
+由平方和分解
+\[
+\sum_{i=1}^n(X_i-\overline X)^2
+=\sum_{i=1}^n(X_i-\mu)^2-n(\overline X-\mu)^2,
+\]
+两边取期望，右侧为 $n\sigma^2-n(\sigma^2/n)=(n-1)\sigma^2$。因此 $E(S^2)=\sigma^2$，$E(B_2)=(n-1)\sigma^2/n$。用样本均值代替总体均值消去一个独立的偏差方向，分母 $n-1$ 使样本方差的期望等于总体方差。以上结果只需要有限二阶矩和简单随机抽样。
+
+\subsection{单个正态总体的抽样分布}
+\begin{infobox}{定理：正态样本的均值与方差}
+设 $X_1,\ldots,X_n$ 是来自 $N(\mu,\sigma^2)$ 的简单随机样本，其中 $\sigma>0$，$n\ge2$。则 $\overline X$ 与 $S^2$ 独立，且
+\begin{align*}
+\overline X&\sim N(\mu,\sigma^2/n),&
+\frac{\overline X-\mu}{\sigma/\sqrt n}&\sim N(0,1),\\
+\frac{(n-1)S^2}{\sigma^2}&\sim\chi^2(n-1),&
+\frac{\overline X-\mu}{S/\sqrt n}&\sim t(n-1).
+\end{align*}
+\end{infobox}
+\proof 令 $Z_i=(X_i-\mu)/\sigma$，对向量 $(Z_1,\ldots,Z_n)$ 作第一行是 $(1,\ldots,1)/\sqrt n$ 的正交变换，得到 $(Y_1,\ldots,Y_n)$。原联合密度与 $\exp(-\sum_i Z_i^2/2)$ 成正比。正交变换保持平方和，雅可比行列式绝对值为 $1$，所以变换后仍为 $n$ 个独立标准正态变量。第一坐标是 $Y_1=\sqrt n(\overline X-\mu)/\sigma$，而
+\[
+\frac{(n-1)S^2}{\sigma^2}=\sum_{i=1}^n Z_i^2-Y_1^2
+=\sum_{j=2}^n Y_j^2.
+\]
+此平方和与 $Y_1$ 独立，只含 $n-1$ 个平方项。再将 $Y_1$ 除以 $\sqrt{(\sum_{j=2}^n Y_j^2)/(n-1)}$ 即得 $t$ 分布。该卡方量的方差为 $2(n-1)$，所以
+\[
+D(S^2)=\left(\frac{\sigma^2}{n-1}\right)^2\,2(n-1)=\frac{2\sigma^4}{n-1}.
+\]
+一般总体也有前一节的均值和方差公式。这里的精确抽样分布以及均值与样本方差的独立性均依赖正态总体条件。
+
+\Needspace{18\baselineskip}
+\subsection{两个正态总体的抽样分布}
+从 $N(\mu_1,\sigma_1^2)$ 与 $N(\mu_2,\sigma_2^2)$ 独立抽取简单随机样本，容量分别为 $n_1,n_2\ge2$，记均值为 $\overline X,\overline Y$，样本方差为 $S_1^2,S_2^2$，自由度为 $\nu_i=n_i-1$。均值之差服从
+\[
+\overline X-\overline Y\sim N\!\left(\mu_1-\mu_2,\ \frac{\sigma_1^2}{n_1}+\frac{\sigma_2^2}{n_2}\right).
+\]
+分别将两个独立的卡方量 $V_i=\nu_i S_i^2/\sigma_i^2$ 除以各自自由度，得到
+\[
+\frac{S_1^2/S_2^2}{\sigma_1^2/\sigma_2^2}
+=\frac{V_1/\nu_1}{V_2/\nu_2}\sim F(\nu_1,\nu_2).
+\]
+若 $\sigma_1^2=\sigma_2^2=\sigma^2$，按自由度加权构造\term{合并样本方差}
+\[
+S_w^2=\frac{\nu_1 S_1^2+\nu_2 S_2^2}{\nu_1+\nu_2}.
+\]
+此时 $(\nu_1+\nu_2)S_w^2/\sigma^2=V_1+V_2\sim\chi^2(\nu_1+\nu_2)$，且它与 $\overline X-\overline Y$ 独立。将均值差的标准正态量除以 $\sqrt{(V_1+V_2)/(\nu_1+\nu_2)}$，得
+\[
+\frac{\overline X-\overline Y-(\mu_1-\mu_2)}{S_w\sqrt{1/n_1+1/n_2}}\sim t(n_1+n_2-2).
+\]
+这一合并公式适用于两总体方差相等的情形。两样本的独立性同时保证均值差的方差可加与卡方量之间的独立性。
+
+\chapterpage{参数估计}
+设总体分布的形式已知，参数 $\theta$ 未知。利用样本估计 $\theta$ 或其函数 $g(\theta)$ 时，可以给出一个数值，也可以构造一个具有指定覆盖率的区间。
+
+\subsection{点估计与矩估计}
+用于估计 $\theta$ 的统计量 $\widehat\theta(X_1,\ldots,X_n)$ 称为\term{估计量}。代入观测值得到 $\widehat\theta(x_1,\ldots,x_n)$，称为\term{估计值}。
+
+\begin{infobox}{方法：矩估计}
+设有 $m$ 个未知参数 $\boldsymbol\theta=(\theta_1,\ldots,\theta_m)$。若总体前 $m$ 阶原点矩存在且能据此解出参数，则令
+\[
+E_{\boldsymbol\theta}(X^k)=A_k=\frac{1}{n}\sum_{i=1}^n X_i^k,\qquad k=1,\ldots,m.
+\]
+解方程组并核对参数范围，即得\term{矩估计量}。也可选择能确定参数的其他总体矩与对应样本矩，不同选择可能产生不同估计量。
+\end{infobox}
+大数定律给出 $A_k\xrightarrow{P}E(X^k)$（要求 $E|X|^k<\infty$）。若由总体矩解出的参数函数在真值对应的矩处连续，代入样本矩所得的估计量依概率趋于真值。
+
+\example{（课件例题）求总体均值 $\mu$ 和方差 $\sigma^2$ 的矩估计量。}
+\solution 令 $\mu=A_1$、$\sigma^2+\mu^2=A_2$，得
+\[
+\widehat\mu_{\mathrm{MM}}=\overline X,\qquad
+\widehat{\sigma^2}_{\mathrm{MM}}=A_2-\overline X^2
+=\frac{1}{n}\sum_{i=1}^n(X_i-\overline X)^2.
+\]
+方差的矩估计等于样本二阶中心矩 $B_2$。其期望为 $(n-1)\sigma^2/n$。第六章的样本方差 $S^2$ 使用分母 $n-1$，满足 $E(S^2)=\sigma^2$。
+
+\example{（课件例题）总体在 $0,1,2,3$ 处的概率依次为 $\theta^2,\ 2\theta(1-\theta),\ \theta^2,\ 1-2\theta$，其中 $0<\theta<1/2$。样本值为 $3,1,3,0,3,1,2,3$，求 $\theta$ 的矩估计值。}
+\solution 总体均值为
+\[
+E(X)=2\theta(1-\theta)+2\theta^2+3(1-2\theta)=3-4\theta.
+\]
+令 $E(X)=\overline X$，解得矩方程的解为 $(3-\overline X)/4$。本组样本的均值为 $2$，估计值为 $1/4$，落在参数范围内。若观测均值不在 $(1,3)$ 内，矩方程在给定参数空间内没有解。
+
+\subsection{最大似然估计}
+\begin{infobox}{定义：似然函数与最大似然估计}
+固定一组观测值 $x_1,\ldots,x_n$。对简单随机样本，\term{似然函数}为
+\[
+L(\theta)=
+\begin{cases}
+\displaystyle\prod_{i=1}^n p(x_i;\theta), & \text{离散总体},\\
+\displaystyle\prod_{i=1}^n f(x_i;\theta), & \text{连续总体},
+\end{cases}
+\]
+其中 $p$ 是点概率，$f$ 是密度。在给定参数空间内使 $L(\theta)$ 取得最大值的参数值称为\term{最大似然估计值}。把观测值换回随机样本，得到最大似然估计量。
+\end{infobox}
+例如，课件的棋子一题中，白子概率只可能取 $3/5$ 或 $2/5$。有放回地依次抽到白、黑、白、白时，两个参数值的似然分别为 $54/625$ 与 $24/625$，因此估计值为 $3/5$。连续模型使用观测处的联合密度比较参数。
+
+在 $L>0$ 的区域可最大化对数似然 $\ell=\ln L$，乘积由此化为和。若候选点位于参数空间内部且 $\ell$ 可微，先求解 $\partial\ell/\partial\theta_j=0$。再检查驻点、允许的边界和样本取值范围给出的限制，确认最大值是否实际取得。若 $\widehat\theta$ 最大化 $L$，则 $g(\widehat\theta)$ 最大化按 $g(\theta)$ 分组取上确界所得的似然，这称为最大似然估计的\term{不变性}。
+
+\example{（课件例题）总体为 $B(1,p)$，其中 $0<p<1$。求 $p$ 的最大似然估计。}
+\solution 令 $k=\sum_{i=1}^n x_i$。由 $L(p)=p^k(1-p)^{n-k}$，
+\[
+\ell'(p)=\frac{k}{p}-\frac{n-k}{1-p},\qquad
+\ell''(p)=-\frac{k}{p^2}-\frac{n-k}{(1-p)^2}<0.
+\]
+当 $0<k<n$ 时，唯一最大值在 $p=k/n$ 取得，故 $\widehat p=\overline X$。当 $k=0$ 或 $k=n$ 时，似然分别在 $p\downarrow0$ 或 $p\uparrow1$ 时趋近上确界，开参数空间内无最大值。若模型允许 $p\in[0,1]$，则全部样本均可用 $\overline X$ 作为最大似然估计。课件给出八次观测中四次成功，估计值为 $1/2$。
+
+\example{（课件例题）设总体密度在 $0<x<1$ 为 $f(x;a)=(a+1)x^a$，区间外为 $0$，其中 $a>-1$。求 $a$ 的矩估计和最大似然估计。}
+\solution $E(X)=(a+1)\int_0^1 x^{a+1}\,\mathrm dx=(a+1)/(a+2)$。代入 $\overline X$ 并解得
+\[
+\widehat a_{\mathrm{MM}}=\frac{2\overline X-1}{1-\overline X}.
+\]
+固定 $0<x_i<1$，对数似然为 $n\ln(a+1)+a\sum_i\ln x_i$。二阶导数是 $-n/(a+1)^2<0$，且一阶导数的零点位于 $a>-1$，故
+\[
+\widehat a_{\mathrm{ML}}=-\frac{n}{\sum_{i=1}^n\ln X_i}-1.
+\]
+
+\example{（课件例题）从 $N(\mu,\sigma^2)$ 抽取简单随机样本，求 $\mu,\sigma^2$ 的最大似然估计。}
+\solution 写 $v=\sigma^2>0$，有
+\[
+\ell(\mu,v)=-\frac{n}{2}\ln(2\pi v)-\frac{1}{2v}\sum_{i=1}^n(x_i-\mu)^2.
+\]
+固定 $v$，平方和在 $\mu=\overline x$ 时最小。代入 $\overline x$，记 $Q=\sum_i(x_i-\overline x)^2$，则关于 $v$ 的导数为 $(Q-nv)/(2v^2)$。若 $Q>0$，它在 $v=Q/n$ 两侧由正变负，故
+\[
+\widehat\mu_{\mathrm{ML}}=\overline X,\qquad
+\widehat{\sigma^2}_{\mathrm{ML}}=\frac{1}{n}\sum_{i=1}^n(X_i-\overline X)^2 .
+\]
+当 $n\ge2$ 时，连续正态模型下 $Q>0$ 几乎必然成立。对于全部观测值相同的样本，取 $\mu=\overline x$ 并令 $v\downarrow0$，似然无上界。
+
+\example{（课件例题）设总体为 $U[0,\theta]$，$\theta>0$，求 $\theta$ 的最大似然估计，并与矩估计比较。}
+\solution 取闭区间上的常数密度版本。对非负样本记 $x_{(n)}=\max_i x_i>0$。只有 $\theta\ge x_{(n)}$ 时，所有观察值才落在密度的取值区间内，此时 $L(\theta)=\theta^{-n}$，随 $\theta$ 严格递减。因此最大似然估计量是 $X_{(n)}$。若用矩估计，$E(X)=\theta/2$ 给出 $2\overline X$。似然最大值在由样本最大值确定的边界上取得。
+
+\subsection{置信区间与枢轴量}
+\begin{infobox}{定义：置信区间与置信限}
+设 $\theta$ 为固定的未知参数，从样本构造随机端点 $L(X),U(X)$。若对模型中每个参数值均有
+\[
+P_\theta\!\left(L(X)\le\theta\le U(X)\right)\ge 1-\alpha,
+\]
+则 $[L(X),U(X)]$ 是置信水平为 $1-\alpha$ 的置信区间。若等式成立，则此构造的覆盖概率恰为 $1-\alpha$。
+
+若 $P_\theta(\theta\ge L(X))\ge1-\alpha$，则 $L(X)$ 是单侧\term{置信下限}。若 $P_\theta(\theta\le U(X))\ge1-\alpha$，则 $U(X)$ 是单侧\term{置信上限}。
+\end{infobox}
+固定参数与抽样方案，重复抽取同样容量的样本并用同一公式构造区间。若覆盖概率恰为 $1-\alpha$，长期覆盖真值的比例趋于 $1-\alpha$。给定一组样本后，区间的两个端点均已确定。比较覆盖水平相同的构造时，可用平均区间长度衡量精度。
+
+\begin{infobox}{方法：用枢轴量构造区间}
+构造由样本和参数组成的\term{枢轴量} $G(X;\theta)$，使其分布已知且不随未知参数改变。选定常数 $c,d$ 使 $P_\theta(c\le G(X;\theta)\le d)=1-\alpha$，再解双边不等式得到 $\theta$ 的区间。
+\end{infobox}
+对于连续对称分布，常在左右两尾各留出 $\alpha/2$ 的概率，临界值互为相反数。卡方和 $F$ 分布也可取等尾区间，两个临界值分别是上侧 $1-\alpha/2$ 与 $\alpha/2$ 分位数。
+
+\example{（课件例题）设 $X_1,\ldots,X_8$ 来自 $N(\mu,2)$，求随机区间 $[\overline X-1,\overline X+1]$ 的覆盖概率。}
+\solution $\overline X\sim N(\mu,1/4)$，故覆盖概率为 $P(|2(\overline X-\mu)|\le2)=2\Phi(2)-1\approx0.9545$。若要求恰为 $0.95$ 的等尾区间，半长应取 $u_{0.025}/2\approx0.9800$。
+
+\subsection{单个正态总体均值的置信区间}
+设简单随机样本取自 $N(\mu,\sigma^2)$。当 $\sigma$ 已知时，枢轴量是 $(\overline X-\mu)/(\sigma/\sqrt n)\sim N(0,1)$。由
+\[
+P\!\left(-u_{\alpha/2}\le\frac{\overline X-\mu}{\sigma/\sqrt n}\le u_{\alpha/2}\right)=1-\alpha
+\]
+解得等尾区间 $\overline X\pm u_{\alpha/2}\sigma/\sqrt n$。这里以及后文的 $c\pm h$ 表示区间 $[c-h,c+h]$。当 $\sigma$ 未知且 $n\ge2$ 时，用第六章的 $t$ 枢轴量，得 $\overline X\pm t_{\alpha/2}(n-1)S/\sqrt n$。
+
+\begin{center}\begin{tabularx}{\linewidth}{l Y Y}
+\toprule 条件 & $1-\alpha$ 置信下限 & $1-\alpha$ 置信上限\\\midrule
+$\sigma$ 已知 & $\overline X-u_\alpha\,\sigma/\sqrt n$ & $\overline X+u_\alpha\,\sigma/\sqrt n$\\
+$\sigma$ 未知 & $\overline X-t_\alpha(n-1)S/\sqrt n$ & $\overline X+t_\alpha(n-1)S/\sqrt n$\\
+\bottomrule
+\end{tabularx}\end{center}
+例如，$P((\overline X-\mu)/(S/\sqrt n)\le t_\alpha(n-1))=1-\alpha$，解得 $\mu\ge\overline X-t_\alpha(n-1)S/\sqrt n$，所以减去临界值对应置信下限。单侧置信限将全部的 $\alpha$ 留在同一尾。
+
+在课件的已知方差例题中，$\sigma=0.32$，样本值为 $1.2,3.4,0.6,5.6$。算得 $\overline x=2.7$，故 $95\%$ 等尾区间为 $2.7\pm1.9600(0.32/\sqrt4)$，约为 $[2.3864,3.0136]$。
+
+\example{（课件例题）从正态总体抽得八个观测值 $12.1,11.9,12.4,12.3,11.9,12.1,12.4,12.1$，总体方差未知，求总体均值的 $99\%$ 等尾置信区间。}
+\solution 算得 $\overline x=12.15$、$s=0.2$、$n=8$。用 $t_{0.005}(7)\approx3.4995$，
+\[
+12.15\pm3.4995\,\frac{0.2}{\sqrt8}\approx[11.9025,\,12.3975].
+\]
+另一道课件例题给出 $n=9$、$\overline x=6$、$s=0.5745$。用 $t_{0.05}(8)\approx1.8595$，得均值的 $95\%$ 单侧置信上限为 $6+1.8595(0.5745/\sqrt9)\approx6.3561$。
+
+\subsection{单个正态总体方差的置信区间}
+当 $\mu$ 未知时，令 $\nu=n-1$、$Q=(n-1)S^2$，有 $Q/\sigma^2\sim\chi^2(\nu)$。当 $\mu$ 已知时，可取 $Q=\sum_i(X_i-\mu)^2$、$\nu=n$。两种情形下均可将
+\[
+\chi^2_{1-\alpha/2}(\nu)\le \frac{Q}{\sigma^2}\le\chi^2_{\alpha/2}(\nu)
+\]
+反解为
+\[
+\left[\frac{Q}{\chi^2_{\alpha/2}(\nu)},\ \relax
+      \frac{Q}{\chi^2_{1-\alpha/2}(\nu)}\right].
+\]
+大分位数在下端点的分母，小分位数在上端点的分母。对两端开平方即可得 $\sigma$ 的区间。单侧下限为 $Q/\chi^2_\alpha(\nu)$，单侧上限为 $Q/\chi^2_{1-\alpha}(\nu)$。
+
+继续使用上题的八个观测值。均值未知，故 $Q=7(0.2)^2=0.28$。查得 $\chi^2_{0.005}(7)\approx20.2777$、$\chi^2_{0.995}(7)\approx0.9893$，代入得到 $\sigma^2$ 的 $99\%$ 区间约为 $[0.0138,0.2830]$。若只求 $99\%$ 置信上限，则用 $\chi^2_{0.99}(7)\approx1.2390$，上限约为 $0.2260$。
+
+\subsection{两个正态总体参数的置信区间}
+沿用第六章的两个独立正态样本记号。对均值差 $\delta=\mu_1-\mu_2$，根据方差条件选择枢轴量：
+\begin{itemize}
+\item 两总体方差均已知。令 $b=\sqrt{\sigma_1^2/n_1+\sigma_2^2/n_2}$。$(\overline X-\overline Y-\delta)/b\sim N(0,1)$，所以区间为 $\overline X-\overline Y\pm u_{\alpha/2}b$。
+\item 两总体方差相等但未知。令 $b=S_w\sqrt{1/n_1+1/n_2}$。$(\overline X-\overline Y-\delta)/b\sim t(n_1+n_2-2)$，所以区间为 $\overline X-\overline Y\pm t_{\alpha/2}(n_1+n_2-2)b$。
+\end{itemize}
+
+对方差比 $\rho=\sigma_1^2/\sigma_2^2$，令 $R_S=S_1^2/S_2^2$，$\nu_i=n_i-1$。第六章给出 $R_S/\rho\sim F(\nu_1,\nu_2)$。将等尾不等式反解为
+\[
+\left[\frac{R_S}{F_{\alpha/2}(\nu_1,\nu_2)},\
+      \frac{R_S}{F_{1-\alpha/2}(\nu_1,\nu_2)}\right]
+=\left[\frac{R_S}{F_{\alpha/2}(\nu_1,\nu_2)},\
+      R_S F_{\alpha/2}(\nu_2,\nu_1)\right].
+\]
+此处样本方差和总体方差取相同的比值方向。用右尾表求上端点时，交换分子与分母的自由度。
+
+\example{（课件例题）两组独立正态样本的观测值（单位为厘米）为
+\[
+\begin{aligned}
+A:\;&162.6,\quad170.2,\quad172.7,\quad165.1,\quad157.5,\\
+B:\;&175.3,\quad177.8,\quad167.6,\quad180.3,\quad182.9 .
+\end{aligned}
+\]
+分别在两总体标准差为 $6,5.4$ 和两总体方差相等但未知时，求均值差的 $90\%$ 等尾置信区间。再在两个均值均未知时，求方差比的 $90\%$ 等尾置信区间。}
+\solution 由数据得 $\overline x-\overline y=-11.16$、$s_1^2=36.607$、$s_2^2=34.337$。
+\begin{enumerate}
+\item 方差已知时，半长为 $u_{0.05}\sqrt{6^2/5+5.4^2/5}\approx5.9379$，区间约为 $[-17.0979,-5.2221]$。
+\item 等方差未知时，$s_w^2=(36.607+34.337)/2=35.472$。半长为 $t_{0.05}(8)\sqrt{35.472(2/5)}\approx7.0045$，区间约为 $[-18.1645,-4.1555]$。
+\item $F_{0.05}(4,4)\approx6.3882$，$R_S\approx1.0661$。两自由度相同，下端点用 $R_S$ 除以该分位数，上端点用 $R_S$ 乘以该分位数。区间约为 $[0.1669,6.8106]$。
+\end{enumerate}
+
+\subsection{一般总体均值的大样本区间}
+若样本独立同分布且总体有有限的正方差，中心极限定理给出 $\sqrt n(\overline X-\mu)/\sigma$ 的标准正态极限。若 $\sigma$ 未知，由大数定律和 $S^2=\dfrac{n}{n-1}(A_2-\overline X^2)$ 可得 $S^2\xrightarrow{P}\sigma^2$，在分母用 $S$ 替换 $\sigma$ 后仍有同一极限。因此大样本下，均值的近似 $1-\alpha$ 置信区间为
+\[
+\overline X\pm u_{\alpha/2}\,\frac{\sigma}{\sqrt n}\quad(\sigma\text{ 已知}),\qquad
+\overline X\pm u_{\alpha/2}\,\frac{S}{\sqrt n}\quad(\sigma\text{ 未知}).
+\]
+
+\subsection{二项比例的大样本区间}
+设 $X_i\sim B(1,p)$ 且相互独立，$0<p<1$，记 $\widehat p=\overline X$、$u=u_{\alpha/2}$。中心极限定理给出
+\[
+P\!\left(\frac{\sqrt n\,|\widehat p-p|}{\sqrt{p(1-p)}}\le u\right)\approx1-\alpha .
+\]
+平方后整理得到 $(n+u^2)p^2-(2n\widehat p+u^2)p+n\widehat p^{\,2}\le0$。其两个根给出\term{Wilson 得分区间}，写成中心与半长即
+\[
+\frac{\widehat p+u^2/(2n)}{1+u^2/n}
+\ \pm\ \relax
+\frac{u}{1+u^2/n}\sqrt{\frac{\widehat p(1-\widehat p)}{n}+\frac{u^2}{4n^2}}.
+\]
+也可先用 $\widehat p$ 代替标准误中的 $p$，得到课件给出的简化式，即\term{Wald 区间}：
+\[
+\widehat p\pm u\sqrt{\frac{\widehat p(1-\widehat p)}{n}}.
+\]
+两个结果均为近似区间。成功数或失败数太少时，Wald 区间的覆盖可能偏离标称水平，端点也可能超出 $[0,1]$。例如所有观测均成功时，Wald 区间退化为单点 $1$。
+
+\example{（课件例题）调查 $400$ 人，其中有 $100$ 人收看春节晚会。按独立两点样本模型估计收视比例，求近似 $95\%$ 置信区间。}
+\solution $\widehat p=0.25$，$u_{0.025}\approx1.9600$。将观测值代入得分区间，得到 $[0.2101,0.2947]$。用简化式得到半长 $1.9600\sqrt{0.25(0.75)/400}\approx0.0424$，区间约为 $[0.2076,0.2924]$。
+
 \chapterpage{要点与符号}
 \renewcommand{\arraystretch}{1.15}
 \subsection{主要符号}
@@ -1572,6 +1914,24 @@ D(aX+bY)&=a^2D(X)+b^2D(Y)+2ab\operatorname{Cov}(X,Y),\\
 
 大数定律说明均值的稳定性，中心极限定理描述其波动尺度和极限分布。不相关只排除线性联系，不能替代独立；对整数计数作正态近似时，先明确端点，再考虑 $1/2$ 的连续性修正。
 
+\subsection{抽样分布与参数估计速查}
+样本均值为 $\overline X$，样本方差 $S^2$ 的分母为 $n-1$，样本二阶中心矩 $B_2$ 的分母为 $n$。上侧分位数的下标是右尾概率，例如 $P(Z\ge u_\alpha)=\alpha$（$Z\sim N(0,1)$）。如果采用左尾表，用概率 $1-\alpha$ 查同一个临界值。
+
+\begin{center}\begin{tabularx}{\linewidth}{l Y l}
+\toprule 正态总体的估计目标 & 枢轴量 & 分布\\\midrule
+均值，方差已知 & $(\overline X-\mu)/(\sigma/\sqrt n)$ & $N(0,1)$\\
+均值，方差未知 & $(\overline X-\mu)/(S/\sqrt n)$ & $t(n-1)$\\
+方差，均值未知 & $(n-1)S^2/\sigma^2$ & $\chi^2(n-1)$\\
+均值差，两方差已知 & $\displaystyle\frac{\overline X-\overline Y-(\mu_1-\mu_2)}
+{\sqrt{\sigma_1^2/n_1+\sigma_2^2/n_2}}$ & $N(0,1)$\\
+均值差，等方差未知 & $\displaystyle\frac{\overline X-\overline Y-(\mu_1-\mu_2)}
+{S_w\sqrt{1/n_1+1/n_2}}$ & $t(n_1+n_2-2)$\\
+方差比，两均值未知 & $(S_1^2/S_2^2)/(\sigma_1^2/\sigma_2^2)$ & $F(n_1-1,n_2-1)$\\\bottomrule
+\end{tabularx}\end{center}
+两样本公式要求两个简单随机样本相互独立。等尾双侧区间在每尾留 $\alpha/2$，单侧置信限在对应的一尾留 $\alpha$。对正的方差参数解倒数不等式时，较大的临界值进入下端点的分母。
+
+矩估计令模型矩与样本矩相等，再解参数。最大似然估计固定样本值，在允许的参数范围内最大化联合点概率或联合密度。构造置信区间时，先确定枢轴量的分布与自由度，再将概率不等式解成参数的范围。一般总体均值和二项比例的大样本区间依赖正态近似。
+
 \subsection{易混概念辨析}
 \begin{center}\begin{tabularx}{\linewidth}{l Y}\toprule
 比较&区别\\\midrule
@@ -1586,5 +1946,5 @@ $P(A\mid B)$ 与 $P(B\mid A)$&条件方向不同，分母分别为 $P(B)$ 与 $P
 几何分布两种计数&本讲义从 $1$ 起计试验次数；失败次数从 $0$ 起计\\\bottomrule
 \end{tabularx}\end{center}
 \subsection{参考资料与范围}
-本讲义依据《概率一1》至《概率一5》五份课程课件整理，参照周永春等编《大学数学：概率论与数理统计》第三版（高等教育出版社，2020年）核对定义与记号。原题条件明确时重新计算，另设的补充例题用于展示方法。
+本讲义依据《概率一1》至《概率一7》七份课程课件整理，参照周永春等编《大学数学：概率论与数理统计》第三版（高等教育出版社，2020年）核对定义与记号。原题条件明确时重新计算，另设的补充例题用于展示方法。
 \end{document}
