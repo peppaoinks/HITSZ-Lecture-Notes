@@ -1,0 +1,293 @@
+\documentclass[UTF8,11pt,a4paper,fontset=none]{ctexart}
+\usepackage[left=25mm,right=25mm,top=25mm,bottom=22mm,headheight=16pt,headsep=9mm,footskip=11mm]{geometry}
+\usepackage{amsmath,amssymb,xcolor,fancyhdr,lastpage}
+\usepackage[unicode,hidelinks,pdfdisplaydoctitle]{hyperref}
+\hypersetup{pdftitle={2026 秋 最优化方法第一次作业},pdfauthor={}}
+\setCJKmainfont[Path=/System/Library/Fonts/Supplemental/,FontIndex=6]{Songti.ttc}
+\setCJKfamilyfont{zhhei}[Path=/System/Library/Fonts/,FontIndex=0]{STHeiti Medium.ttc}
+\definecolor{heading}{HTML}{20364A}
+\definecolor{muted}{HTML}{505B65}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small 最优化方法\quad 第一次作业}
+\fancyhead[R]{\small 2026 年秋季学期}
+\fancyfoot[L]{\small\color{muted}\leftmark}
+\fancyfoot[R]{\small 第 \thepage\ 页 / 共 \pageref{LastPage} 页}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3pt}
+\AtBeginDocument{%
+  \setlength{\abovedisplayskip}{7pt}
+  \setlength{\belowdisplayskip}{7pt}
+  \setlength{\abovedisplayshortskip}{5pt}
+  \setlength{\belowdisplayshortskip}{7pt}
+}
+\newcommand{\hx}[1]{{\CJKfamily{zhhei}#1}}
+\newcommand{\topic}[1]{{\large\color{heading}\hx{#1}}\par}
+\newcommand{\problem}[1]{\par\addvspace{12pt}\hx{#1}\par}
+\newcommand{\D}[1]{\partial_{#1}}
+\newcommand{\chaptertitle}[3]{%
+  \par\addvspace{19pt}%
+  {\large\CJKfamily{zhhei}\color{heading} 第#1章\quad #2}\hfill
+  {\small\color{muted} 教材第 #3 页}\par\vspace{8pt}%
+}
+\newcommand{\question}[1]{\par\addvspace{8pt}{\CJKfamily{zhhei} #1}\enspace}
+\begin{document}
+\pdfbookmark[0]{题目与作答区}{questions}
+
+{\fontsize{24}{31}\selectfont\CJKfamily{zhhei}\color{heading} 第一次作业}\par\vspace{6pt}
+{\small\color{muted} 最优化方法\quad / \quad 题目与作答区}\par\vspace{17pt}
+\hrule height 0.8pt
+\vspace{7pt}
+{\small 姓名\enspace\rule{29mm}{0.35pt}\qquad 学号\enspace\rule{38mm}{0.35pt}}\par
+\markboth{第 1 章习题}{}
+
+\chaptertitle{1}{运筹学思想与运筹学建模}{18--19}
+\pdfbookmark[1]{8（2） 梯度与黑塞矩阵}{question-8（2）}
+\question{8（2）\quad 梯度与黑塞矩阵}
+\par\vspace{4pt}
+求下列函数的梯度和黑塞矩阵。
+\[
+ f_2(\boldsymbol{x})
+ =3x_1x_2+2x_1^2+x_2^2+5x_3^2-6x_1x_3+4x_1x_2x_3+17.
+\]
+
+\newpage
+\pdfbookmark[1]{8（5） 梯度与黑塞矩阵}{question-8（5）}
+\question{8（5）\quad 梯度与黑塞矩阵}
+\par\vspace{4pt}
+求下列函数的梯度和黑塞矩阵。
+\[
+\begin{aligned}
+ f_5(\boldsymbol{x})
+  &=6x_1^2x_2+2x_2^2x_3+x_3^3-x_1^2+3x_2^2\\
+  &\quad {}+2x_1x_2x_3-5x_1+3x_2-x_1x_2+59.
+\end{aligned}
+\]
+
+\newpage
+\markboth{第 2 章习题}{}
+\chaptertitle{2}{基本概念和基本理论}{35--36}
+\pdfbookmark[1]{7（3） 函数的凹凸性}{question-7（3）}
+\question{7（3）\quad 函数的凹凸性}\par\vspace{4pt}
+判断下列函数属于凸函数、严格凸函数、凹函数、严格凹函数或非凸非凹函数中的哪一类。
+\[
+ f(\boldsymbol{x})
+ =3x_1^2+2x_2^2+2x_1x_2+5x_3^2+4x_1x_3-3x_2x_3+7x_1+4x_2-6x_3.
+\]
+\newpage
+\pdfbookmark[1]{7（4） 凸性范围}{question-7（4）}
+\question{7（4）\quad 凸性范围}\par\vspace{4pt}
+讨论下列函数在什么范围内是凸函数。
+\[
+ f(\boldsymbol{x})=x_1^3+2x_1^2+3x_2^2+x_1x_2-6x_1.
+\]
+
+\newpage
+\pdfbookmark[1]{10（3） 凸规划}{question-10（3）}
+\question{10（3）\quad 凸规划}\par\vspace{4pt}
+讨论下列问题是否为凸规划。
+\[
+\begin{aligned}
+\min\quad & f(\boldsymbol{x})=(x_1-1)^2+(x_2-2)^2+x_3\\[2pt]
+\text{s.t.}\quad &
+\begin{cases}
+ x_1+2x_2-x_3=5,\\
+ 2x_1-3x_2+2x_3+x_4=7,\\
+ x_1,\ x_2,\ x_3,\ x_4\geq 0.
+\end{cases}
+\end{aligned}
+\]
+
+\vfill
+{\color{muted}\hrule height 0.35pt}
+\vspace{7pt}
+{\small\color{muted} 教材\enspace 侯福均、吴祈宗编著，《运筹学与最优化方法》（第 3 版），机械工业出版社。}
+\newpage
+\markboth{第 1 章解答}{}
+\pdfbookmark[0]{详细解答}{answers}
+\pdfbookmark[1]{第 1 章解答}{answers-1}
+
+{\fontsize{24}{31}\selectfont\color{heading}\hx{第一次作业参考答案}}\par
+{\small\color{muted} 最优化方法\quad / \quad 第 1、2 章习题}\par\vspace{11pt}
+\hrule height 0.7pt
+\vspace{9pt}
+\topic{第 1 章\quad 梯度与黑塞矩阵}
+
+记 \(\D{i}=\frac{\partial}{\partial x_i}\)。梯度为 \((\D{1}f,\D{2}f,\D{3}f)^{\mathsf T}\)，
+黑塞矩阵的第 \(i,j\) 项为 \(H_{ij}=\D{j}(\D{i}f)\)。两题均为多项式，所以 \(H_{ji}=H_{ij}\)。
+
+\begingroup\setlength{\jot}{0pt}\setlength{\parskip}{0pt}
+\problem{8（2）}
+\[
+\begin{aligned}
+\D{1} f_2
+ &=\D{1}(3x_1x_2+2x_1^2-6x_1x_3+4x_1x_2x_3)
+ =3x_2+4x_1-6x_3+4x_2x_3,\\
+\D{2} f_2
+ &=\D{2}(3x_1x_2+x_2^2+4x_1x_2x_3)
+ =3x_1+2x_2+4x_1x_3,\\
+\D{3} f_2
+ &=\D{3}(5x_3^2-6x_1x_3+4x_1x_2x_3)
+ =10x_3-6x_1+4x_1x_2.
+\end{aligned}
+\]
+以上三式给出 \(\nabla f_2\)。再求偏导，得到黑塞矩阵的上三角元素。
+\[
+\begin{aligned}
+H_{11}&=\D{1}(4x_1)=4,&
+H_{12}&=\D{2}(3x_2+4x_2x_3)=3+4x_3,\\
+H_{13}&=\D{3}(-6x_3+4x_2x_3)=-6+4x_2,&
+H_{22}&=\D{2}(2x_2)=2,\\
+H_{23}&=\D{3}(4x_1x_3)=4x_1,&
+H_{33}&=\D{3}(10x_3)=10.
+\end{aligned}
+\]
+\[
+\nabla^2 f_2=
+\begin{pmatrix}
+4&3+4x_3&-6+4x_2\\
+3+4x_3&2&4x_1\\
+-6+4x_2&4x_1&10
+\end{pmatrix}.
+\]
+
+\problem{8（5）}
+\[
+\begin{aligned}
+\D{1} f_5
+ &=\D{1}(6x_1^2x_2-x_1^2+2x_1x_2x_3-5x_1-x_1x_2)\\
+ &=12x_1x_2-2x_1+2x_2x_3-5-x_2,\\
+\D{2} f_5
+ &=\D{2}(6x_1^2x_2+2x_2^2x_3+3x_2^2+2x_1x_2x_3+3x_2-x_1x_2)\\
+ &=6x_1^2+4x_2x_3+6x_2+2x_1x_3+3-x_1,\\
+\D{3} f_5
+ &=\D{3}(2x_2^2x_3+x_3^3+2x_1x_2x_3)
+ =2x_2^2+3x_3^2+2x_1x_2.
+\end{aligned}
+\]
+将这三式按顺序排成列向量，即得 \(\nabla f_5\)。继续求二阶偏导。
+\[
+\begin{aligned}
+H_{11}&=\D{1}(12x_1x_2-2x_1)=12x_2-2,\\
+H_{12}&=\D{2}(12x_1x_2+2x_2x_3-x_2)=12x_1+2x_3-1,\\
+H_{13}&=\D{3}(2x_2x_3)=2x_2,&
+H_{22}&=\D{2}(4x_2x_3+6x_2)=4x_3+6,\\
+H_{23}&=\D{3}(4x_2x_3+2x_1x_3)=4x_2+2x_1,&
+H_{33}&=\D{3}(3x_3^2)=6x_3.
+\end{aligned}
+\]
+\[
+\nabla^2 f_5=
+\begin{pmatrix}
+12x_2-2&12x_1+2x_3-1&2x_2\\
+12x_1+2x_3-1&4x_3+6&4x_2+2x_1\\
+2x_2&4x_2+2x_1&6x_3
+\end{pmatrix}.
+\]
+
+\endgroup
+\newpage
+\markboth{第 2 章解答}{}
+\pdfbookmark[1]{第 2 章解答}{answers-2}
+\topic{第 2 章\quad 凸函数与凸规划}
+
+\problem{7（3）\quad 函数的凹凸性}
+\[
+\begin{aligned}
+\D{1} f &= 6x_1+2x_2+4x_3+7,\\
+\D{2} f &= 2x_1+4x_2-3x_3+4,\\
+\D{3} f &= 4x_1-3x_2+10x_3-6.
+\end{aligned}
+\qquad
+H=\nabla^2 f=
+\begin{pmatrix}6&2&4\\2&4&-3\\4&-3&10\end{pmatrix}.
+\]
+各行由对应的一阶偏导式再对 \(x_1,x_2,x_3\) 求偏导得到。
+前两阶顺序主子式为 \(\Delta_1=6\) 和
+\(\Delta_2=6\cdot4-2\cdot2=20\)。沿第一行展开三阶行列式，得
+\[
+\begin{aligned}
+\Delta_3=\det H
+ &=6[4\cdot10-(-3)(-3)]
+   -2[2\cdot10-(-3)\cdot4]
+   +4[2(-3)-4\cdot4]\\
+ &=6(40-9)-2(20+12)+4(-6-16)\\
+ &=186-64-88=34.
+\end{aligned}
+\]
+三个顺序主子式均为正，由 Sylvester 判据知 \(H\) 正定，
+因此 \(f\) 在 \(\mathbb R^3\) 上是\hx{严格凸函数}。
+
+\problem{7（4）\quad 凸性范围}
+\[
+\begin{aligned}
+\D{1} f &=3x_1^2+4x_1+x_2-6,\\
+\D{2} f &=6x_2+x_1.
+\end{aligned}
+\qquad
+H=\nabla^2 f=\begin{pmatrix}6x_1+4&1\\1&6\end{pmatrix}.
+\]
+\[
+ \det H=(6x_1+4)\cdot6-1\cdot1=36x_1+23.
+\]
+二阶对称矩阵半正定要求两个对角元和行列式均非负。这里 \(H_{22}=6>0\)，
+而 \(\det H\ge0\) 又推出 \(H_{11}\ge 1/6>0\)。
+所以 \(H\succeq0\) 当且仅当 \(x_1\ge -23/36\)。由此，\(f\) 在闭半平面
+\(\{(x_1,x_2)\in\mathbb R^2:x_1\ge-23/36\}\) 上是\hx{凸函数}。
+若 \(x_1<-23/36\)，行列式为负，黑塞矩阵不定，\(f\) 在该点的任何开邻域上都不凸。
+
+\problem{10（3）\quad 凸规划}
+对目标函数 \(f=(x_1-1)^2+(x_2-2)^2+x_3\) 求导，得
+\[
+ \nabla f=(2(x_1-1),\,2(x_2-2),\,1,\,0)^{\mathsf T},
+ \qquad
+ \nabla^2 f=\operatorname{diag}(2,2,0,0)\succeq0.
+\]
+所以 \(f\) 是凸函数。可行域由两个仿射等式
+\(x_1+2x_2-x_3=5\) 和 \(2x_1-3x_2+2x_3+x_4=7\)
+与四个非负半空间取交集，是凸集。取 \(\boldsymbol{x}=(3,1,0,4)^{\mathsf T}\)，
+两个等式左边分别为 \(3+2=5\) 和 \(6-3+4=7\)，各分量也均非负。
+
+该问题在凸集上最小化凸函数，因此\hx{是凸规划}。
+
+\newpage
+\markboth{作业要点与应用}{}
+\pdfbookmark[0]{作业要点与应用}{applications}
+\topic{这份作业练了什么}
+\problem{从求导到判定凸规划}
+\begin{itemize}
+ \setlength\itemsep{5pt}
+ \item \hx{8（2）、8（5）}\quad 梯度描述各变量改动一点时，函数值的一阶变化。黑塞矩阵描述这些变化率如何改变，其中混合偏导可以表示两个变量之间的影响。
+ \item \hx{7（3）、7（4）}\quad 7（3）的黑塞矩阵恒正定，所以函数在整个定义域上严格凸。7（4）的黑塞矩阵随位置变化，需要先求出半正定的区域。
+ \item \hx{10（3）}\quad 同时检查目标函数和可行域。如果目标函数凸、可行域也是凸集，就构成凸规划。对这样的最小化问题，可行域上的局部最优也是全局最优。
+\end{itemize}
+
+\topic{生产生活中的应用}
+\problem{生产分配\quad 两台设备如何分单}
+假设工厂要完成 100 千克的订单，设备 A、B 的产量分别为 \(x_A,x_B\)。
+用一个简化模型表示设备成本随产量加速上涨。
+\[
+ \min\; C(x_A,x_B)=x_A^2+2x_B^2,\qquad
+ x_A+x_B=100,\quad x_A,x_B\ge0.
+\]
+梯度的两个分量 \(2x_A\) 和 \(4x_B\) 是两台设备的边际成本。
+把少量订单从边际成本较高的设备移给较低的设备，可以降低总成本。
+代入 \(x_B=100-x_A\)，令 \(g(x_A)=C(x_A,100-x_A)\)，在区间 \([0,100]\) 上求导。
+\[
+ g'(x_A)=2x_A-4(100-x_A)=6x_A-400,\qquad g''(x_A)=6>0.
+\]
+令 \(g'(x_A)=0\)，得到 \(x_A=200/3\)、\(x_B=100/3\)。
+该点在可行区间内，且代入后的成本函数严格凸，因此最省成本的分配是
+A 生产约 \(66.7\) 千克，B 生产约 \(33.3\) 千克。此时两台设备的边际成本相等。
+
+\problem{电动车充电\quad 如何利用分时电价}
+设 \(q_t\) 为第 \(t\) 个时段的充电量，\(p_t\) 为固定电价，
+\(u_t\) 为该时段受充电功率限制的最大充电量。若出发前需补充 \(E\) 千瓦时，
+可写成
+\[
+ \min\; \sum_{t=1}^{T}p_tq_t,\qquad
+ \sum_{t=1}^{T}q_t=E,\quad 0\le q_t\le u_t\quad(t=1,\ldots,T).
+\]
+目标函数和约束都是线性的，这是一个凸规划。只要总充电上限足以达到需求，
+就可以优先安排较便宜的时段，达到该时段上限后再用次便宜的时段补足，直到充满所需电量。
+\end{document}
