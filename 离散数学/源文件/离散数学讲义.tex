@@ -5,14 +5,15 @@
 \setCJKmonofont{Songti SC}[BoldFont={Songti SC Bold}]
 \setmainfont{Times New Roman}
 \usepackage{amsmath,amssymb,booktabs,tabularx,array,enumitem,fancyhdr,needspace,longtable,tikz}
-\usetikzlibrary{arrows.meta}
+\usetikzlibrary{arrows.meta,backgrounds,fit}
 \usepackage[hidelinks]{hyperref}
 \hypersetup{pdftitle={离散数学},pdfsubject={命题逻辑、一阶逻辑、集合代数、二元关系、函数、集合基数与图论讲义}}
 \ctexset{section={format=\large\bfseries,beforeskip=0pt,afterskip=14pt},subsection={format=\normalsize\bfseries,beforeskip=12pt,afterskip=6pt}}
 \setcounter{tocdepth}{1}
-\linespread{1.22}
+\linespread{1.20}
 \setlength{\parindent}{2em}
-\setlength{\parskip}{3pt}
+\setlength{\parskip}{2.5pt}
+\setlength{\emergencystretch}{1em}
 \setlength{\tabcolsep}{6pt}
 \renewcommand{\arraystretch}{1.35}
 \setlist{itemsep=4pt,topsep=5pt,parsep=0pt,leftmargin=2em}
@@ -25,9 +26,14 @@
 \renewcommand{\headrulewidth}{0.3pt}
 \renewcommand{\sectionmark}[1]{\markboth{#1}{}}
 \newcommand{\chapterpage}[1]{\clearpage\section{#1}}
-\newcommand{\example}[1]{\par\Needspace{5\baselineskip}\noindent\textbf{例：#1}\par}
+\newcounter{lectureexample}[section]
+\renewcommand{\thelectureexample}{\thesection.\arabic{lectureexample}}
+\newcommand{\example}[1]{\par\Needspace{7\baselineskip}\refstepcounter{lectureexample}\noindent\textbf{例\thelectureexample\quad #1}\par}
+\newcounter{lecturefigure}[section]
+\renewcommand{\thelecturefigure}{\thesection-\arabic{lecturefigure}}
+\newcommand{\diagramcaption}[1]{\par\nopagebreak\vspace{3pt}\refstepcounter{lecturefigure}{\small 图\thelecturefigure\quad #1\par}}
 \newcommand{\note}[1]{\par\noindent\textbf{说明：}#1\par}
-\newcommand{\exercise}{\subsection{本章练习与参考解答}}
+\newcommand{\exercise}{\subsection{本章练习}}
 \newcommand{\term}[1]{\textbf{#1}}
 \newcolumntype{Y}{>{\raggedright\arraybackslash}X}
 \allowdisplaybreaks[2]
@@ -54,7 +60,7 @@
 
 \term{简单命题}（原子命题）不能再分解为由联结词连接的命题；\term{复合命题}由简单命题和联结词构成。分类依据逻辑结构，而非句子长短或是否出现“和”“与”等字。
 \example{识别命题与原子结构}
-“$2+5=7$”是真命题；“$2$ 是合数”是假命题；“$x+5>3$”在 $x$ 未指定且未量化时是含变量的开语句；疑问句、祈使句、感叹句和无法一致确定真值的悖论不作为本课程的命题。
+“$2+5=7$”是真命题；“$2$ 是合数”是假命题；“$x+5>3$”在 $x$ 未指定且未量化时是含变量的开语句；疑问句、祈使句、感叹句和无法一致确定真值的悖论不作为本书的命题。
 “张辉与王丽都是三好学生”可分成两个命题的合取；“张辉与王丽是同学”描述一个关系，在命题逻辑中作为一个简单命题。“豆沙包由面粉和红小豆做成”中的“和”连接原料名称，不能据此拆成两个命题。
 
 一个具体命题具有固定真值，可称为\term{命题常项}；命题变项（命题变元）是代表任意命题真值的符号，通常记为 $p,q,r,\ldots$。应区分具体陈述、表示陈述的符号和符号的赋值。
@@ -90,6 +96,10 @@ p\oplus q\equiv(p\land\neg q)\lor(\neg p\land q)
 
 \subsection{充分条件、必要条件与蕴涵符号化}
 $p\to q$ 表示 $p$ 是 $q$ 的充分条件，$q$ 是 $p$ 的必要条件。当 $p$ 为假时，蕴涵式恒真，称为空真；这不表示后件实际为真。
+
+可以把 $p\to q$ 理解为一条限制：“不能出现 $p$ 成立而 $q$ 不成立的情况。”例如“若提交作业，就获得提交记录”只排除“已提交却没有记录”；没有提交时，无论是否因其他原因产生记录，都不违反这条限制。因此它不保证 $p$ 发生，也不表达 $p$ 与 $q$ 之间一定存在因果关系。
+
+判断条件方向时，可先找反例应当是什么。“只有持票，才能入场”被“入场但未持票”推翻，所以应写成“入场 $\to$ 持票”。用这种方式检查，比只根据“只有”二字的位置决定箭头更可靠。
 \begin{center}
 \begin{tabularx}{\linewidth}{Y c}
 \toprule 自然语言 & 形式\\\midrule
@@ -111,11 +121,11 @@ p\to q\equiv\neg q\to\neg p.
 \subsection{合式公式、子公式与层次}
 \term{合式公式}的递归定义为：原子命题公式是公式；若 $A$ 是公式，则 $(\neg A)$ 是公式；若 $A,B$ 是公式，则 $(A\land B)$、$(A\lor B)$、$(A\to B)$、$(A\leftrightarrow B)$ 是公式；只有有限次应用上述规则得到的符号串才是公式。
 
-构造公式时使用的较小公式称为\term{子公式}。最外层的联结词是主联结词。课件采用的优先顺序是
+构造公式时使用的较小公式称为\term{子公式}。最外层的联结词是主联结词。本书采用的优先顺序是
 \[
 \neg\quad>\quad\land\quad>\quad\lor\quad>\quad\to\quad>\quad\leftrightarrow.
 \]
-括号优先，先内后外；课件约定同级从左到右。蕴涵没有结合律，连续蕴涵宜写全括号以明确结构。
+括号优先，先内后外；本书约定同级从左到右。蕴涵没有结合律，连续蕴涵宜写全括号以明确结构。
 
 令 $h(A)$ 为公式层次：原子公式 $h(p)=0$；$h(\neg A)=h(A)+1$；对二元联结词 $\circ$，
 \[
@@ -124,10 +134,25 @@ h(A\circ B)=1+\max\{h(A),h(B)\}.
 层次衡量嵌套深度，不是联结词总数。例如 $\neg p\to q$ 为 $2$ 层，$\neg(p\to q)\leftrightarrow r$ 为 $3$ 层，
 $((\neg p\land q)\to r)\leftrightarrow(\neg r\lor s)$ 为 $4$ 层。
 
+\example{从结构树确定计算顺序}
+对 $F=(p\lor q)\to\neg r$，先分别构造 $p\lor q$ 和 $\neg r$，再用蕴涵连接它们。
+\begin{center}
+\begin{tikzpicture}[every node/.style={font=\normalsize},level distance=1cm]
+\node[draw,rounded corners,inner sep=5pt] (root) at(0,0) {$\to$};
+\node (left) at(-1.8,-1) {$\lor$};\node (right) at(1.8,-1) {$\neg$};
+\node (p) at(-2.6,-2) {$p$};\node (q) at(-1,-2) {$q$};\node (r) at(1.8,-2) {$r$};
+\draw (root)--(left) (root)--(right) (left)--(p) (left)--(q) (right)--(r);
+\node[anchor=west,align=left,font=\small] at(3,-1){顶部是主联结词\\从叶子向上计算真值};
+\end{tikzpicture}
+\diagramcaption{公式的结构与真值计算顺序}\label{fig:lecture-1}
+\end{center}
+从叶子到顶部，最长经过两个联结词，所以 $h(F)=2$；虽然图中共有三个联结词，层次仍不是 $3$。
+
 \subsection{赋值、真值表与公式类型}
 对公式中每个命题变元指定一个真值，称为一个\term{赋值}或解释。含 $n$ 个不同变元的公式共有 $2^n$ 个赋值。固定变元顺序 $p,q,r$ 后，字符串 $101$ 表示 $p=1,q=0,r=1$。使公式为真的赋值称为成真赋值，使公式为假的称为成假赋值。
 
 \term{真值表}列出公式在全部赋值下的真值。构造步骤为：确定不同变元及顺序；按二进制从 $00\cdots0$ 排到 $11\cdots1$；按子公式由内向外逐列计算；据最后一列汇总赋值与类型。
+\Needspace{18\baselineskip}
 \example{完整真值表}
 设 $F=(p\lor q)\to\neg r$。
 \begin{center}
@@ -145,6 +170,8 @@ $((\neg p\land q)\to r)\leftrightarrow(\neg r\lor s)$ 为 $4$ 层。
 \end{center}
 成真赋值为 $000,001,010,100,110$；成假赋值为 $011,101,111$。
 
+以 $011$ 这一行为例：先算 $p\lor q=0\lor1=1$，再算 $\neg r=0$，最后得到 $1\to0=0$。若改成 $001$，前件变为 $0$，因此最终值为 $1$。真值表中的中间列正是结构树两个分支的计算结果。
+
 \term{重言式}（永真式）在每个赋值下为真；\term{矛盾式}（永假式）在每个赋值下为假；\term{可满足式}至少有一个成真赋值。重言式是可满足式，逆向不成立。既有成真赋值又有成假赋值的公式称为非重言式的可满足式，也称偶然式。
 \[
 p\lor\neg p\text{ 是重言式},\qquad
@@ -152,30 +179,34 @@ p\land\neg p\text{ 是矛盾式}.
 \]
 设 $T(F)$ 为成真赋值集合，则重言式对应全部赋值，矛盾式对应空集，偶然式对应非空真子集。$F$ 永真当且仅当 $\neg F$ 不可满足；$F$ 可满足当且仅当 $\neg F$ 非永真。
 
+\subsection{本章小结}
+识别命题时不以“现在能否求出真值”为标准；符号化时先确定原子陈述，再辨析“或”和条件方向；真值表必须列出全部不同变元，不能只列部分组合。
+
 \exercise
-\begin{enumerate}
+\begin{enumerate}[label=1.\arabic*.,leftmargin=2.8em]
 \begin{samepage}
-\item 设 $p$：交通阻塞，$q$：某人迟到。将“交通不阻塞就不迟到”“没迟到，所以交通没阻塞”“迟到仅当交通阻塞”符号化。\\
-\term{解：}$\neg p\to\neg q$、$\neg q\to\neg p$、$q\to p$。第一式与第三式等值；第二式与 $p\to q$ 等值。
+\item  设 $p$：交通阻塞，$q$：某人迟到。将“交通不阻塞就不迟到”“如果没迟到，则交通没阻塞”“迟到仅当交通阻塞”符号化。
 \end{samepage}
+
 \begin{samepage}
-\item 求 $\neg(p\to q)\land q$ 的类型。\\
-\term{解：}$p\to q$ 假要求 $p=1,q=0$，但合取又要求 $q=1$，故无成真赋值，是矛盾式。
+\item  求 $\neg(p\to q)\land q$ 的类型。
 \end{samepage}
+
 \begin{samepage}
-\item 判断 $(p\to q)\leftrightarrow(p\to r)$ 的类型，并列出成假赋值。\\
-\term{解：}$p=0$ 时两侧均真；$p=1$ 时比较 $q,r$。仅 $101,110$ 使公式为假，故为非重言式的可满足式。
+\item  判断 $(p\to q)\leftrightarrow(p\to r)$ 的类型，并列出成假赋值。
 \end{samepage}
+
 \begin{samepage}
-\item 求 $\neg((p\lor q)\to r)$ 的层次及成真赋值。\\
-\term{解：}层次为 $3$；要求 $p\lor q=1,r=0$，成真赋值为 $010,100,110$。
+\item  求 $\neg((p\lor q)\to r)$ 的层次及成真赋值。
 \end{samepage}
 \end{enumerate}
-\note{识别命题时不以“现在能否求出真值”为标准；符号化时先确定原子陈述，再辨析“或”和条件方向；真值表必须列出全部不同变元，不能只列部分组合。}
+
 
 \chapterpage{命题逻辑等值演算}
+
+同一个真值条件可以写成不同形式。等值演算研究怎样改变公式的写法而保持它在每个赋值下的真值；范式进一步把公式整理成统一结构，便于比较公式、寻找满足赋值和建立约束模型。
 \subsection{等值式与记号的层次}
-若 $A\leftrightarrow B$ 为重言式，则称 $A,B$ 逻辑等值，记为 $A\equiv B$。课件用 $A\Leftrightarrow B$ 表示同一关系。$\leftrightarrow$ 是公式内部的双条件联结词；$\equiv$ 是公式之间的关系，不是另一种命题联结词。
+若 $A\leftrightarrow B$ 为重言式，则称 $A,B$ 逻辑等值，记为 $A\equiv B$。逻辑等值也常记为 $A\Leftrightarrow B$。$\leftrightarrow$ 是公式内部的双条件联结词；$\equiv$ 是公式之间的关系，不是另一种命题联结词。
 
 等值具有自反性、对称性、传递性。比较两个公式时，应在它们所含变元的并集上赋值。某变元虽在公式表面出现，却不影响真值，称为真值函数意义下的哑元。例如 $p\lor(r\land\neg r)\equiv p$ 中 $r$ 不影响输出；这与一阶逻辑中约束变量的称谓应结合上下文区分。
 
@@ -248,10 +279,14 @@ q\land\neg(p\to q)&\equiv q\land p\land\neg q\equiv0,\\
 \end{align*}
 注意求 DNF 用 $\land$ 对 $\lor$ 的分配，求 CNF 用 $\lor$ 对 $\land$ 的分配，不能仅凭最终出现哪个联结词判断。
 
+读 DNF 时，可把每个合取项看作一种使公式成立的方案，最外层的“或”表示方案至少满足一种。读 CNF 时，可把每个析取子句看作一项限制，最外层的“且”表示所有限制必须同时满足。例如 $(p\lor r)\land(q\lor r)$ 中，$r=1$ 可以同时满足两项限制；$r=0$ 时，则必须同时有 $p=q=1$。
+
 \subsection{极小项、极大项及二进制编号}
 固定 $n$ 个变元及顺序后，每个变元恰好出现一次、正负形式择一的简单合取式称为\term{极小项}（最小项）；相应的简单析取式称为\term{极大项}（最大项）。各有 $2^n$ 个。
 
 $m_i$ 仅在编号 $i$ 的赋值为真：二进制位为 $1$ 取正文字，为 $0$ 取负文字。$M_i$ 仅在编号 $i$ 的赋值为假：二进制位为 $0$ 取正文字，为 $1$ 取负文字。因此 $\neg m_i\equiv M_i$，$\neg M_i\equiv m_i$。
+
+例如编号 $5$ 对应 $101$。要让一个合取式只在这一行成立，三个文字应分别为 $p,\neg q,r$，所以 $m_5=p\land\neg q\land r$。要让一个析取式只在这一行失败，三个文字就必须在这一行全假，所以 $M_5=\neg p\lor q\lor\neg r$。两种编号指向同一行，区别在于一个标记成真行，一个排除成假行。
 \begin{center}
 \begin{tabular}{c c l l}
 \toprule 编号 & $pqr$ & $m_i$ & $M_i$\\\midrule
@@ -285,7 +320,7 @@ B\equiv B\land(p\lor\neg p)\equiv(B\land p)\lor(B\land\neg p).
 C\equiv C\lor(p\land\neg p)\equiv(C\lor p)\land(C\lor\neg p).
 \]
 最后消除重复项，按编号排序。也可直接由真值表求主范式。
-\example{课件中的三变元主范式}
+\example{由成真条件求三变元主范式}
 对 $F=(p\to\neg q)\to r\equiv(p\land q)\lor r$，
 \[
 p\land q\equiv m_6\lor m_7,\qquad
@@ -347,36 +382,40 @@ A&\equiv((p\downarrow p)\downarrow(q\downarrow q))\downarrow(r\downarrow r)
 &&\{\downarrow\}.
 \end{align*}
 
+\subsection{本章小结}
+等值演算的每一步都保持所有赋值下的真值。普通范式展示公式的联结结构，主范式还逐项记录全部成真或成假赋值，因此其唯一性依赖于预先固定的变元全集与顺序。证明联结词集合完备，可以构造出一组已知完备的联结词；证明不完备，则可寻找所有可构造公式共同保持的性质。
+
 \exercise
-\begin{enumerate}
+\begin{enumerate}[label=2.\arabic*.,leftmargin=2.8em]
 \begin{samepage}
-\item 按 $p,q,r$ 顺序，已知 $F$ 的成真赋值为 $001,010,111$，求两类主范式。\\
-\term{解：}$F\equiv\Sigma m(1,2,7)\equiv\Pi M(0,3,4,5,6)$。
+\item  按 $p,q,r$ 顺序，已知 $F$ 的成真赋值为 $001,010,111$，求两类主范式。
 \end{samepage}
+
 \begin{samepage}
-\item 设 $F\equiv\Sigma m(1,2,4)$，求 $\neg F$ 的 PDNF 与 $F$ 的 PCNF（共三变元）。\\
-\term{解：}两者的编号都是 $0,3,5,6,7$，但前者使用 $m_i$，后者使用 $M_i$。
+\item  设 $F\equiv\Sigma m(1,2,4)$，求 $\neg F$ 的 PDNF 与 $F$ 的 PCNF（共三变元）。
 \end{samepage}
+
 \begin{samepage}
-\item 求 $(p\to q)\land\neg p$ 的主范式。\\
-\term{解：}公式等值于 $\neg p$，故为 $m_0\lor m_1$，也为 $M_2\land M_3$。
+\item  求 $(p\to q)\land\neg p$ 的主范式。
 \end{samepage}
+
 \begin{samepage}
-\item 判断“每个 CNF 都可满足”。\\
-\term{解：}错误，CNF $p\land\neg p$ 不可满足。普通范式的结构并不保证可满足性。
+\item  判断“每个 CNF 都可满足”。
 \end{samepage}
+
 \begin{samepage}
-\item 只用与非表示 $p\to q$。\\
-\term{解：}$p\to q\equiv\neg(p\land\neg q)\equiv p\uparrow(q\uparrow q)$。
+\item  只用与非表示 $p\to q$。
 \end{samepage}
 \end{enumerate}
 \chapterpage{命题逻辑的推理理论}
+
+等值演算比较两个公式是否表达相同条件，推理则研究结论是否由前提保证。证明推理有效，要排除所有“前提全真、结论为假”的情况；构造形式证明，则要把这种保证写成每一步都有依据的推导。
 \subsection{推理的形式结构与有效性}
 推理由前提 $A_1,\ldots,A_k$ 和结论 $B$ 构成。若每个使全部前提为真的赋值都使 $B$ 为真，则推理有效（正确），记为
 \[
 \{A_1,\ldots,A_k\}\models B.
 \]
-课件以重言蕴涵记号 $A_1\land\cdots\land A_k\Rightarrow B$ 表示这一关系。注意 $\to$ 是公式中的蕴涵联结词，$\Rightarrow$ 在此表示该蕴涵式为重言式。
+也可用重言蕴涵记号 $A_1\land\cdots\land A_k\Rightarrow B$ 表示这一关系。注意 $\to$ 是公式中的蕴涵联结词，$\Rightarrow$ 在此表示该蕴涵式为重言式。
 \[
 \{A_1,\ldots,A_k\}\models B
 \quad\Longleftrightarrow\quad
@@ -386,7 +425,7 @@ A&\equiv((p\downarrow p)\downarrow(q\downarrow q))\downarrow(r\downarrow r)
 
 有效性保证“当前提都真时，结论也真”，并不保证前提在实际世界中为真，也不单独保证结论实际为真。前提互相矛盾时，没有使全部前提为真的赋值，因此在经典逻辑中可语义地蕴涵任意结论。
 \example{有效形式与无效形式}
-$p\to q,p\models q$ 是假言推理。即使“今天是 $1$ 号则明天是 $5$ 号”在日常意义下为假，该形式仍然有效。
+$p\to q,p\models q$ 是假言推理。例如把 $p$ 解释为“下雨”、$q$ 解释为“地面湿”，从“下雨则地面湿”和“下雨”可推出“地面湿”。这里验证的是两个前提共同保证结论；若没有证据说明两个前提都真，就不能仅凭推理形式断言现实中地面已经湿了。
 $p\to q,q\not\models p$：$p=0,q=1$ 时两个前提都真而结论假，称为\term{肯定后件错误}。$p\to q,\neg p\not\models\neg q$ 也无效，同一赋值即为反例，称为\term{否定前件错误}。
 
 \subsection{判断推理是否有效的方法}
@@ -424,9 +463,9 @@ $p\to q,q\not\models p$：$p=0,q=1$ 时两个前提都真而结论假，称为\t
 \[
 \mathcal I=\langle\mathcal A,\mathcal E,\mathcal X,\mathcal R\rangle,
 \]
-分别表示字母表、合式公式集、公理集、推理规则集。前两者定义形式语言，后两者定义演算。课件的自然推理系统 P 无固定公理，按规则从前提构造证明；公理推理系统另指定公理及规则。公理系统推出的定理是否永真，取决于系统的可靠性，不能由“设有公理”本身保证。
+分别表示字母表、合式公式集、公理集、推理规则集。前两者定义形式语言，后两者定义演算。这里使用的自然推理系统 P 无固定公理，按规则从前提构造证明；公理推理系统另指定公理及规则。公理系统推出的定理是否永真，取决于系统的可靠性，不能由“设有公理”本身保证。
 
-P 的字母表包含命题变元、五种联结词、括号和逗号；公式按第一章递归定义。规则包括前提引入、结论引入、等值置换，以及假言推理、附加、化简、拒取式、假言三段论、析取三段论、构造性二难、破坏性二难、合取引入。课件的结论引入允许引用此前已依法得到的公式，不允许直接写入待证结论。
+P 的字母表包含命题变元、五种联结词、括号和逗号；公式按第一章递归定义。规则包括前提引入、结论引入、等值置换，以及假言推理、附加、化简、拒取式、假言三段论、析取三段论、构造性二难、破坏性二难、合取引入。结论引入允许引用此前已依法得到的公式，不允许直接写入待证结论。
 
 若公式序列 $C_1,\ldots,C_l$ 的每一行都是前提或由此前的行按规则得到，且最后一行是结论 $B$，该序列即为证明。记 $\Gamma\vdash B$ 表示在指定系统中可形式推出 $B$；$\Gamma\models B$ 表示语义蕴涵。前者依据规则，后者依据真值。可靠的规则保证可推出的结论语义有效；二者定义不同。
 
@@ -472,6 +511,8 @@ A\to(B\to C)\equiv(A\land B)\to C.
 \end{center}
 第 8 行以后不能把第 5 行的 $s$ 当作无条件成立的结论继续使用。
 
+第 7 行的 $q$ 也是在临时假设 $s$ 下得到的。解除假设时，保留下来的是“假如 $s$，那么 $q$”这一整条条件结论，而不是无条件的 $q$。写证明时把子证明范围标清，可以避免把“在假设下成立”误当成“已经证明成立”。
+
 \subsection{归谬法与证明方法选择}
 在经典逻辑中，欲证明 $C$，可暂时假设 $\neg C$，导出矛盾 $\bot$，再解除假设得到 $C$。语义依据是
 \[
@@ -483,28 +524,32 @@ A\to(B\to C)\equiv(A\land B)\to C.
 
 结论为蕴涵时优先考虑附加前提；结论为否定或正向推导较困难时考虑归谬；有连续蕴涵或可消去的合取时考虑直接证明。选择方法后仍应写出合法的规则序列。
 
+\subsection{本章小结}
+有效推理不能倒用；证明中不能引入尚未证明的结论。假设解除后，其作用范围内的结果只能在相应条件下保留。
+
 \exercise
-\begin{enumerate}
+\begin{enumerate}[label=3.\arabic*.,leftmargin=2.8em]
 \begin{samepage}
-\item 前提 $q\to r,p\to\neg r$，结论 $q\to\neg p$，构造证明。\\
-\term{解：}假设 $q$，由 $q\to r$ 得 $r$，由 $p\to\neg r$ 与 $r$ 得 $\neg p$；解除假设得 $q\to\neg p$。
+\item  前提 $q\to r,p\to\neg r$，结论 $q\to\neg p$，构造证明。
 \end{samepage}
+
 \begin{samepage}
-\item 前提 $p\to(q\lor r),s\to\neg q,p,s$，证明 $r\lor t$。\\
-\term{解：}由 $p$ 得 $q\lor r$，由 $s$ 得 $\neg q$，析取三段论得 $r$，附加律得 $r\lor t$。
+\item  前提 $p\to(q\lor r),s\to\neg q,p,s$，证明 $r\lor t$。
 \end{samepage}
+
 \begin{samepage}
-\item 前提 $p\lor q,p\to r,q\to r$，证明 $r$。\\
-\term{解：}构造性二难得 $r\lor r$，幂等律置换得 $r$。
+\item  前提 $p\lor q,p\to r,q\to r$，证明 $r$。
 \end{samepage}
+
 \begin{samepage}
-\item 前提 $p\to q,q\to r$，结论 $r\to p$，判断是否有效。\\
-\term{解：}无效，取 $p=0,q=0,r=1$，全部前提真而结论假。
+\item  前提 $p\to q,q\to r$，结论 $r\to p$，判断是否有效。
 \end{samepage}
 \end{enumerate}
-\note{有效推理不能倒用；证明中不能引入尚未证明的结论。假设解除后，其作用范围内的结果只能在相应条件下保留。}
+
 
 \chapterpage{一阶逻辑的基本概念}
+
+“所有学生都交了作业”与“有学生交了作业”涉及同一性质，却提出不同要求。命题逻辑把整句话作为一个命题，一阶逻辑则进一步标明讨论哪些对象、它们有什么性质，以及条件要求对所有对象还是某些对象成立。
 \subsection{个体词、谓词、论域与量词}
 一阶逻辑把命题内部的对象、性质与关系分开描述。\term{个体常项}表示具体对象，如 $a,b,c$；\term{个体变项}如 $x,y,z$ 在指定\term{个体域}（论域）$D$ 中取值。本讲义采用经典一阶逻辑的非空论域约定。
 
@@ -518,7 +563,7 @@ A\to(B\to C)\equiv(A\land B)\to C.
 论域可以有限，也可以无限。$\mathbb N,\mathbb Z,\mathbb Q,\mathbb R$ 的真值背景不同。本讲义 $\mathbb N=\{0,1,2,\ldots\}$。
 
 \subsection{命题符号化与特性谓词}
-符号化时先说明论域、常项和谓词含义，再构造公式。课件约定未指定论域时按全总个体域处理，并用特性谓词限制对象类别。
+符号化时先说明论域、常项和谓词含义，再构造公式。若要同时讨论不同类别的对象，可选取包含这些对象的共同论域，再用特性谓词限制类别。
 \example{同一陈述在不同论域中的形式}
 设 $P(x)$：$x$ 是人，$M(x)$：$x$ 爱美，$L(x)$：$x$ 用左手写字。
 \begin{center}
@@ -567,6 +612,21 @@ A\to(B\to C)\equiv(A\land B)\to C.
 \exists y\forall xR(x,y)\models\forall x\exists yR(x,y),
 \]
 逆向不成立。
+
+\example{逐行寻找见证与寻找共同见证}
+取 $D=\{a,b\}$，令 $R(x,y)$ 表示 $x=y$。把 $x$ 的取值排成行、$y$ 的取值排成列，$1$ 表示关系成立：
+\begin{center}
+\begin{tikzpicture}[x=1.2cm,y=.85cm,every node/.style={font=\normalsize}]
+\node at(0,0){$x\backslash y$};\node at(1,0){$a$};\node at(2,0){$b$};
+\node at(0,-1){$a$};\node at(0,-2){$b$};
+\node[draw,circle,inner sep=3pt] at(1,-1){$1$};\node at(2,-1){$0$};
+\node at(1,-2){$0$};\node[draw,circle,inner sep=3pt] at(2,-2){$1$};
+\draw (.5,.3)--(.5,-2.4);\draw(-.45,-.45)--(2.5,-.45);
+\node[anchor=west,align=left,font=\small] at(3,-1){每一行都有一个 $1$\\但没有一列全是 $1$};
+\end{tikzpicture}
+\diagramcaption{量词顺序决定见证能否随对象改变}\label{fig:lecture-2}
+\end{center}
+$\forall x\exists yR(x,y)$ 为真：$x=a$ 时选 $y=a$，$x=b$ 时选 $y=b$。而 $\exists y\forall xR(x,y)$ 为假：无论固定哪一列，都有一行是 $0$。两个公式的区别，在于是否必须先固定同一个 $y$。
 
 \subsection{一阶语言、项、原子公式与合式公式}
 一阶语言的非逻辑符号包括常项、函数符号和谓词符号，各符号的元数固定。逻辑符号包括变量、量词、联结词与括号；带等号的语言还包含等号。
@@ -633,29 +693,33 @@ $\exists x(x+7=5)$ 在自然数域为假，在实数域为真，见证为 $x=-2$
 
 命题逻辑可用有限真值表判定。一般一阶逻辑的有效性、可满足性不存在对所有公式都能停机并正确判断的通用算法；这不妨碍判断许多具体公式。逻辑有效性可半判定，可满足性一般不能半判定；有限论域的一个固定解释则可以枚举求值。
 
+\subsection{本章小结}
+自然语言符号化必须交代论域和谓词含义；全称条件与存在条件的联结词不同；量词顺序表达对象之间的依赖关系。
+
 \exercise
-\begin{enumerate}
+\begin{enumerate}[label=4.\arabic*.,leftmargin=2.8em]
 \begin{samepage}
-\item 在全总论域下表达“所有大熊猫可爱”“有人爱发脾气”。\\
-\term{解：}$\forall x(P(x)\to C(x))$；$\exists x(H(x)\land T(x))$，其中 $P,C,H,T$ 分别表示大熊猫、可爱、人、爱发脾气。
+\item  在全总论域下表达“所有大熊猫可爱”“有人爱发脾气”。
 \end{samepage}
+
 \begin{samepage}
-\item 分析 $\forall xP(x)\to Q(x)$ 的自由变量并与 $\forall x(P(x)\to Q(x))$ 比较。\\
-\term{解：}前者按括号为 $(\forall xP(x))\to Q(x)$，$Q(x)$ 中的 $x$ 自由；后者无自由变量，二者含义不同。
+\item  分析 $\forall xP(x)\to Q(x)$ 的自由变量并与 $\forall x(P(x)\to Q(x))$ 比较。
 \end{samepage}
+
 \begin{samepage}
-\item 在自然数域中判断 $\forall x\forall y\exists z(x+y=z)$ 和 $\exists z\forall x\forall y(x+y=z)$。\\
-\term{解：}第一式真，见证为 $z=x+y$；第二式假，不同的 $x,y$ 可有不同的和，不存在统一的 $z$。
+\item  在自然数域中判断 $\forall x\forall y\exists z(x+y=z)$ 和 $\exists z\forall x\forall y(x+y=z)$。
 \end{samepage}
+
 \begin{samepage}
-\item 给出 $\exists x(P(x)\land Q(x))$ 的成真、成假解释。\\
-\term{解：}取 $D=\{a,b\}$。$P=Q=\{a\}$ 时真；$P=\{a\},Q=\{b\}$ 时假。
+\item  给出 $\exists x(P(x)\land Q(x))$ 的成真、成假解释。
 \end{samepage}
 \end{enumerate}
-\note{自然语言符号化必须交代论域和谓词含义；全称条件与存在条件的联结词不同；量词顺序表达对象之间的依赖关系。}
+
 \chapterpage{一阶逻辑等值演算与推理}
+
+量词参与运算后，公式的变形既要保持真值，也要保持每个变量受哪个量词约束。下面先用有限论域解释量词运算，再讨论一般的等值变形和推理规则。每次移动量词，都需要同时检查它的种类、辖域和自由变量条件。
 \subsection{等值关系、置换与量词否定}
-一阶公式 $A,B$ 等值，是指对所有解释和同一自由变量赋值，二者真值相同，记为 $A\equiv B$，课件记为 $A\Leftrightarrow B$。命题逻辑十六组等值式的代换实例仍成立；等值子公式可在保持变量绑定关系的条件下置换。
+一阶公式 $A,B$ 等值，是指对所有解释和同一自由变量赋值，二者真值相同，记为 $A\equiv B$，也记为 $A\Leftrightarrow B$。命题逻辑十六组等值式的代换实例仍成立；等值子公式可在保持变量绑定关系的条件下置换。
 
 量词否定等值式为
 \[
@@ -694,13 +758,19 @@ $\exists x(x+7=5)$ 在自然数域为假，在实数域为真，见证为 $x=-2$
 \exists x\forall yR(x,y)
 \equiv\bigvee_{u\in D}\bigl(R(u,a)\land R(u,b)\land R(u,c)\bigr).
 \]
-\example{课件给定解释的求值}
-设 $D=\{2,3\}$，$a=2$，$f(2)=3,f(3)=2$，$P(2)=0,P(3)=1$，且 $R(2,2)=R(2,3)=R(3,2)=1,R(3,3)=0$。则
+\example{逐个代入论域中的对象}
+设 $D=\{2,3\}$，$a=2$，$f(2)=3,f(3)=2$，$P(2)=0,P(3)=1$，且 $R(2,2)=R(2,3)=R(3,2)=1,R(3,3)=0$。求 $\forall x\exists y(P(f(x))\land R(y,f(a)))$ 的真值。因为 $f(a)=3$，先分别代入 $x=2,3$：
 \begin{align*}
-&\forall x\exists y(P(f(x))\land R(y,f(a)))\\
-&\quad\equiv P(f(2))\land P(f(3))\land(R(2,3)\lor R(3,3))\\
-&\quad\equiv1\land0\land(1\lor0)\equiv0.
+&\exists y(P(f(2))\land R(y,3))
+ \equiv 1\land(1\lor0)\equiv1,\\
+&\exists y(P(f(3))\land R(y,3))
+ \equiv 0\land(1\lor0)\equiv0.
 \end{align*}
+外层全称量词要求两个取值都满足条件，因此
+\[
+\forall x\exists y(P(f(x))\land R(y,f(a)))\equiv1\land0\equiv0.
+\]
+
 
 \subsection{量词辖域的收缩与扩张}
 以下各式都要求 $x\notin FV(B)$，即 $B$ 中没有 $x$ 的自由出现，并采用非空论域。
@@ -758,7 +828,7 @@ $\forall$ 对 $\lor$、$\exists$ 对 $\land$ 一般不满足相应的双向分�
 
 \term{自由代替}记作 $A[t/x]$，只把 $x$ 的自由出现换为项 $t$。条件是 $t$ 对 $x$ 可自由代入：$t$ 中的变量不能因代入进入量词辖域而被意外绑定。$\forall yR(x,y)$ 中不能直接以 $y$ 代替自由 $x$；应先换名为 $\forall zR(x,z)$，再得到 $\forall zR(y,z)$。
 
-课件将自由变量换为全新符号称为“代替规则”。其精确含义需要同时对应变量赋值：$A(x)$ 与 $A(u)$ 在 $x,u$ 指向同一对象时真值一致，保持可满足性、有效性等性质；在同一固定赋值下，二者不一定等值。例如 $P(x)$ 与 $P(u)$ 可因 $s(x)\ne s(u)$ 而真值不同。因此本讲义进行等值演算和前束化时优先换约束变量，保留原自由变量名称，不把自由改名当作无条件等值置换。
+自由变量换名需要同时对应变量赋值：$A(x)$ 与 $A(u)$ 在 $x,u$ 指向同一对象时真值一致，保持可满足性、有效性等性质；在同一固定赋值下，二者不一定等值。例如 $P(x)$ 与 $P(u)$ 可因 $s(x)\ne s(u)$ 而真值不同。因此本讲义进行等值演算和前束化时优先换约束变量，保留原自由变量名称，不把自由改名当作无条件等值置换。
 
 \subsection{前束范式及其求法}
 \term{前束范式}形如
@@ -819,7 +889,7 @@ $\forall x(P(x)\to\neg Q(x))$ 也是同一公式的前束范式，母式允许�
 \frac{\exists xA(x)\qquad [A(c)]\ \cdots\ B}{B}
 \qquad(c\text{ 是新参数，且不出现在最终 }B\text{ 中}).
 \]
-课件也将后两类规则写为蕴涵形式：从 $B\to A(t)$ 可导出 $B\to\exists xA(x)$；若新参数满足独立性条件，从 $A(c)\to B$ 可导出 $(\exists xA(x))\to B$。
+后两类规则也可写为蕴涵形式：从 $B\to A(t)$ 可导出 $B\to\exists xA(x)$；若新参数满足独立性条件，从 $A(c)\to B$ 可导出 $(\exists xA(x))\to B$。
 
 \example{存在消去的完整证明}
 前提为 $\forall x(P(x)\to Q(x)),\exists xP(x)$，结论为 $\exists xQ(x)$。
@@ -842,37 +912,41 @@ $\forall x(P(x)\to\neg Q(x))$ 也是同一公式的前束范式，母式允许�
 
 \example{无效的量词推理}
 $\exists xP(x),\exists xQ(x)\not\models\exists x(P(x)\land Q(x))$，可取 $D=\{a,b\}$、$P=\{a\}$、$Q=\{b\}$。分别得到的见证不能强行设为同一对象。
+
+例如“有人会游泳”和“有人会下棋”，可能分别由两个人见证。为它们分别取新名字 $c,d$，只是暂不假定二者是否相同，并不额外断言 $c\ne d$；真正错误的是未经证明就把二者都当作同一个对象使用。
 由 $P(a)$ 推 $\forall xP(x)$ 也无效：$a$ 是特定常项，取 $P=\{a\}$ 且论域还含 $b$ 即可反驳。
 
+\subsection{本章小结}
+量词规则的变量条件是规则本身的一部分。全称引入要求任意对象，存在消去要求新见证且结论不依赖见证名称；忽略条件会产生无效证明。
+
 \exercise
-\begin{enumerate}
+\begin{enumerate}[label=5.\arabic*.,leftmargin=2.8em]
 \begin{samepage}
-\item 将 $\neg\exists x\forall yR(x,y)$ 化为前束范式。\\
-\term{解：}$\forall x\exists y\neg R(x,y)$。
+\item  将 $\neg\exists x\forall yR(x,y)$ 化为前束范式。
 \end{samepage}
+
 \begin{samepage}
-\item 化简 $(\exists xP(x))\to Q$，其中 $Q$ 无自由 $x$，写成前束范式。\\
-\term{解：}$\forall x(P(x)\to Q)$。
+\item  化简 $(\exists xP(x))\to Q$，其中 $Q$ 无自由 $x$，写成前束范式。
 \end{samepage}
+
 \begin{samepage}
-\item 由 $\forall x(P(x)\to Q(x)),\exists x\neg Q(x)$ 证明 $\exists x\neg P(x)$。\\
-\term{解：}为第二前提取新见证 $c$，假设 $\neg Q(c)$。由第一前提得 $P(c)\to Q(c)$，拒取式得 $\neg P(c)$，存在引入得 $\exists x\neg P(x)$，最后解除见证假设。
+\item  由 $\forall x(P(x)\to Q(x)),\exists x\neg Q(x)$ 证明 $\exists x\neg P(x)$。
 \end{samepage}
+
 \begin{samepage}
-\item 判断 $\forall x(P(x)\lor Q(x)),\forall x\neg P(x)\models\forall xQ(x)$。\\
-\term{解：}有效。对任意 $u$ 全称消去得 $P(u)\lor Q(u)$ 和 $\neg P(u)$，析取三段论得 $Q(u)$，全称引入即可。
+\item  判断 $\forall x(P(x)\lor Q(x)),\forall x\neg P(x)\models\forall xQ(x)$。
 \end{samepage}
+
 \begin{samepage}
-\item 解释为何不能把 $\forall xR(x,y)$ 中的约束 $x$ 直接换成 $y$。\\
-\term{解：}原来自由的 $y$ 会被量词捕获；应取尚未使用的新变量 $z$，得到 $\forall zR(z,y)$。
+\item  解释为何不能把 $\forall xR(x,y)$ 中的约束 $x$ 直接换成 $y$。
 \end{samepage}
 \end{enumerate}
-\note{量词规则的变量条件是规则本身的一部分。全称引入要求任意对象，存在消去要求新见证且结论不依赖见证名称；忽略条件会产生无效证明。}
+
 \chapterpage{集合代数}
 集合代数研究集合的表示、隶属与包含关系、运算、恒等式和有限集合计数。集合的并、交、补与命题逻辑的析取、合取、否定对应，是典型的布尔代数结构。
 
 \subsection{集合、元素与三种基本性质}
-\term{集合}可理解为由确定对象组成的全体，对象称为元素。集合具有确定性、互异性、无序性：应能判定对象是否属于集合；重复列出的同一对象只计一次；元素排列次序不影响集合。
+\term{集合}可理解为由确定对象组成的全体，对象称为元素。集合具有确定性、互异性、无序性：每个对象是否属于集合应有唯一确定的答案；重复列出的同一对象只计一次；元素排列次序不影响集合。确定性不要求已经知道每个答案，也不要求存在一个总能算出答案的算法。
 \[
 \{1,1,2\}=\{1,2\}=\{2,1\}.
 \]
@@ -906,7 +980,7 @@ A\subseteq B\quad\Longleftrightarrow\quad\forall x(x\in A\to x\in B).
 \]
 否定包含为 $A\nsubseteq B\Longleftrightarrow\exists x(x\in A\land x\notin B)$。
 $A=B$ 当且仅当 $A\subseteq B$ 且 $B\subseteq A$。
-$A\subsetneq B$ 表示真包含，即 $A\subseteq B$ 且 $A\ne B$。课件有时以 $\subset$ 表示真包含，本讲义统一用 $\subsetneq$ 避免歧义。
+$A\subsetneq B$ 表示真包含，即 $A\subseteq B$ 且 $A\ne B$。符号 $\subset$ 在不同书中含义不统一，这里用 $\subsetneq$ 明确表示真包含。
 
 包含具有自反性、反对称性和传递性：$A\subseteq A$；若相互包含则相等；$A\subseteq B\subseteq C$ 则 $A\subseteq C$。隶属关系不能一般当作传递关系：$a\in\{a\}$ 且 $\{a\}\in\{\{a\}\}$，但 $a\notin\{\{a\}\}$。
 \example{括号层次}
@@ -916,6 +990,13 @@ $A\subsetneq B$ 表示真包含，即 $A\subseteq B$ 且 $A\ne B$。课件有时
 \{\{d\}\}\in A,\quad\{d\}\notin A,\quad d\in A.
 \]
 $\{d\}\subseteq A$ 仍然成立，因为它的唯一元素 $d$ 属于 $A$。可见“不属于”不等于“不包含”。
+
+一种稳定的检查方法是先读左边的对象：判断 $x\in A$，要在 $A$ 的元素中找到整个 $x$；判断 $S\subseteq A$，则要把 $S$ 的元素逐一拿出来检查。特别地，
+\[
+x\in A\quad\Longleftrightarrow\quad\{x\}\subseteq A
+\quad\Longleftrightarrow\quad\{x\}\in\mathcal P(A).
+\]
+这三个式子表达同一事实，但左边对象的括号层次和所用关系不同。
 \example{同一个对象同时属于与包含}
 设 $A=\{a\},B=\{\{a\},\{\{a\}\}\}$。则 $\{A\}=\{\{a\}\}$ 是 $B$ 的一个元素，故 $\{A\}\in B$；其唯一元素 $\{a\}$ 也属于 $B$，故 $\{A\}\subseteq B$。两个判断针对不同的逻辑关系，可以同时成立。
 
@@ -949,8 +1030,8 @@ $\mathbb N,\mathbb Z,\mathbb Q,\mathbb R$ 都是无限集合。有限集合计�
 并 & $A\cup B=\{x\mid x\in A\lor x\in B\}$\\
 交 & $A\cap B=\{x\mid x\in A\land x\in B\}$\\
 相对补（差） & $A\setminus B=\{x\mid x\in A\land x\notin B\}$\\
-绝对补（补集） & $A^c=U\setminus A$，课件也记作 $\sim A$\\
-对称差 & $A\triangle B=(A\setminus B)\cup(B\setminus A)$；\newline 也为 $(A\cup B)\setminus(A\cap B)$，课件记作 $A\oplus B$\\\bottomrule
+绝对补（补集） & $A^c=U\setminus A$，也记作 $\sim A$\\
+对称差 & $A\triangle B=(A\setminus B)\cup(B\setminus A)$；\newline 也为 $(A\cup B)\setminus(A\cap B)$，也记作 $A\oplus B$\\\bottomrule
 \end{longtable}
 差保留属于 $A$ 而不属于 $B$ 的元素，对称差保留恰好属于二者之一的元素。$A\setminus B=A\cap B^c$，$A\triangle B=(A\cap B^c)\cup(A^c\cap B)$。
 \example{直接计算}
@@ -962,34 +1043,35 @@ A^c&=\{4,5\}, &A\triangle B&=\{1,2,4\}.
 \end{align*}
 
 \begin{center}
-\begin{tikzpicture}[scale=.55]
+\begin{tikzpicture}[scale=.72,every node/.style={font=\small}]
 \begin{scope}[shift={(0,0)}]
 \fill[gray!35] (0,0) circle(1.3);\fill[gray!35] (1.8,0) circle(1.3);
 \draw (-1.6,-1.6) rectangle(3.4,1.6);\draw (0,0) circle(1.3);\draw(1.8,0) circle(1.3);
-\node at(-.5,.8){$A$};\node at(2.3,.8){$B$};\node at(.9,-2.2){$A\cup B$};
+\node[anchor=north west,inner sep=1pt] at(-1.55,1.55){$U$};\node at(-.5,.8){$A$};\node at(2.3,.8){$B$};\node at(.9,-2.2){$A\cup B$};
 \end{scope}
 \begin{scope}[shift={(6.5,0)}]
 \begin{scope}\clip (0,0) circle(1.3);\fill[gray!35] (1.8,0) circle(1.3);\end{scope}
 \draw (-1.6,-1.6) rectangle(3.4,1.6);\draw (0,0) circle(1.3);\draw(1.8,0) circle(1.3);
-\node at(-.5,.8){$A$};\node at(2.3,.8){$B$};\node at(.9,-2.2){$A\cap B$};
+\node[anchor=north west,inner sep=1pt] at(-1.55,1.55){$U$};\node at(-.5,.8){$A$};\node at(2.3,.8){$B$};\node at(.9,-2.2){$A\cap B$};
 \end{scope}
 \begin{scope}[shift={(13,0)}]
 \fill[gray!35] (0,0) circle(1.3);\fill[white] (1.8,0) circle(1.3);
 \draw (-1.6,-1.6) rectangle(3.4,1.6);\draw (0,0) circle(1.3);\draw(1.8,0) circle(1.3);
-\node at(-.5,.8){$A$};\node at(2.3,.8){$B$};\node at(.9,-2.2){$A\setminus B$};
+\node[anchor=north west,inner sep=1pt] at(-1.55,1.55){$U$};\node at(-.5,.8){$A$};\node at(2.3,.8){$B$};\node at(.9,-2.2){$A\setminus B$};
 \end{scope}
 \begin{scope}[shift={(3.25,-5.5)}]
 \fill[gray!35] (-1.6,-1.6) rectangle(3.4,1.6);\fill[white] (0,0) circle(1.3);
 \draw (-1.6,-1.6) rectangle(3.4,1.6);\draw (0,0) circle(1.3);\draw(1.8,0) circle(1.3);
-\node at(-.5,.8){$A$};\node at(2.3,.8){$B$};\node at(.9,-2.2){$A^c$};
+\node[anchor=north west,inner sep=1pt] at(-1.55,1.55){$U$};\node at(-.5,.8){$A$};\node at(2.3,.8){$B$};\node at(.9,-2.2){$A^c$};
 \end{scope}
 \begin{scope}[shift={(9.75,-5.5)}]
 \fill[gray!35] (0,0) circle(1.3);\fill[gray!35] (1.8,0) circle(1.3);
 \begin{scope}\clip (0,0) circle(1.3);\fill[white] (1.8,0) circle(1.3);\end{scope}
 \draw (-1.6,-1.6) rectangle(3.4,1.6);\draw (0,0) circle(1.3);\draw(1.8,0) circle(1.3);
-\node at(-.5,.8){$A$};\node at(2.3,.8){$B$};\node at(.9,-2.2){$A\triangle B$};
+\node[anchor=north west,inner sep=1pt] at(-1.55,1.55){$U$};\node at(-.5,.8){$A$};\node at(2.3,.8){$B$};\node at(.9,-2.2){$A\triangle B$};
 \end{scope}
 \end{tikzpicture}
+\diagramcaption{五种集合运算：灰色区域为运算结果}\label{fig:lecture-3}
 \end{center}
 图中矩形表示全集 $U$，阴影表示相应运算的结果。集合补与命题否定一样依赖指定背景。
 
@@ -1017,9 +1099,9 @@ A^c&=\{4,5\}, &A\triangle B&=\{1,2,4\}.
 \]
 若 $A$ 是集合，$\bigcup\{A\}=\bigcap\{A\}=A$。单个原子对象一般不能直接参与广义并交；“去掉括号一层”只是便于记忆，严格含义取决于元素也是集合。
 
-$\bigcup\varnothing=\varnothing$。课件在未固定全集的集合论语境下不定义 $\bigcap\varnothing$；若预先固定 $U$ 并将交限制为 $U$ 中满足条件的元素，则可约定空族交为 $U$。两种约定的背景不同，不应混用。
+$\bigcup\varnothing=\varnothing$。在未固定全集的集合论语境下不定义 $\bigcap\varnothing$；若预先固定 $U$ 并将交限制为 $U$ 中满足条件的元素，则可约定空族交为 $U$。两种约定的背景不同，不应混用。
 
-课件将广义并交、幂集和补列为优先的运算，嵌套时由内到外（书写上从右向左）计算；普通 $\cup,\cap,\setminus,\triangle$ 的混合次序用括号确定。
+广义并交、幂集和补的嵌套运算由内到外计算；普通 $\cup,\cap,\setminus,\triangle$ 的混合次序用括号确定。
 \example{多层运算}
 设 $\mathcal A=\{\{a\},\{a,b\}\}$，其中 $a,b$ 本身为集合，则
 \begin{align*}
@@ -1134,7 +1216,7 @@ $A\setminus B=A$ & $A\cap B=\varnothing$\\
 $A\cap B=B$ & $B\subseteq A$\\\bottomrule
 \end{tabularx}
 \end{center}
-\example{课件习题的四个条件推导}
+\example{四个条件的逐步推导}
 若 $A\setminus B=B$，左侧与 $B$ 不相交，故 $B=\varnothing$，代回得 $A=\varnothing$。若 $A\setminus B=B\setminus A$，两侧相互不交又相等，因此都为空，得到相互包含，故 $A=B$。若 $A\cap B=A\cup B$，则 $A\subseteq A\cup B=A\cap B\subseteq B$，交换角色得 $B\subseteq A$，故 $A=B$。若 $A\triangle B=A$，两侧与 $A$ 取对称差，得 $B=\varnothing$。各条件代回原式均成立，因而也是充分条件。
 
 \subsection{有限集合的计数与容斥原理}
@@ -1207,40 +1289,42 @@ $24$ 人每人至少会一种外语。英语 $13$ 人、日语 $5$ 人、德语 
 \example{三个区域的旋转着色}
 将正三角形的三个可循环轮换的区域用黑、白两色着色，位置固定时有 $2^3=8$ 种。若旋转重合视为相同，则按黑色区域个数分为 $0,1,2,3$ 四类。在此三区域模型中同黑色个数的方案可互相旋转重合，因此有 $4$ 类；对更多区域不能仅按黑色个数自动归并。
 
+\subsection{本章小结}
+集合的括号层次决定元素身份；幂集元素是子集；广义运算的输入是集合族；容斥中的交集默认包含更高重交集，计数前须明确全集与等同规则。
+
 \exercise
-\begin{enumerate}
+\begin{enumerate}[label=6.\arabic*.,leftmargin=2.8em]
 \begin{samepage}
-\item 判断 $\varnothing\subseteq\varnothing$、$\varnothing\in\varnothing$、$\varnothing\subseteq\{\varnothing\}$、$\varnothing\in\{\varnothing\}$。\\
-\term{解：}依次为真、假、真、真。若 $A=\{a,b,c,\{a,b\}\}$，则 $\{a,b\}\subseteq A$ 与 $\{a,b\}\in A$ 同时成立。
+\item  判断 $\varnothing\subseteq\varnothing$、$\varnothing\in\varnothing$、$\varnothing\subseteq\{\varnothing\}$、$\varnothing\in\{\varnothing\}$。
 \end{samepage}
+
 \begin{samepage}
-\item 设 $S_1=\{1,\ldots,9\},S_2=\{2,4,6,8\},S_3=\{1,3,5,7,9\},S_4=\{3,4,5\},S_5=\{3,5\}$。限定 $X$ 是这五个候选集合之一，分别求：$X\cap S_5=\varnothing$；$X\subseteq S_4$ 且 $X\cap S_2=\varnothing$；$X\subseteq S_1$ 且 $X\nsubseteq S_3$；$X\setminus S_3=\varnothing$；$X\subseteq S_3$ 且 $X\nsubseteq S_1$。\\
-\term{解：}依次为 $S_2$；$S_5$；$S_1,S_2,S_4$；$S_3,S_5$；无候选。若不限制为候选，前四题通常有更多解，不能据上述条件断言唯一集合。
+\item  设 $S_1=\{1,\ldots,9\},S_2=\{2,4,6,8\},S_3=\{1,3,5,7,9\},S_4=\{3,4,5\},S_5=\{3,5\}$。限定 $X$ 是这五个候选集合之一，分别求：$X\cap S_5=\varnothing$；$X\subseteq S_4$ 且 $X\cap S_2=\varnothing$；$X\subseteq S_1$ 且 $X\nsubseteq S_3$；$X\setminus S_3=\varnothing$；$X\subseteq S_3$ 且 $X\nsubseteq S_1$。
 \end{samepage}
+
 \begin{samepage}
-\item 判断“$A\setminus B=A$ 当且仅当 $B=\varnothing$”。\\
-\term{解：}错误，必要条件应为 $A\cap B=\varnothing$。反例 $A=\{1\},B=\{2\}$。
+\item  判断“$A\setminus B=A$ 当且仅当 $B=\varnothing$”。
 \end{samepage}
+
 \begin{samepage}
-\item 判断“$A\triangle A=A$”和“$A\cap B=B$ 则 $A=U$”。\\
-\term{解：}均错误。前者通常为 $\varnothing$，取 $A=\{1\}$ 可反驳；后者只要求 $B\subseteq A$，取 $U=\{1,2\},A=B=\{1\}$ 可反驳。
+\item  判断“$A\triangle A=A$”和“$A\cap B=B$ 则 $A=U$”。
 \end{samepage}
+
 \begin{samepage}
-\item 若 $x$ 是集合且 $A=\{x\}\cup x$，证明 $x\in A$ 且 $x\subseteq A$。\\
-\term{解：}$x\in\{x\}\subseteq A$，故属于关系成立；$x\subseteq\{x\}\cup x=A$，故包含关系也成立。
+\item  若 $x$ 是集合且 $A=\{x\}\cup x$，证明 $x\in A$ 且 $x\subseteq A$。
 \end{samepage}
+
 \begin{samepage}
-\item 证明 $\mathcal P(A\cap B)=\mathcal P(A)\cap\mathcal P(B)$，并判断幂集是否同样对并分配。\\
-\term{解：}$X\subseteq A\cap B$ 当且仅当 $X\subseteq A$ 且 $X\subseteq B$。对并一般只有 $\mathcal P(A)\cup\mathcal P(B)\subseteq\mathcal P(A\cup B)$；取 $A=\{1\},B=\{2\}$，子集 $\{1,2\}$ 仅属于右侧。
+\item  证明 $\mathcal P(A\cap B)=\mathcal P(A)\cap\mathcal P(B)$，并判断幂集是否同样对并分配。
 \end{samepage}
+
 \begin{samepage}
-\item $50$ 人中参加三项活动的人数分别为 $25,20,18$，两两交集人数分别为 $10,8,6$，三重交集为 $3$。求未参加者、恰好参加两项者和恰好参加一项者。\\
-\term{解：}并集人数为 $25+20+18-10-8-6+3=42$，未参加者 $8$；恰好两项者 $24-9=15$；恰好一项者 $63-48+9=24$。再加三项者 $3$，总数为 $42$。
+\item  $50$ 人中参加三项活动的人数分别为 $25,20,18$，两两交集人数分别为 $10,8,6$，三重交集为 $3$。求未参加者、恰好参加两项者和恰好参加一项者。
 \end{samepage}
 \end{enumerate}
-\note{集合的括号层次决定元素身份；幂集元素是子集；广义运算的输入是集合族；容斥中的交集默认包含更高重交集，计数前须明确全集与等同规则。}
+
 \chapterpage{二元关系}
-二元关系用有序对描述对象之间的联系。等价关系将对象分类，偏序关系描述对象之间的次序。本章依据第七章 7.6--7.7 节及其习题课整理；为使本章可独立阅读，先补充关系表示、运算、性质和闭包的必要定义。
+二元关系用有序对描述对象之间的联系。等价关系将对象分类，偏序关系描述对象之间的次序。从关系的表示和运算出发，可以依次理解关系的性质、等价分类以及偏序结构。
 
 \subsection{有序对、笛卡尔积与二元关系}
 \term{有序对} $\langle a,b\rangle$ 的两个分量有先后之分，且
@@ -1264,13 +1348,28 @@ r_{ij}=1\Longleftrightarrow a_iRa_j,\qquad r_{ij}=0\Longleftrightarrow\neg(a_iRa
 \end{align*}
 定义域不一定是题目指定的整个 $A$，值域也不一定是整个 $B$。
 
+\example{同一关系的三种表示}
+取 $A=\{1,2,3\}$，$R=\{(1,2),(2,3)\}$。按 $1,2,3$ 排列行列，有
+\[
+M_R=\begin{pmatrix}0&1&0\\0&0&1\\0&0&0\end{pmatrix}.
+\]
+\begin{center}
+\begin{tikzpicture}[>=Stealth,every node/.style={font=\normalsize}]
+\foreach \n/\x in {1/0,2/2.6,3/5.2}\node[circle,draw,inner sep=4pt](v\n)at(\x,0){$\n$};
+\draw[->,thick](v1)--(v2);\draw[->,thick](v2)--(v3);
+\draw[->,dashed](v1) to[bend left=30] node[above,font=\small]{闭包中补入 $(1,3)$}(v3);
+\end{tikzpicture}
+\diagramcaption{有序对、矩阵中的 $1$ 与有向边一一对应}\label{fig:lecture-4}
+\end{center}
+实线表示原关系；第一行第二列的 $1$ 对应边 $1\to2$。第三行全为 $0$，所以 $3$ 不在定义域中；第一列全为 $0$，所以 $1$ 不在值域中。图上虽能从 $1$ 经 $2$ 到达 $3$，原关系仍没有 $(1,3)$。虚线所示的边是在要求传递性时才必须补上的，后面称这种最小补全为传递闭包。
+
 \subsection{逆、合成、幂、限制与像}
 \term{逆关系} $R^{-1}=\{\langle y,x\rangle\mid xRy\}$，其矩阵为 $M_R$ 的转置。
-本章沿用课件的合成顺序：$R\circ S$ 表示\term{先沿 $R$，再沿 $S$}，即
+本书约定合成按从左到右的顺序进行：$R\circ S$ 表示\term{先沿 $R$，再沿 $S$}，即
 \[
 x(R\circ S)z\quad\Longleftrightarrow\quad\exists y\,(xRy\land ySz).
 \]
-不同教材可能采用相反的书写约定，运算时必须先核对定义。课件习题给出的 $R\circ S$ 结果与上述顺序一致。
+不同教材可能采用相反的书写约定，运算时必须先核对定义。
 
 在本约定下，$R^0=I_A$，$R^{n+1}=R^n\circ R$；$xR^ny$ 表示存在长度为 $n$ 的有向行走，从 $x$ 到 $y$。合成满足结合律，一般不满足交换律，且
 \[
@@ -1297,6 +1396,11 @@ R[C]&=\{y\mid\exists x\in C\,(xRy)\}.
 \end{longtable}
 反对称并非“不对称”：恒等关系既对称又反对称。传递性要求每条两步路径都有对应的直达关系，不能仅检查某一组三个元素。证明性质时任取相关元素，展开定义；否定性质时给出违反量词条件的具体反例。
 
+\example{用最小反例区分容易混淆的性质}
+在 $A=\{1,2\}$ 上，$R=\{(1,1)\}$ 既不自反，也不反自反：它缺少 $(2,2)$，却又保留了一个自环。因此“不自反”只要求至少缺一个自环，“反自反”要求一个自环也没有。
+
+对称要求一条边出现时，其反向也出现；反对称只禁止\term{不同点}之间同时出现两个方向。关系 $\{(1,2)\}$ 不对称但反对称，$I_A$ 则同时满足二者。在图~\ref{fig:lecture-4} 的 $R=\{(1,2),(2,3)\}$ 中，反对称成立，传递性却失败；反例就是 $1R2,2R3$ 成立而 $1R3$ 不成立。
+
 \term{闭包}是在包含原关系的前提下，满足指定性质的最小关系。自反、对称、传递闭包分别为
 \[
 r(R)=R\cup I_A,\qquad s(R)=R\cup R^{-1},\qquad
@@ -1304,7 +1408,9 @@ t(R)=\bigcup_{n\ge1}R^n.
 \]
 传递闭包包含正长度路径的全部可达关系；只有存在正长度回路时，才会因此加入相应自环。它与自反传递闭包 $I_A\cup t(R)$ 不同。若 $|A|=n\ge1$，则 $t(R)=R\cup\cdots\cup R^n$。
 
-\example{关系运算与三类闭包（习题课第 1 题）}
+计算传递闭包时，新补入的边也可能与已有边形成新的两步路径，所以不能只补一轮就停止。有限集合上可反复检查“已有 $xRy$ 和 $yRz$，是否还缺 $xRz$”，直到再无新增有序对。闭包只添加被性质迫使出现的关系；任意多加边虽然可能得到一个传递关系，却未必是最小的那个。
+
+\example{关系运算与三类闭包}
 设 $A=\{1,2,3\}$，$R=\{\langle x,y\rangle\in A^2\mid x+2y\le6\}$，$S=\{\langle1,2\rangle,\langle1,3\rangle,\langle2,2\rangle\}$。逐项枚举得
 \begin{align*}
 R&=\{(1,1),(1,2),(2,1),(2,2),(3,1)\},\\
@@ -1380,6 +1486,7 @@ X/R=\bigl\{\{0,2,4\},\{1,3\}\bigr\}.
 \foreach \u in {z,t,o,h}\path[->] (\u) edge[loop below] (\u);
 \path[->] (f) edge[loop above] (f);
 \end{tikzpicture}
+\diagramcaption{等价关系将同类元素连接，不同类之间没有边}\label{fig:lecture-5}
 \end{center}
 若把同类元素相邻排列，矩阵呈对角全 $1$ 方块，不同方块之间全 $0$。这给出有限等价关系的另一种检查方式。
 
@@ -1411,7 +1518,7 @@ xR_\pi y\Longleftrightarrow\exists B\in\pi\;(x,y\in B).
 \[
 A/R=\bigl\{\{1,2\},\{3,4\}\bigr\}.
 \]
-一般步骤是：选择尚未归类的元素，求其等价类，加入结果并标记其中所有元素，直到没有剩余元素。课件第 28 页第二步应在已求类的\term{外部}选择新代表元。
+一般步骤是：选择尚未归类的元素，求其等价类，加入结果并标记其中所有元素，直到没有剩余元素。选取的新代表元必须在已求各类的并集之外，否则只会重复得到已有的类。
 
 若有限划分的块大小为 $n_1,\ldots,n_k$，则
 \[
@@ -1476,10 +1583,13 @@ R_1\subseteq R_2\quad\Longleftrightarrow\quad\pi_{R_1}\le\pi_{R_2}.
 \node (d) at (-1,2.2) {$4$};\node (e) at (1,2.2) {$6$};\node (f) at (0,3.3) {$12$};
 \foreach \u/\v in {a/b,a/c,b/d,b/e,c/e,d/f,e/f}\draw (\u)--(\v);
 \end{tikzpicture}
+\diagramcaption{正因子集合 $D_{12}$ 的整除偏序}\label{fig:lecture-6}
 \end{center}
 $1\mid12$，但不画 $1$ 到 $12$ 的直接边，因为这一关系可由路径恢复。$4$ 与 $6$ 虽然数值可比较，但在整除序中不可比。
 
-\example{三种整除序的哈斯图（课件例 7.7.5）}
+例如要判断 $2\preceq12$，可沿 $2\to4\to12$ 持续向上，因而成立。要判断 $4\preceq6$，不能先向下走到 $2$ 再向上到 $6$；这条折线不是持续向上的路径。哈斯图中的线表示覆盖关系，完整偏序还包括长度大于一的向上路径以及每个元素与自身的关系。
+
+\example{三种整除序的哈斯图}
 下图依次表示 $D_8=\{1,2,4,8\}$、$\{2,3,6,12,24,36\}$ 和 $D_{30}$ 上的整除序。
 \begin{center}
 \begin{tikzpicture}[scale=1.05,every node/.style={circle,draw,fill=white,inner sep=2pt}]
@@ -1498,10 +1608,11 @@ $1\mid12$，但不画 $1$ 到 $12$ 的直接边，因为这一关系可由路径
 \foreach \u/\v in {a/b,a/c,a/d,b/e,b/f,c/e,c/g,d/f,d/g,e/h,f/h,g/h}\draw (\u)--(\v);
 \end{scope}
 \end{tikzpicture}
+\diagramcaption{链式、分叉式与含交叉边的整除偏序}\label{fig:lecture-7}
 \end{center}
 第二个集合中 $24$ 与 $36$ 之间无整除关系，均为极大元。第三个图共有 $12$ 条覆盖边；某些边交叉时，没有圆点的交叉处不作为顶点。
 
-\example{由哈斯图恢复关系矩阵（课件例 7.7.6）}
+\example{由哈斯图恢复关系矩阵}
 设覆盖对为 $(d,c),(c,a),(c,b)$，另有孤立点 $e$。则
 \[
 R=I_A\cup\{(d,c),(c,a),(c,b),(d,a),(d,b)\},\quad A=\{a,b,c,d,e\}.
@@ -1520,11 +1631,12 @@ M_R=\begin{pmatrix}
 \end{pmatrix}.
 \]
 \end{minipage}
+\diagramcaption{由覆盖边恢复全部关系，再填写关系矩阵}\label{fig:lecture-8}
 \end{center}
 矩阵行列均按 $a,b,c,d,e$ 排列。孤立点仍有自环，所以 $eRe$ 成立。
 
 \subsection{链、反链与有限偏序的分解}
-偏序集的子集 $C$ 中任意两元素均可比，则称 $C$ 为\term{链}；子集 $D$ 中任意两个\term{不同}元素均不可比，则称 $D$ 为\term{反链}。单元素集既是链又是反链。本章按课件约定，以元素个数计链长和反链大小；有些书以边数计链长，引用结论时须区分。
+偏序集的子集 $C$ 中任意两元素均可比，则称 $C$ 为\term{链}；子集 $D$ 中任意两个\term{不同}元素均不可比，则称 $D$ 为\term{反链}。单元素集既是链又是反链。本书以元素个数计链长和反链大小；有些书以边数计链长，引用结论时须区分。
 
 反链要求不存在向上可达路径，不能仅凭“没有直接连边”判断。例如 $D_{12}$ 中 $\{1,12\}$ 没有覆盖边，却是链；$\{4,6\}$ 是反链。
 
@@ -1549,7 +1661,7 @@ M_R=\begin{pmatrix}
 
 若非空有限偏序集只有一个极大元，则它是最大元，因为每个元素向上均可延伸到某个极大元。\term{有限性不可省略}：由一个孤立点和一条无上端点的无限链组成的偏序，孤立点是唯一极大元，但不是最大元。
 
-\example{子集中的四种极值（课件例 7.7.8）}
+\example{子集中的四种极值}
 下图的覆盖对为 $(1,2),(1,3),(2,4),(2,5),(3,5),(4,6),(4,7),(5,7),(6,8),(7,8)$。
 \begin{center}
 \begin{tikzpicture}[scale=1.1,every node/.style={circle,draw,fill=white,inner sep=2pt}]
@@ -1557,6 +1669,7 @@ M_R=\begin{pmatrix}
 \node (d) at (-1,2) {$4$};\node (e) at (1,2) {$5$};\node (f) at (-1,3) {$6$};\node (g) at (1,3) {$7$};\node (h) at (0,4) {$8$};
 \foreach \u/\v in {a/b,a/c,b/d,b/e,c/e,d/f,d/g,e/g,f/h,g/h}\draw (\u)--(\v);
 \end{tikzpicture}
+\diagramcaption{同一偏序中，不同子集可以有不同的极值}\label{fig:lecture-9}
 \end{center}
 \begin{center}\small
 \begin{tabular}{c c c c c}
@@ -1580,7 +1693,7 @@ L_A(B)=\{\ell\in A\mid\forall b\in B\;(\ell\preceq b)\}.
 上下界可能有多个，也可能不存在；确界若存在则唯一。仅找到一个极小上界，尚不能断定它是最小上界；它还须小于等于所有上界。$B$ 的最大元若存在，就是 $\sup_A B$；若 $\sup_A B\in B$，它也是 $B$ 的最大元。最小元与下确界对偶。
 
 \example{同一哈斯图中的上下界与确界}
-在前例八元素偏序集中：
+在图~\ref{fig:lecture-9} 的八元素偏序集中：
 \begin{center}\small
 \begin{tabular}{c c c c c}
 \toprule $B$ & $U_A(B)$ & $L_A(B)$ & $\sup_A B$ & $\inf_A B$\\\midrule
@@ -1591,9 +1704,11 @@ $\{4,5\}$ & $\{7,8\}$ & $\{1,2\}$ & $7$ & $2$\\\bottomrule
 \end{center}
 $\{4,5\}$ 没有最大元和最小元，却同时有上、下确界，且二者都不属于该子集。
 
+具体地，$4$ 的上方候选有 $4,6,7,8$，$5$ 的上方候选有 $5,7,8$；取交集才得到共同上界 $\{7,8\}$。再在这个集合内部比较，$7\preceq8$，所以上确界是 $7$。这说明求确界有两个步骤：先找全部共同的界，再在这些界中找最小元或最大元。
+
 在 $D_{12}$ 的整除序中，$B=\{4,6\}$ 的上界集合为 $\{12\}$，下界集合为 $\{1,2\}$，故上确界是 $12$，下确界是 $2$。对于正整数的整除序，有限非空集合的下确界为最大公因数，上确界为最小公倍数；若换成受限的承载集合，则须重新检查候选元素是否属于其中。
 
-\example{孤立点与子集的上下界（课件第 44、64 页）}
+\example{孤立点与子集的上下界}
 设覆盖对为 $(b,d),(b,e),(c,d),(c,e),(d,f),(e,f),(g,h)$，另有孤立点 $a$。图为
 \begin{center}
 \begin{tikzpicture}[scale=1.0,every node/.style={circle,draw,fill=white,inner sep=2pt}]
@@ -1602,6 +1717,7 @@ $\{4,5\}$ 没有最大元和最小元，却同时有上、下确界，且二者�
 \node (g) at (3,0) {$g$};\node (h) at (3,1.2) {$h$};
 \foreach \u/\v in {b/d,b/e,c/d,c/e,d/f,e/f,g/h}\draw (\u)--(\v);
 \end{tikzpicture}
+\diagramcaption{孤立点和不同分支对上下界的影响}\label{fig:lecture-10}
 \end{center}
 关系可恢复为
 \[
@@ -1609,16 +1725,17 @@ R=I_A\cup\{(b,d),(b,e),(b,f),(c,d),(c,e),(c,f),(d,f),(e,f),(g,h)\}.
 \]
 全集的极小元为 $a,b,c,g$，极大元为 $a,f,h$，无最小元和最大元。孤立点 $a$ 同时属于两类极值。对 $B=\{b,c,d\}$，$U_A(B)=\{d,f\}$，上确界是 $d$；下界集合为空，因此没有下确界。
 
-\example{有界而无确界（课件图 7.7.4）}
-下图重绘课件的十四元素偏序。覆盖边均由较低点向较高点理解。
+\example{有界而无确界}
+下图表示一个十三元素偏序集。覆盖边均由较低点向较高点理解。方框标出待求界的 $d,e$；浅灰圆点为它们的共同上界，双圈为共同下界。
 \begin{center}
-\begin{tikzpicture}[scale=1.1,every node/.style={circle,draw,fill=white,inner sep=2pt}]
-\node (a) at (0,4) {$a$};\node (b) at (-1.4,3) {$b$};\node (c) at (1.4,3) {$c$};
-\node (d) at (-1.4,2) {$d$};\node (e) at (1.4,2) {$e$};
+\begin{tikzpicture}[scale=1.3,every node/.style={circle,draw,fill=white,inner sep=2pt}]
+\node[fill=gray!20] (a) at (0,4) {$a$};\node[fill=gray!20] (b) at (-1.4,3) {$b$};\node[fill=gray!20] (c) at (1.4,3) {$c$};
+\node[rectangle,thick] (d) at (-1.4,2) {$d$};\node[rectangle,thick] (e) at (1.4,2) {$e$};
 \node (f) at (-2.4,1) {$f$};\node (g) at (-.8,1) {$g$};\node (h) at (.8,1) {$h$};\node (i) at (2.4,1) {$i$};
-\node (j) at (-2.4,0) {$j$};\node (k) at (-.8,0) {$k$};\node (m) at (.8,0) {$m$};\node (n) at (2.4,0) {$n$};
+\node (j) at (-2.4,0) {$j$};\node[double,double distance=1pt] (k) at (-.8,0) {$k$};\node[double,double distance=1pt] (m) at (.8,0) {$m$};\node (n) at (2.4,0) {$n$};
 \foreach \u/\v in {b/a,c/a,d/b,d/c,e/b,e/c,f/d,g/d,h/e,i/e,j/f,k/f,j/g,k/g,m/g,k/h,m/h,n/h,m/i,n/i}\draw (\u)--(\v);
 \end{tikzpicture}
+\diagramcaption{共同上界有两个不同的极小元，因此不存在上确界}\label{fig:lecture-11}
 \end{center}
 读图求界时，应分别寻找每个元素的上方可达点或下方可达点，再取交集。对 $B=\{d,e\}$，包括自身的向上可达集合为
 \[
@@ -1629,93 +1746,76 @@ R=I_A\cup\{(b,d),(b,e),(b,f),(c,d),(c,e),(c,f),(d,f),(e,f),(g,h)\}.
 对 $B=\{f,g,h,i\}$，上界仍为 $a,b,c$，不存在下界，因此也无上下确界。图中的 $\{j,k,m,n\}$ 和 $\{f,g,h,i\}$ 都是四元反链；$\{m,h,e,c,a\}$ 是五元链。
 
 \subsection{良序及与全序的关系}
-若偏序集的\term{每个非空子集都有最小元}，称它为\term{良序集}（well-ordered set）。这里要求最小元，而非仅有极小元。课件括注中的 well founded relation 通常译为良基关系，应与 well-order 区分。
+若偏序集的\term{每个非空子集都有最小元}，称它为\term{良序集}（well-ordered set）。这里要求最小元，而非仅有极小元。仅要求每个非空子集有极小元的性质称为良基性，与良序不同。
 
 良序必为全序：对任意 $x,y$，非空子集 $\{x,y\}$ 有最小元，故 $x,y$ 可比。有限全序必为良序：任一非空子集有限，逐个比较即可得到一个不大于其余元素的最小元。因此，在有限偏序中，“全序”和“良序”等价。
 
 无限全序未必良序。正整数通常次序是良序，$\mathbb Z$ 的通常次序不是良序，$(0,1)$ 的通常次序也不是良序，因为集合本身没有最小元。“集合存在某个良序”不表示它当前给定的次序就是良序。一般良序定理在通常的含选择公理集合论中成立，与选择公理等价；不能用它断言实数的通常大小次序为良序。
 
 \subsection{关系构造与包含式的证明}
-\example{等价关系的合成仍为原关系（习题课第 5 题）}
+\example{等价关系的合成仍为原关系}
 设 $R$ 是 $A$ 上的等价关系，$S=\{(a,b)\mid\exists c\in A\;(aRc\land cRb)\}=R\circ R$。传递性给出 $S\subseteq R$；若 $aRb$，取 $c=b$，利用 $bRb$ 得 $aSb$，所以 $R\subseteq S$。故 $S=R$，自然也是等价关系。此结论中传递性负责一个包含方向，自反性负责另一个方向。
 
-\example{两个偏序的直积（习题课第 6 题）}
+\example{两个偏序的直积}
 设 $\langle A,R\rangle,\langle B,S\rangle$ 为偏序集，在 $A\times B$ 上定义
 \[
 (x,y)T(u,v)\Longleftrightarrow xRu\land ySv.
 \]
 自反性由 $xRx,ySy$ 得到。若两个有序对相互满足 $T$，则 $xRu,uRx$ 及 $ySv,vSy$，分别由反对称性得 $x=u,y=v$。若 $(x,y)T(u,v)$、$(u,v)T(w,t)$，由 $R,S$ 的传递性得 $xRw,ySt$，即 $(x,y)T(w,t)$。故 $T$ 为偏序。这是逐坐标偏序，不是字典序；即使两个因子均为全序，直积也未必全序，例如通常次序下的 $(1,2)$ 和 $(2,1)$ 不可比。
 
-\example{传递闭包的单调性（习题课第 7 题）}
+\example{传递闭包的单调性}
 设 $R\subseteq S$，证明 $t(R)\subseteq t(S)$。由归纳法证明每个 $n\ge1$ 均有 $R^n\subseteq S^n$。初始 $n=1$ 已知；若 $xR^{n+1}y$，则存在 $z$ 使 $xR^nz$ 且 $zRy$。由归纳假设得 $xS^nz$ 且 $zSy$，故 $xS^{n+1}y$。对所有正整数幂取并即得结论。
 
+\subsection{本章小结}
+求商集要选择类外的新代表元；反链只比较不同元素；极值从子集内部找，界从整个偏序集中找；有界不保证有确界；哈斯图判序依据向上可达性，不能用数值大小、画图高度或单条覆盖边替代定义。
+
 \exercise
-\begin{enumerate}
-\item 在 $A=\{1,2,3,4,5,6\}$ 上，设
+\begin{enumerate}[label=7.\arabic*.,leftmargin=2.8em]
+\begin{samepage}
+\item  在 $A=\{1,2,3,4,5,6\}$ 上，设
 \[
 R=\{1,4\}^2\cup\{2,3,6\}^2\cup\{5\}^2.
 \]
-判断 $R$ 是否为等价关系，并求商集和有序对数。\\
-\term{解：}三块非空、互斥且覆盖 $A$，由划分对应定理可知 $R$ 是等价关系。商集为
-\[
-A/R=\bigl\{\{1,4\},\{2,3,6\},\{5\}\bigr\}.
-\]
-有序对数为 $2^2+3^2+1^2=14$。这是课件第 33 页补充题的关系的分块表示。
+判断 $R$ 是否为等价关系，并求商集和有序对数。
+\end{samepage}
 
-\item 设 $A=\{1,2,3,4\}$，在 $A\times A$ 上定义 $(x,y)R(u,v)\Longleftrightarrow x+y=u+v$。求所对应的划分。\\
-\term{解：}按和 $s=2,\ldots,8$ 分类，得
-\begin{align*}
-C_2&=\{(1,1)\},&C_3&=\{(1,2),(2,1)\},\\
-C_4&=\{(1,3),(2,2),(3,1)\},&C_5&=\{(1,4),(2,3),(3,2),(4,1)\},\\
-C_6&=\{(2,4),(3,3),(4,2)\},&C_7&=\{(3,4),(4,3)\},\\
-C_8&=\{(4,4)\}.&&
-\end{align*}
-商集为 $(A\times A)/R=\{C_2,\ldots,C_8\}$，不是 $A/R$。承载集合的元素本身就是有序对。
+\begin{samepage}
+\item  设 $A=\{1,2,3,4\}$，在 $A\times A$ 上定义 $(x,y)R(u,v)\Longleftrightarrow x+y=u+v$。求所对应的划分。
+\end{samepage}
 
-\item 写出 $\{1,2,3\}$ 的全部划分，并给出相应等价关系。\\
-\term{解：}五个划分为
-\[
-\{\{1\},\{2\},\{3\}\},\quad\{\{1,2\},\{3\}\},\quad
-\{\{1,3\},\{2\}\},\quad\{\{2,3\},\{1\}\},\quad\{\{1,2,3\}\}.
-\]
-对应关系依次为 $I_A$，$I_A\cup\{(1,2),(2,1)\}$，$I_A\cup\{(1,3),(3,1)\}$，$I_A\cup\{(2,3),(3,2)\}$，$A^2$。
+\begin{samepage}
+\item  写出 $\{1,2,3\}$ 的全部划分，并给出相应等价关系。
+\end{samepage}
 
-\item 设 $R_1,R_2$ 为 $A$ 上的等价关系。判断 $R_1\cap R_2$ 与 $R_1\cup R_2$ 是否一定是等价关系。\\
-\term{解：}交集保留自反、对称和传递性，故是等价关系。并集未必传递：在 $\{1,2,3\}$ 上，分别取划分 $\{\{1,2\},\{3\}\}$ 与 $\{\{1\},\{2,3\}\}$ 所对应的关系；并集包含 $(1,2),(2,3)$，却不含 $(1,3)$。
+\begin{samepage}
+\item  设 $R_1,R_2$ 为 $A$ 上的等价关系。判断 $R_1\cap R_2$ 与 $R_1\cup R_2$ 是否一定是等价关系。
+\end{samepage}
 
-\item 对课件第 68 页的五元素图，覆盖对为 $(e,c),(d,c),(d,b),(c,a),(b,a)$。恢复关系，判定 $aRb,dRa,cRd,cRb,bRe,aRa,eRa$，并求 $B_1=\{c,d,e\}$、$B_2=\{b,c,d\}$、$B_3=\{b,c,d,e\}$ 的上下界和确界。
+\begin{samepage}
+\item  设五元素偏序集 $A=\{a,b,c,d,e\}$ 的覆盖对为 $(e,c),(d,c),(d,b),(c,a),(b,a)$。恢复关系，判定 $aRb,dRa,cRd,cRb,bRe,aRa,eRa$，并求 $B_1=\{c,d,e\}$、$B_2=\{b,c,d\}$、$B_3=\{b,c,d,e\}$ 的上下界和确界。
 \begin{center}
 \begin{tikzpicture}[scale=1.0,every node/.style={circle,draw,fill=white,inner sep=2pt}]
 \node (a) at (0,2.4) {$a$};\node (b) at (1,1.2) {$b$};\node (c) at (-1,1.2) {$c$};\node (d) at (0,0) {$d$};\node (e) at (-2,0) {$e$};
 \foreach \u/\v in {e/c,d/c,d/b,c/a,b/a}\draw (\u)--(\v);
 \end{tikzpicture}
+\diagramcaption{五元素偏序集的哈斯图}\label{fig:lecture-12}
 \end{center}
-\term{解：}关系为
-\[
-R=I_A\cup\{(e,c),(e,a),(d,c),(d,b),(d,a),(c,a),(b,a)\}.
-\]
-七个判断依次为假、真、假、假、假、真、真。全集的最大元与唯一极大元为 $a$，极小元为 $d,e$，无最小元。
-\begin{center}\small
-\begin{tabular}{c c c c c}
-\toprule 子集 & 上界 & 下界 & 上确界 & 下确界\\\midrule
-$B_1$ & $\{c,a\}$ & $\varnothing$ & $c$ & 无\\
-$B_2$ & $\{a\}$ & $\{d\}$ & $a$ & $d$\\
-$B_3$ & $\{a\}$ & $\varnothing$ & $a$ & 无\\\bottomrule
-\end{tabular}
-\end{center}
-课件习题课第 4 题的图与本图具有相同的覆盖结构，答案可共用。
+\end{samepage}
 
-\item 在 $A=\{a,b,c,d,e\}$ 上取 $R=I_A\cup\{(c,a),(c,d)\}$，画哈斯图并求极值。\\
-\term{解：}仅画 $c$ 向上连接 $a,d$ 的两条边，$b,e$ 为孤立点。极大元为 $a,b,d,e$，极小元为 $b,c,e$，无最大元与最小元。孤立点同时为极大元和极小元。
+\begin{samepage}
+\item  在 $A=\{a,b,c,d,e\}$ 上取 $R=I_A\cup\{(c,a),(c,d)\}$，画哈斯图并求极值。
+\end{samepage}
 
-\item 设 $X$ 是 $n\ge2$ 元有限集，$A=\mathcal P(X)\setminus\{\varnothing,X\}$，按包含关系排序。求极大元、极小元以及最大元、最小元。\\
-\term{解：}极小元为所有单元素集；极大元为所有 $X\setminus\{x\}$，$x\in X$。若一个集合至少含两元素，可删去其中一个而仍非空，故非极小；若至少缺两个元素，可增加其中一个而仍不等于 $X$，故非极大。最大元、最小元均不存在。
+\begin{samepage}
+\item  设 $X$ 是 $n\ge2$ 元有限集，$A=\mathcal P(X)\setminus\{\varnothing,X\}$，按包含关系排序。求极大元、极小元以及最大元、最小元。
+\end{samepage}
 
-\item 若一个偏序集有 $13$ 个元素，证明它至少有一条四元链或一条五元反链。\\
-\term{解：}$13=4\cdot3+1$，取 $m=4,n=3$，由分解定理的推论立即得到。若所有链均至多三元，可划为至多三个反链，由抽屉原理至少一块含五个元素。
+\begin{samepage}
+\item  若一个偏序集有 $13$ 个元素，证明它至少有一条四元链或一条五元反链。
+\end{samepage}
 \end{enumerate}
 
-\note{求商集要选择类外的新代表元；反链只比较不同元素；极值从子集内部找，界从整个偏序集中找；有界不保证有确界；哈斯图判序依据向上可达性，不能用数值大小、画图高度或单条覆盖边替代定义。}
+
 
 \chapterpage{函数：定义、性质、复合与反函数}
 函数是在关系中加入“每个输入恰有一个输出”这一条件得到的结构。本章从有序对集合出发，讨论函数、像与完全原像、单射和满射、函数构造、复合与可逆性。自然数统一记为 $\mathbb N=\{0,1,2,\ldots\}$，正整数另记为 $\mathbb Z^+$。复合沿用上一章的关系约定：$f\circ g$ 表示先作用 $f$，再作用 $g$，即 $(f\circ g)(x)=g(f(x))$。
@@ -1731,6 +1831,8 @@ $B_3$ & $\{a\}$ & $\varnothing$ & $a$ & 无\\\bottomrule
 \]
 不同输入可以有相同输出；一个输入不能有两个输出。$B$ 中也可以有未被取到的元素。定义域和值域由有序对集合决定，陪域则需要在 $f:A\to B$ 中指定。
 
+因此检查函数图时，应从定义域逐点出发：每个输入都必须恰好发出一支箭头。检查单射、满射时则转到输出一侧：是否有两支箭头合并，是否有陪域元素没有箭头到达。前一项会破坏单射，后一项会破坏满射，但都不一定破坏“是函数”这一基本要求。
+
 \example{检查是否为指定集合间的函数}
 设 $A=\{a,b\},B=\{1,2,3\}$。
 \[
@@ -1744,7 +1846,7 @@ $F_1,F_2$ 都是 $A\to B$ 的函数。$F_3$ 同时违反单值性和定义域覆
 \example{关系本身的定义域与预先指定的定义域}
 关系 $R=\{(x,y)\in\mathbb N^2\mid x+y=10\}$ 的定义域为 $\{0,1,\ldots,10\}$，且 $y=10-x$ 唯一。因此它是此有限定义域上的函数，却不是 $\mathbb N\to\mathbb N$ 的函数。关系 $|x|=y$ 在 $\mathbb R^2$ 中给出 $\mathbb R\to\mathbb R$ 的函数；关系 $x=|y|$ 对 $x>0$ 有两个输出，对 $x<0$ 无输出，因而不是。
 
-本讲义按课件将函数视为有序对集合。函数 $f,g$ 相等，当且仅当定义域相同，且每个输入处的值相同：
+本书将函数视为有序对集合。函数 $f,g$ 相等，当且仅当定义域相同，且每个输入处的值相同：
 \[
 f=g\Longleftrightarrow\operatorname{dom}f=\operatorname{dom}g
 \ \land\ \forall x\in\operatorname{dom}f\;(f(x)=g(x)).
@@ -1778,11 +1880,19 @@ f^{-1}(\{2,4\})=\{a,b\}.
 \]
 \begin{center}
 \begin{tikzpicture}[>=Stealth,every node/.style={font=\small}]
-\node at (0,2.7) {$A$};\node at (4,2.7) {$B$};
+\node at (0,2.95) {$A$};\node at (4,3.1) {$B$};
+\draw[rounded corners](-.6,-1.55) rectangle(.6,2.45);
+\draw[rounded corners](3.4,-1.75) rectangle(4.6,2.65);
 \foreach \n/\y in {a/2,b/1,c/0,d/-1}\node (\n) at (0,\y) {$\n$};
 \foreach \n/\y in {1/2.4,2/1.5,3/0.5,4/-0.4,5/-1.3}\node (v\n) at (4,\y) {$\n$};
+\begin{scope}[on background layer]
+\fill[gray!18,rounded corners](-.4,.7)rectangle(.4,2.3);
+\fill[gray!18](4,1.5)circle(.28);
+\end{scope}
+\node[anchor=west,align=left,font=\small] at(5.2,1.2){阴影标出输出 $2$\\以及它的全部原像 $a,b$};
 \draw[->] (a)--(v2);\draw[->] (b)--(v2);\draw[->] (c)--(v3);\draw[->] (d)--(v5);
 \end{tikzpicture}
+\diagramcaption{函数的陪域、实际值域与纤维}\label{fig:lecture-13}
 \end{center}
 箭头从定义域指向陪域。$a,b$ 的箭头合到 $2$，表示二者属于同一纤维；$1,4$ 没有入箭头，所以不在值域中。
 
@@ -1835,7 +1945,7 @@ $f:\mathbb R\to\mathbb R,f(x)=x^2$ 既非单射又非满射：$f(1)=f(-1)$，且
 \end{enumerate}
 
 \example{定义域、陪域与值域的逐项核对}
-下表补充课件 8.1 节中的几类函数。结论均针对表中指定的定义域与陪域。
+下表比较几类常见函数。结论均针对表中指定的定义域与陪域。
 \begin{center}
 \begin{tabularx}{\linewidth}{l l Y}
 \toprule 函数与集合 & 值域 & 单满性及理由\\\midrule
@@ -1914,8 +2024,9 @@ f\circ g=\{(x,z)\mid\exists y\;((x,y)\in f\land(y,z)\in g)\}.
 \draw[->] (x)--node[above]{$f$}(y);\draw[->] (y)--node[above]{$g$}(z);
 \draw[->] (x) to[bend right=25] node[below]{$f\circ g$}(z);
 \end{tikzpicture}
+\diagramcaption{函数复合按先 $f$ 后 $g$ 的顺序读取}\label{fig:lecture-14}
 \end{center}
-从左向右沿箭头读图。其他课程常用 $(g\circ f)(x)=g(f(x))$；本章和本课程关系合成保持一致，不能混用两种记法。计算时先写成嵌套表达式，再代入化简。
+从左向右沿箭头读图。其他课程常用 $(g\circ f)(x)=g(f(x))$；本书的函数复合与关系合成保持一致，不能混用两种记法。计算时先写成嵌套表达式，再代入化简。
 
 \example{复合不满足交换律}
 设 $f,g:\mathbb R\to\mathbb R$，$f(x)=2x+1,g(x)=x^2+1$。则
@@ -1926,7 +2037,7 @@ f\circ g=\{(x,z)\mid\exists y\;((x,y)\in f\land(y,z)\in g)\}.
 \end{align*}
 第一、二式不同，说明复合一般不可交换。另取 $f(x)=x-1$ 定义在 $\mathbb R$ 上，$g(t)=\sqrt t$ 定义在 $[0,+\infty)$ 上，则 $f\circ g$ 的定义域为 $[1,+\infty)$，值为 $\sqrt{x-1}$，不能直接沿用 $f$ 的定义域。
 
-\example{有限映射的逐点复合（课件例 8.9.1）}
+\example{有限映射的逐点复合}
 设 $A=\{x_1,x_2,x_3,x_4\}$、$B=\{y_1,\ldots,y_5\}$、$C=\{z_1,z_2,z_3\}$，给定 $f:A\to B$、$g:B\to C$。按先 $f$ 后 $g$ 的顺序逐行计算：
 \begin{center}
 \begin{tabular}{c c c}
@@ -1971,7 +2082,9 @@ f\circ g=h\circ g\Rightarrow f=h,
 \[
 f^{-1}=\{(y,x)\mid(x,y)\in f\}.
 \]
-其定义域为 $f(A)$，值域为 $A$。逆关系是从 $f(A)$ 到 $A$ 的函数，当且仅当 $f$ 单射；要成为从整个 $B$ 到 $A$ 的\term{反函数}，还必须有 $f(A)=B$。因此
+其定义域为 $f(A)$，值域为 $A$。逆关系是从 $f(A)$ 到 $A$ 的函数，当且仅当 $f$ 单射；要成为从整个 $B$ 到 $A$ 的\term{反函数}，还必须有 $f(A)=B$。
+
+把箭头全部反向即可看出这两个条件的分工。若原来有两个输入合到一个输出，反向后就从一点分叉，违反输出唯一性；若原陪域中有遗漏的点，反向后该点没有输出，违反定义域覆盖。双射恰好同时排除了这两类障碍。因此
 \[
 f:A\to B\text{ 可逆}\Longleftrightarrow f\text{ 是双射}.
 \]
@@ -1997,83 +2110,7 @@ f\circ f^{-1}=I_A,\qquad f^{-1}\circ f=I_B,\qquad
 从 $z\in C$ 出发，先用 $g^{-1}$ 还原中间元素，再用 $f^{-1}$ 还原初始输入，故求逆时顺序反转。代入可得
 $f^{-1}(g^{-1}(g(f(x))))=x$，另一方向同理。
 
-\subsection{本章练习与参考解答}
-\begin{enumerate}
-\item 设 $A=\{1,2,3,4,5\},B=\{6,7,8,9,10\}$。判断下列关系是否为 $A\to B$ 的函数，并判断单满性：
-\[
-\begin{aligned}
-F_1&=\{(1,8),(3,9),(4,10),(2,6),(5,9)\},\\
-F_2&=\{(1,7),(2,6),(4,5),(1,9),(5,10)\},\\
-F_3&=\{(1,8),(3,10),(2,6),(4,9)\}.
-\end{aligned}
-\]
-\term{解：}$F_1$ 是函数，因 $3,5$ 同映到 $9$ 而非单射，又遗漏输出 $7$ 而非满射。$F_2$ 不是函数：输入 $1$ 对应两个输出、输入 $3$ 缺失，且 $5\notin B$。$F_3$ 缺少输入 $5$，不是给定定义域上的函数。
-
-\item 判断 $f:(0,+\infty)\to(0,+\infty),f(x)=x/(x^2+1)$ 的单满性。\\
-\term{解：}它是函数，但 $f(2)=f(1/2)=2/5$，故不单射。由 $(x-1)^2\ge0$ 得 $0<f(x)\le1/2$，故不满射。它在 $(0,1]$ 上连续递增且从趋近 $0$ 到 $1/2$，所以值域恰为 $(0,1/2]$。
-
-\item 设 $f:\mathbb N\to\mathbb N$，$f(n)=n/2$（$n$ 偶数），$f(n)=n+1$（$n$ 奇数）。求 $f(\{0,1\})$ 和 $f^{-1}(\{2\})$。\\
-\term{解：}像为 $\{0,2\}$。偶数分支由 $n/2=2$ 得 $n=4$；奇数分支由 $n+1=2$ 得 $n=1$。因此完全原像为 $\{1,4\}$，并非单个“反函数值”。
-
-\item 构造 $f:\mathbb R^2\to\mathbb R^2,f(x,y)=(x+y,x-y)$ 的反函数，求直线 $L=\{(x,y)\mid y=x+1\}$ 的像。\\
-\term{解：}解 $u=x+y,v=x-y$ 得 $x=(u+v)/2,y=(u-v)/2$，每个 $(u,v)$ 恰有一个原像，故为双射。在线 $L$ 上写 $y=x+1$，得 $u=2x+1,v=-1$，所以 $f(L)=\{(u,-1)\mid u\in\mathbb R\}$。
-
-\item 设 $f:\mathbb N^2\to\mathbb N,f(x,y)=|x^2-y^2|$。判断单满性，求 $f(\mathbb N\times\{0\})$、$f^{-1}(\{0\})$。\\
-\term{解：}$f(1,0)=f(0,1)=1$，故不单射。平方模 $4$ 仅为 $0,1$，平方差及其绝对值不可能模 $4$ 余 $2$，故 $2$ 无原像，不满射。像为 $\{n^2\mid n\in\mathbb N\}$，零的原像为 $\{(n,n)\mid n\in\mathbb N\}$。这里利用 $x,y\ge0$ 才能由 $x^2=y^2$ 推出 $x=y$。
-
-\item 设 $f:\mathbb Z^+\to\mathbb Z^+$，$f(1)=1$，$f(n)=n-1$（$n>1$）。判断性质，并比较 $n\mapsto n+1$。\\
-\term{解：}$f(1)=f(2)=1$，不单射；任给 $y\ge1$，取 $n=y+1$ 即有 $f(n)=y$，所以满射。后继函数单射但遗漏 $1$，不满射。无限等势集合上单满性并不等价。
-
-\item 设 $f,g:\mathbb R\to\mathbb R$，$f(x)=x^2-2,g(x)=x+4$。求两种复合及所有可逆函数的反函数。\\
-\term{解：}$(f\circ g)(x)=x^2+2$，$(g\circ f)(x)=(x+4)^2-2=x^2+8x+14$。前者值域为 $[2,+\infty)$，后者为 $[-2,+\infty)$，且都有两个不同输入映到同一输出，均非单非满。$f$ 也不可逆；仅 $g$ 可逆，$g^{-1}(x)=x-4$。
-
-\item 设 $f,g:\mathbb N\to\mathbb N$，
-\[
-f(n)=\begin{cases}n+1,&0\le n\le3,\\0,&n=4,\\n,&n\ge5,\end{cases}
-\qquad
-g(n)=\begin{cases}n/2,&n\text{ 偶数},\\3,&n\text{ 奇数}.\end{cases}
-\]
-求复合的单满性及 $(f\circ g)(\{0,1,2\})$。\\
-\term{解：}先求 $f$ 再求 $g$，得到
-\[
-(f\circ g)(n)=\begin{cases}
-0,&n=4,\\1,&n=1,\\2,&n=3,\\3,&n=0,2\text{ 或 }n\ge5\text{ 且为奇数},\\n/2,&n\ge6\text{ 且为偶数}.
-\end{cases}
-\]
-$0,1,2$ 分别由 $4,1,3$ 取到；$y\ge3$ 可取 $n=2y$。所以复合满射；$0,2$ 都映到 $3$，故不单射。所求集合像为 $\{1,3\}$。
-
-\item 证明：$f:A\to B$ 单射，当且仅当对每个 $S\subseteq A$ 都有 $f^{-1}(f(S))=S$；满射，当且仅当对每个 $T\subseteq B$ 都有 $f(f^{-1}(T))=T$。\\
-\term{解：}单射时，$f(x)\in f(S)$ 意味着存在 $s\in S$ 使 $f(x)=f(s)$，故 $x=s\in S$；结合总成立的包含式即得等号。反之取 $S=\{a\}$，若 $f(b)=f(a)$，则 $b\in f^{-1}(f(S))=\{a\}$，所以 $a=b$。第二个等价由 $f(f^{-1}(T))=T\cap f(A)$ 得到；反向只须取 $T=B$。
-
-\item 在 $\mathbb R$ 上定义 $f_1(x)=1$（$x\ge0$）、$f_1(x)=-1$（$x<0$），$f_2(x)=x$，$f_3(x)=-1$（$x\in\mathbb Z$）、$f_3(x)=1$（$x\notin\mathbb Z$），$f_4(x)=1$。令 $xE_i y\Longleftrightarrow f_i(x)=f_i(y)$。写出划分、细分哈斯图和自然映射在 $0$ 处的值。\\
-\term{解：}记 $\pi_i=\mathbb R/E_i$，则
-\begin{align*}
-\pi_1&=\{(-\infty,0),[0,+\infty)\},&
-\pi_2&=\{\{x\}\mid x\in\mathbb R\},\\
-\pi_3&=\{\mathbb Z,\mathbb R\setminus\mathbb Z\},&
-\pi_4&=\{\mathbb R\}.
-\end{align*}
-\begin{center}
-\begin{tikzpicture}[every node/.style={font=\small}]
-\node (p2) at (0,0) {$\pi_2$};\node (p1) at (-1.6,1.2) {$\pi_1$};\node (p3) at (1.6,1.2) {$\pi_3$};\node (p4) at (0,2.4) {$\pi_4$};
-\draw (p2)--(p1)--(p4)--(p3)--(p2);
-\end{tikzpicture}
-\end{center}
-向上表示划分变粗：单元素划分细分其余划分，单块划分最粗。$\pi_1,\pi_3$ 不可比，因为非负半轴跨越整数与非整数两块，而整数块跨越正负两半轴。自然映射 $q_i(x)=[x]_{E_i}$，故
-\[
-q_1(0)=[0,+\infty),\quad q_2(0)=\{0\},\quad
-q_3(0)=\mathbb Z,\quad q_4(0)=\mathbb R.
-\]
-四个自然映射均满射，其中只有 $q_2$ 为单射和双射。注意 $q_1(0)$ 是等价类这一集合，不能写成数值 $f_1(0)=1$。
-
-\item 设 $f:A\to A$ 为幂等函数。证明若它单射或满射，则 $f=I_A$。\\
-\term{解：}单射时由 $f(f(x))=f(x)$ 消去 $f$ 得 $f(x)=x$。满射时任取 $y\in A$，选 $x$ 使 $f(x)=y$，得 $f(y)=f(f(x))=f(x)=y$。故任一条件均足够。
-
-\item 在不改变先左后右约定的前提下，证明 $(f\circ g)^{-1}=g^{-1}\circ f^{-1}$，其中 $f:A\to B,g:B\to C$ 为双射。\\
-\term{解：}令 $h=g^{-1}\circ f^{-1}:C\to A$。按结合律，$(f\circ g)\circ h=f\circ(g\circ g^{-1})\circ f^{-1}=I_A$，且 $h\circ(f\circ g)=g^{-1}\circ(f^{-1}\circ f)\circ g=I_C$。由双向逆的唯一性得结论。
-\end{enumerate}
-
-\example{分段函数的复合与可逆性（课件第 55--56 页）}
+\example{分段函数的复合与可逆性}
 设 $f,g:\mathbb R\to\mathbb R$，
 \[
 f(x)=\begin{cases}x^2,&x\ge3,\\-2,&x<3,\end{cases}
@@ -2087,7 +2124,75 @@ f(x)=\begin{cases}x^2,&x\ge3,\\-2,&x<3,\end{cases}
 \]
 第二式的分界点来自 $x+2\ge3\Longleftrightarrow x\ge1$，不能仍沿用 $3$。$f$ 在 $x<3$ 的整个区间上为常值，所以不单射，且值域为 $\{-2\}\cup[9,+\infty)$，不满射；$g$ 是双射，反函数 $g^{-1}(x)=x-2$。
 
-\note{判断函数先核对输出存在、输出唯一、输出属于陪域；单射检查输入是否合并，满射检查陪域是否遗漏；完全原像对任何函数都有意义；复合先核对作用顺序和定义域；反函数需双射，求逆后核对两个恒等函数所在的集合。}
+
+\subsection{本章小结}
+判断函数先核对输出存在、输出唯一、输出属于陪域；单射检查输入是否合并，满射检查陪域是否遗漏；完全原像对任何函数都有意义；复合先核对作用顺序和定义域；反函数需双射，求逆后核对两个恒等函数所在的集合。
+
+\exercise
+\begin{enumerate}[label=8.\arabic*.,leftmargin=2.8em]
+\begin{samepage}
+\item  设 $A=\{1,2,3,4,5\},B=\{6,7,8,9,10\}$。判断下列关系是否为 $A\to B$ 的函数，并判断单满性：
+\[
+\begin{aligned}
+F_1&=\{(1,8),(3,9),(4,10),(2,6),(5,9)\},\\
+F_2&=\{(1,7),(2,6),(4,5),(1,9),(5,10)\},\\
+F_3&=\{(1,8),(3,10),(2,6),(4,9)\}.
+\end{aligned}
+\]
+\end{samepage}
+
+\begin{samepage}
+\item  判断 $f:(0,+\infty)\to(0,+\infty),f(x)=x/(x^2+1)$ 的单满性。
+\end{samepage}
+
+\begin{samepage}
+\item  设 $f:\mathbb N\to\mathbb N$，$f(n)=n/2$（$n$ 偶数），$f(n)=n+1$（$n$ 奇数）。求 $f(\{0,1\})$ 和 $f^{-1}(\{2\})$。
+\end{samepage}
+
+\begin{samepage}
+\item  构造 $f:\mathbb R^2\to\mathbb R^2,f(x,y)=(x+y,x-y)$ 的反函数，求直线 $L=\{(x,y)\mid y=x+1\}$ 的像。
+\end{samepage}
+
+\begin{samepage}
+\item  设 $f:\mathbb N^2\to\mathbb N,f(x,y)=|x^2-y^2|$。判断单满性，求 $f(\mathbb N\times\{0\})$、$f^{-1}(\{0\})$。
+\end{samepage}
+
+\begin{samepage}
+\item  设 $f:\mathbb Z^+\to\mathbb Z^+$，$f(1)=1$，$f(n)=n-1$（$n>1$）。判断性质，并比较 $n\mapsto n+1$。
+\end{samepage}
+
+\begin{samepage}
+\item  设 $f,g:\mathbb R\to\mathbb R$，$f(x)=x^2-2,g(x)=x+4$。求两种复合及所有可逆函数的反函数。
+\end{samepage}
+
+\begin{samepage}
+\item  设 $f,g:\mathbb N\to\mathbb N$，
+\[
+f(n)=\begin{cases}n+1,&0\le n\le3,\\0,&n=4,\\n,&n\ge5,\end{cases}
+\qquad
+g(n)=\begin{cases}n/2,&n\text{ 偶数},\\3,&n\text{ 奇数}.\end{cases}
+\]
+求复合的单满性及 $(f\circ g)(\{0,1,2\})$。
+\end{samepage}
+
+\begin{samepage}
+\item  证明：$f:A\to B$ 单射，当且仅当对每个 $S\subseteq A$ 都有 $f^{-1}(f(S))=S$；满射，当且仅当对每个 $T\subseteq B$ 都有 $f(f^{-1}(T))=T$。
+\end{samepage}
+
+\begin{samepage}
+\item  在 $\mathbb R$ 上定义 $f_1(x)=1$（$x\ge0$）、$f_1(x)=-1$（$x<0$），$f_2(x)=x$，$f_3(x)=-1$（$x\in\mathbb Z$）、$f_3(x)=1$（$x\notin\mathbb Z$），$f_4(x)=1$。令 $xE_i y\Longleftrightarrow f_i(x)=f_i(y)$。写出划分、细分哈斯图和自然映射在 $0$ 处的值。
+\end{samepage}
+
+\begin{samepage}
+\item  设 $f:A\to A$ 为幂等函数。证明若它单射或满射，则 $f=I_A$。
+\end{samepage}
+
+\begin{samepage}
+\item  在不改变先左后右约定的前提下，证明 $(f\circ g)^{-1}=g^{-1}\circ f^{-1}$，其中 $f:A\to B,g:B\to C$ 为双射。
+\end{samepage}
+\end{enumerate}
+
+
 
 
 \chapterpage{集合的基数}
@@ -2135,13 +2240,15 @@ m\approx n\Longleftrightarrow m=n.
 \[
 |A|\le|B|\quad\Longleftrightarrow\quad\text{存在单射 }A\to B.
 \]
-课件将此关系记为 $A\preceq B$，并称“$B$ 优势于 $A$”。本章用基数不等式，避免与上一章元素间的偏序记号混淆。若还不等势，记 $|A|<|B|$。子集的包含映射总是单射，所以 $A\subseteq B\Rightarrow|A|\le|B|$。
+这一关系也可读作“$A$ 的元素不多于 $B$”，其依据是存在单射，而不是图形的面积或数轴上的疏密。若还不等势，记 $|A|<|B|$。子集的包含映射总是单射，所以 $A\subseteq B\Rightarrow|A|\le|B|$。
 
 单射的恒等映射与复合分别给出比较关系的自反性、传递性。它在\term{集合本身}上不是反对称的，因为相互可单射并不要求集合相等；在基数意义下则有反对称性：
 \[
 |A|\le|B|\ \land\ |B|\le|A|\quad\Longrightarrow\quad |A|=|B|.
 \]
 这就是\term{康托--伯恩斯坦定理}，也称施罗德--伯恩斯坦定理。两个方向的单射可以完全不同，不必互为反函数。
+
+直接拼接两个单射通常得不到双射，因为它们可能把中间对象送到不同位置。下面的构造先找出 $g$ 没有覆盖的 $A$ 中元素，沿嵌套作用 $a\mapsto g(f(a))$ 追踪其后继；在这部分上用 $f$，其余部分用 $g$ 的逆向对应。两部分的边界正是防止遗漏和重复的关键。
 
 \term{证明：}设 $f:A\to B$、$g:B\to A$ 都是单射。先取 $A_0=A\setminus g(B)$，再递推 $A_{n+1}=g(f(A_n))$，令 $A_*=\bigcup_{n\ge0}A_n$。定义
 \[
@@ -2177,7 +2284,11 @@ p(m,n)=\frac{(m+n)(m+n+1)}2+m.
 \begin{center}
 \begin{tikzpicture}[>=Stealth,x=1.25cm,y=1.0cm,every node/.style={font=\small}]
 \draw[->](-.4,0)--(4.4,0) node[right]{$m$};
-\draw[->](0,-.4)--(0,4.2) node[above]{$n$};
+\draw[->](0,-.4)--(0,4.4) node[above]{$n$};
+\foreach \j in {1,...,4}{
+ \draw(\j,.05)--(\j,-.05) node[below,font=\scriptsize]{$\j$};
+ \draw(.05,\j)--(-.05,\j) node[left,font=\scriptsize]{$\j$};}
+\node[below left,font=\scriptsize]at(0,0){$0$};
 \foreach \s in {1,...,4}\draw[dashed,gray] (0,\s)--(\s,0);
 \foreach \m in {0,...,4}{\foreach \n in {0,...,4}{\ifnum\numexpr\m+\n\relax<5
 \pgfmathtruncatemacro{\code}{(\m+\n)*(\m+\n+1)/2+\m}
@@ -2185,8 +2296,9 @@ p(m,n)=\frac{(m+n)(m+n+1)}2+m.
 \draw[->,thick] (0,.93)--(.93,.07);
 \draw[->,thick] (0,1.93)--(1.93,.07);
 \draw[->,thick] (0,2.93)--(2.93,.07);
-\node[align=left,anchor=west] at (3.1,3.2) {虚线：相同的 $m+n$\\数字：从 $0$ 起的编号};
+\node[align=left,anchor=west] at (3.1,3.2) {虚线：相同的 $m+n$\\点旁数字：枚举编号\\轴旁数字：坐标};
 \end{tikzpicture}
+\diagramcaption{沿有限对角线逐组编号自然数对}\label{fig:lecture-15}
 \end{center}
 读图先按虚线的坐标和从小到大分组，再沿每组箭头从左上到右下编号；粗箭头仅表示枚举方向，不是偏序关系。
 
@@ -2194,10 +2306,12 @@ p(m,n)=\frac{(m+n)(m+n+1)}2+m.
 \[
 \frac{s(s+1)}2\le k<\frac{(s+1)(s+2)}2.
 \]
-令 $m=k-s(s+1)/2$、$n=s-m$，即得唯一原像。因此 $p$ 为双射，$|\mathbb N^2|=\aleph_0$。不能按“先列完整个第一行，再列第二行”的方式枚举，因为第一行无限长，这样永远轮不到第二行。
+令 $m=k-s(s+1)/2$、$n=s-m$，即得唯一原像。因此 $p$ 为双射，$|\mathbb N^2|=\aleph_0$。
+
+例如 $k=8$ 时，$6\le8<10$，所以它位于 $s=3$ 这一组；组内偏移为 $m=8-6=2$，从而 $n=3-2=1$。代回 $p(2,1)=6+2=8$，可见编号和还原是相互对应的。不能按“先列完整个第一行，再列第二行”的方式枚举，因为第一行无限长，这样永远轮不到第二行。
 
 \subsection{有理数的可数性与去重枚举}
-本章沿用课件的广义约定：$|A|\le\aleph_0$ 的集合称为\term{可数集}，包括有限集与空集；与 $\mathbb N$ 等势的集合称为\term{可数无穷集}。部分教材将“可数”专指后者，使用结论前须确认约定。
+本书约定：$|A|\le\aleph_0$ 的集合称为\term{可数集}，包括有限集与空集；与 $\mathbb N$ 等势的集合称为\term{可数无穷集}。部分教材将“可数”专指后者，使用结论前须确认约定。
 
 每个有理数可写成 $p/q$，其中 $p\in\mathbb Z,q\in\mathbb Z^+$，所以可将这些分数放入二维表，并沿有限组依次扫描。但 $1/2=2/4$，直接扫描所有分数会重复，不能立即声称已经得到双射。
 
@@ -2230,7 +2344,7 @@ $4$ & $-3,-1/3,1/3,3$\\\bottomrule
 \]
 它的一个元素是完整的无限二进制序列，而不是一个自然数对。假设所有序列可列为 $s_0,s_1,\ldots$，令 $t(n)=1-s_n(n)$，则 $t$ 在第 $n$ 位与第 $n$ 个序列不同，因而不在列表中。矛盾，故这个乘积不可数。
 
-课件第 26 页“可数个可数集的笛卡尔积仍可数”应改为“\term{有限个}可数集的笛卡尔积仍可数”；可数并与可数乘积不能互换。
+并集的一个元素来自某一项，积集的一个元素却要同时为每一项选定一个分量。前者可记录“第几项、第几个元素”；后者在因子无穷多时需要一整条序列，这正是两种结论不同的原因。
 
 \subsection{区间之间及区间与实数集之间的双射}
 对 $a<b$，仿射映射 $x\mapsto a+(b-a)x$ 给出 $[0,1]\approx[a,b]$，也给出 $(0,1)\approx(a,b)$。端点是否取到应与定义域、陪域保持一致。
@@ -2305,16 +2419,24 @@ b_n=\begin{cases}2,&d_{nn}=1,\\1,&d_{nn}\ne1,\end{cases}
 \qquad y=0.b_0b_1b_2\cdots.
 \]
 \begin{center}
-\begin{tikzpicture}[x=1.0cm,y=.72cm,every node/.style={font=\normalsize}]
+\begin{tikzpicture}[x=1.3cm,y=.82cm,every node/.style={font=\normalsize}]
 \node at (-1.2,0){列表};\foreach \j in {0,...,3}\node at(\j,0){第 $\j$ 位};
 \foreach \i in {0,...,3}{\node at(-1.2,-\i-1){$x_\i$};
 \foreach \j in {0,...,3}{\node at(\j,-\i-1){$d_{\i\j}$};}}
 \foreach \i in {0,...,3}\draw[rounded corners=2pt] (\i-.3,-\i-1.3) rectangle(\i+.3,-\i-.7);
-\node at(4.1,-2.5){$\cdots$};\node at(1.5,-5){$\vdots$};
-\node[anchor=west,align=left] at(5,-2){每行改变一位：\\第 $n$ 行改第 $n$ 位};
+\node at(4.1,-2.5){$\cdots$};\node at(1.5,-4.8){$\vdots$};
+\draw (-1.7,-5.3)--(4.5,-5.3);
+\node at(-1.2,-6){$y$};
+\foreach \i in {0,...,3}\node[draw,rounded corners,inner sep=3pt] at(\i,-6){$b_\i$};
+\node at(4.1,-6){$\cdots$};
+\node[anchor=west,align=left,font=\small] at(5,-2){方框取出对角数字\\第 $n$ 位选择 $b_n\ne d_{nn}$};
+\node[anchor=west,align=left,font=\small] at(5,-5.6){新的一行与每个旧行\\至少有一位不同};
 \end{tikzpicture}
+\diagramcaption{逐行改变对角数字，构造列表之外的实数}\label{fig:lecture-16}
 \end{center}
 $y$ 的数字只有 $1,2$，故 $y\in(0,1)$，也不存在尾部全 $0$ 与全 $9$ 的二义性。对每个 $n$，$y$ 的第 $n$ 位不同于 $x_n$ 的第 $n$ 位，故 $y\ne x_n$。于是列表遗漏了 $y$，与“覆盖全部实数”矛盾。
+
+例如，若前四个对角数字依次为 $1,7,1,0$，则新数的前四位依次取 $2,1,2,1$。第一位排除 $x_0$，第二位排除 $x_1$，以后依此类推。只写出这四位尚不足以完成证明；关键是同一个规则对每个自然数下标都能继续使用。
 
 这里并非寻找一个“列表的最后一项”。反证针对任意假定的完整列表，同时在第 $n$ 位排除第 $n$ 项，构造出一个不在列表中的新元素。由此
 \[
@@ -2357,62 +2479,66 @@ $2^{\mathfrak c}$ & $\mathcal P(\mathbb R)$\\\bottomrule
 
 证明\term{可数}时，给出无遗漏的枚举，或构造到 $\mathbb N$ 的单射，或利用可数并与有限积的封闭性。证明\term{可数无穷}时，还应排除有限情形。证明\term{不可数}时，可使用对角线法，或将已知不可数集合单射嵌入目标集合。仅说“集合很稠密”“元素形式复杂”“每个元素都能写出来”都不是基数证明。
 
-\clearpage
+\subsection{本章小结}
+等势要有双射，基数不等式要有单射；可数约定包含有限集；二维枚举要确保每个元素在有限步出现；有理数枚举须去重；区间等势须排除空集与单点情形；有限积、可数并和可数无穷积须区分；对角线构造应说明新元素属于目标集合且不在原列表中。
+
 \exercise
-\begin{enumerate}
-\item 求 $T=\{x\mid x\text{ 是单词 BASEBALL 中的字母}\}$、$B=\{x\in\mathbb R\mid x^2=9\land2x=8\}$，以及 $\mathcal P(\{1,3,7,11\})$ 的基数。\\
-\term{解：}$T=\{B,A,S,E,L\}$，故 $|T|=5$，重复字母只算一次。$x^2=9$ 给出 $x=\pm3$，$2x=8$ 要求 $x=4$，不能同时满足，故 $B=\varnothing$、$|B|=0$。最后一个集合的基数为 $2^4=16$。
+\begin{enumerate}[label=9.\arabic*.,leftmargin=2.8em]
+\begin{samepage}
+\item  求 $T=\{x\mid x\text{ 是单词 BASEBALL 中的字母}\}$、$B=\{x\in\mathbb R\mid x^2=9\land2x=8\}$，以及 $\mathcal P(\{1,3,7,11\})$ 的基数。
+\end{samepage}
 
-\item 设 $|A|=\aleph_0$，$B=\{b_0,\ldots,b_{r-1}\}$，$r\ge1$ 有限。构造 $A\times B\to\mathbb N$ 的双射。\\
-\term{解：}固定 $A=\{a_0,a_1,\ldots\}$ 的无重复枚举，令 $(a_i,b_j)\mapsto ri+j$。给定 $k\in\mathbb N$，除法算法唯一给出 $k=ri+j$、$0\le j<r$，即唯一原像。所以 $|A\times B|=\aleph_0$。条件 $B\ne\varnothing$ 不可删去；若 $B=\varnothing$，则 $A\times B=\varnothing$。
+\begin{samepage}
+\item  设 $|A|=\aleph_0$，$B=\{b_0,\ldots,b_{r-1}\}$，$r\ge1$ 有限。构造 $A\times B\to\mathbb N$ 的双射。
+\end{samepage}
 
-\item 证明 $A\approx B\Rightarrow\mathcal P(A)\approx\mathcal P(B)$。\\
-\term{解：}取双射 $f:A\to B$，定义 $\Phi(S)=f(S)$。若两像相等，由 $f$ 单射得 $S$ 相等，故 $\Phi$ 单射。任给 $T\subseteq B$，取 $S=f^{-1}(T)$，由 $f$ 满射得 $\Phi(S)=T$，所以满射。其逆就是把子集取完全原像。
+\begin{samepage}
+\item  证明 $A\approx B\Rightarrow\mathcal P(A)\approx\mathcal P(B)$。
+\end{samepage}
 
-\item 设 $A=\{n^7\mid n\in\mathbb N\}$，$B=\{n^{109}\mid n\in\mathbb N\}$。求 $A,B,A\cup B,A\cap B$ 的基数。\\
-\term{解：}$n\mapsto n^7$ 与 $n\mapsto n^{109}$ 分别为到 $A,B$ 的双射，二者均为可数无穷。并集可数且包含无穷集 $A$，故 $|A\cup B|=\aleph_0$。
+\begin{samepage}
+\item  设 $A=\{n^7\mid n\in\mathbb N\}$，$B=\{n^{109}\mid n\in\mathbb N\}$。求 $A,B,A\cup B,A\cap B$ 的基数。
+\end{samepage}
 
-对正整数公共元素，若 $a^7=b^{109}$，比较每个素数的指数，因 $\gcd(7,109)=1$，该公共元素的素因数指数都能被 $7\cdot109=763$ 整除。加上公共元素 $0$，得到
-\[
-A\cap B=\{n^{763}\mid n\in\mathbb N\},\qquad |A\cap B|=\aleph_0.
-\]
-这里“集合等于某个幂集合”与“集合的基数为 $\aleph_0$”应分两步写，不能把集合表达式直接当成基数。
+\begin{samepage}
+\item  已知 $|A|=\aleph_0$、$|B|<|A|$，求 $|A\setminus B|$。
+\end{samepage}
 
-\item 已知 $|A|=\aleph_0$、$|B|<|A|$，求 $|A\setminus B|$。\\
-\term{解：}$|B|<\aleph_0$ 意味着 $B$ 有限。因 $A\cap B$ 有限，而 $A=(A\setminus B)\cup(A\cap B)$，若 $A\setminus B$ 有限，则 $A$ 有限，矛盾。又 $A\setminus B\subseteq A$ 可数，故为可数无穷。这里不要求 $B\subseteq A$，只须从 $A$ 中删去 $A\cap B$。
+\begin{samepage}
+\item  判断并说明：可数个可数集的并、有限个可数集的积、可数个二元集合的积是否都可数。
+\end{samepage}
 
-\newpage
-\item 判断并说明：可数个可数集的并、有限个可数集的积、可数个二元集合的积是否都可数。\\
-\term{解：}前两项可数；第三项不成立，$\{0,1\}^{\mathbb N}$ 的基数为 $\mathfrak c$。二维编号只处理有限元组，无穷序列不能直接用同一个有限配对过程编码成一个自然数。
+\begin{samepage}
+\item  证明 $\mathbb R\setminus\mathbb Q$ 不可数。
+\end{samepage}
 
-\item 证明 $\mathbb R\setminus\mathbb Q$ 不可数。\\
-\term{解：}若无理数集也可数，则它与可数集 $\mathbb Q$ 的并 $\mathbb R$ 可数，与对角线结论矛盾。该证明只需反证不可数，不应把“有理数稠密”当作理由。
+\begin{samepage}
+\item  设 $F:\mathbb N\to\mathcal P(\mathbb N)$，$F(n)=\{0,1,\ldots,n\}$。写出对角集 $D=\{n\mid n\notin F(n)\}$，并说明是否能推出空集不属于幂集。
+\end{samepage}
 
-\item 设 $F:\mathbb N\to\mathcal P(\mathbb N)$，$F(n)=\{0,1,\ldots,n\}$。写出对角集 $D=\{n\mid n\notin F(n)\}$，并说明是否能推出空集不属于幂集。\\
-\term{解：}每个 $n\in F(n)$，所以 $D=\varnothing$。空集当然属于 $\mathcal P(\mathbb N)$，但不等于任何非空的 $F(n)$，所以它不在该 $F$ 的值域中。未被某函数取到与不属于陪域是不同结论。
-
-\item 判断有限二进制串的全体与无限二进制序列的全体是否等势。\\
-\term{解：}有限串按长度分组，每个长度 $n$ 只有 $2^n$ 个，故全体是可数并且无穷，基数为 $\aleph_0$。无限序列的全体基数为 $\mathfrak c$，二者不等势。“长度没有统一上界”不等于“每个元素自身有无限长度”。
+\begin{samepage}
+\item  判断有限二进制串的全体与无限二进制序列的全体是否等势。
+\end{samepage}
 \end{enumerate}
 
-\note{等势要有双射，基数不等式要有单射；可数约定包含有限集；二维枚举要确保每个元素在有限步出现；有理数枚举须去重；区间等势须排除空集与单点情形；有限积、可数并和可数无穷积须区分；对角线构造应说明新元素属于目标集合且不在原列表中。}
+
 
 \chapterpage{图的基本概念}
-图把对象记为顶点，把对象之间的联系记为边。本章对应课件第十四章：先讨论边、度数与同构，再用通路描述连通性，最后用矩阵和集合运算处理图。以下均讨论有限图。
+图把对象记为顶点，把对象之间的联系记为边。本章先讨论边、度数与同构，再用通路描述连通性，最后用矩阵和集合运算处理图。以下均讨论有限图。
 
 \subsection{无向图、有向图与邻接}
-无向图记为 $G=(V,E)$。$V$ 是顶点集，$E$ 中每条边指定一个无序端点对；有向图记为 $D=(V,E)$，每条弧指定一个有序端点对 $(u,v)$，其中 $u$ 是始点，$v$ 是终点。两个端点可以相同，此时称为\term{环}。边应有各自的身份：同一端点对可以出现多次，形成\term{平行边}。有向图只有始点、终点分别相同的弧才是平行弧；$u\to v$ 与 $v\to u$ 并不平行。课件称含平行边的图为多重图，称既无环又无平行边的图为\term{简单图}。
+无向图记为 $G=(V,E)$。$V$ 是顶点集，$E$ 中每条边指定一个无序端点对；有向图记为 $D=(V,E)$，每条弧指定一个有序端点对 $(u,v)$，其中 $u$ 是始点，$v$ 是终点。两个端点可以相同，此时称为\term{环}。边应有各自的身份：同一端点对可以出现多次，形成\term{平行边}。有向图只有始点、终点分别相同的弧才是平行弧；$u\to v$ 与 $v\to u$ 并不平行。本书称含平行边的图为多重图，称既无环又无平行边的图为\term{简单图}。
 
 图的\term{阶}是 $n=|V|$，边数是 $m=|E|$，平行边逐条计入。$n$ 阶零图 $N_n$ 保留 $n$ 个顶点但无边，$N_1$ 是平凡图；没有顶点的空图通常作为运算结果出现。顶点或边带有名称时称为标定图。把有向图的每条弧分别去掉箭头，得到它的\term{基图}；如果两条反向弧因此成为平行边，仍各保留一条。
 
-边与它的端点\term{关联}，两个不同顶点有边相连时\term{相邻}。两条无向边共用端点时相邻；两条有向边按次序相接时，前一条的终点须等于后一条的始点。按课件的开邻域约定，$N_G(v)$ 收集与 $v$ 相邻的其他顶点，闭邻域为 $N_G[v]=N_G(v)\cup\{v\}$。有向图中，从 $v$ 出发的其他顶点为后继，从其他顶点指向 $v$ 的为先驱；两者之并是开邻域。关联集收集的是边，因而能区分平行边；邻域收集的是顶点，不能直接当作度数。无关联边的顶点叫孤立点。
+边与它的端点\term{关联}，两个不同顶点有边相连时\term{相邻}。两条无向边共用端点时相邻；两条有向边按次序相接时，前一条的终点须等于后一条的始点。这里约定开邻域不含顶点自身，$N_G(v)$ 收集与 $v$ 相邻的其他顶点，闭邻域为 $N_G[v]=N_G(v)\cup\{v\}$。有向图中，从 $v$ 出发的其他顶点为后继，从其他顶点指向 $v$ 的为先驱；两者之并是开邻域。关联集收集的是边，因而能区分平行边；邻域收集的是顶点，不能直接当作度数。无关联边的顶点叫孤立点。
 
 \subsection{度数与握手定理}
 无向图中，$d(v)$ 是边在 $v$ 处的端点次数：普通边贡献 $1$，环贡献 $2$。有向图中，出度 $d^+(v)$ 数以 $v$ 为始点的弧，入度 $d^-(v)$ 数以 $v$ 为终点的弧，环对二者各贡献 $1$。总度为 $d^+(v)+d^-(v)$。最大度和最小度分别记为 $\Delta,\delta$；出度、入度的极值可分别加上标 $+,-$。无向图中度为 $1$ 的顶点是悬挂顶点，其唯一关联边是悬挂边。
 
 \Needspace{14\baselineskip}
 \example{从边图读取度数}
-下图重绘课件例 1.1。左图的两条弧线表示两条不同的无向边；右图中，每个箭头都表示一条有向边，特别注意 $c,d$ 间的箭头方向相反。
+左图的两条弧线表示两条不同的无向边；右图中，每个箭头都表示一条有向边，特别注意 $c,d$ 间的箭头方向相反。
 \begin{center}
 \begin{tikzpicture}[>=Stealth, every node/.style={font=\small}, thick]
 \begin{scope}
@@ -2441,6 +2567,7 @@ A\cap B=\{n^{763}\mid n\in\mathbb N\},\qquad |A\cap B|=\aleph_0.
 \node at (1.05,-1.45){有向图 $D$};
 \end{scope}
 \end{tikzpicture}
+\diagramcaption{环、平行边和有向边对度数的不同贡献}\label{fig:lecture-17}
 \end{center}
 左图按 $v_1,\ldots,v_5$ 的度数列是 $(4,4,2,1,3)$。$v_1$ 只关联三条边，但 $e_1$ 是环，所以度为 $4$；$N_G(v_1)=\{v_2,v_5\}$。右图按 $a,b,c,d$ 的出度列为 $(4,0,2,1)$，入度列为 $(1,3,1,2)$，总度列为 $(5,3,3,3)$。
 
@@ -2463,6 +2590,8 @@ A\cap B=\{n^{763}\mid n\in\mathbb N\},\qquad |A\cap B|=\aleph_0.
 图同构是保持边结构的顶点双射。具体地，$f:V_1\to V_2$ 是双射，且每对端点之间的边数与其像之间的边数相等；对有向图还须保持方向。此时记为 $G_1\cong G_2$。同构可以通过恒等映射、取逆和复合分别验证自反、对称、传递，因此是等价关系。图形的点位、线长和交叉不属于结构数据；没有标作顶点的线条交叉不是新顶点。
 
 顶点数、边数、排序后的度数列、连通分支数和各种长度的圈数都是同构不变量。一个不变量不同就能否定同构；几个不变量相同仍不能确认同构。例如六边形 $C_6$ 与两个不相交的三角形都为六阶、六边、$2$-正则，但连通分支数分别为 $1,2$。
+
+证明两个图同构时，需要给出具体的顶点配对，并核对配对后哪些点相邻、边有几条。若只是发现度数列相同，所做的仍只是筛选候选配对；这个条件没有记录各条边究竟怎样连接。
 
 \begin{center}
 \begin{tabularx}{\linewidth}{l Y c}
@@ -2487,6 +2616,7 @@ A\cap B=\{n^{763}\mid n\in\mathbb N\},\qquad |A\cap B|=\aleph_0.
 \foreach \i in {0,...,4}{\fill (o\i) circle(2pt) (i\i) circle(2pt);}
 \node[align=left,anchor=west] at (2.15,0){每个外点：两条外边、一条辐条。\\每个内点：两条内边、一条辐条。\\只有实心点才是顶点。};
 \end{tikzpicture}
+\diagramcaption{彼得森图：十个顶点各有三条关联边}\label{fig:lecture-18}
 \end{center}
 
 \subsection{子图、补图和基本操作}
@@ -2505,7 +2635,7 @@ d_{\overline G}(v)=n-1-d_G(v).
 删边 $G-e$ 保留顶点，包括新出现的孤立点；删点 $G-v$ 同时删去该点的所有关联边。收缩非环边 $uv$ 时删除此边、合并其两个端点，其他边只改变端点身份，不自动去重；同端点的其他边会成为环。若题目明确要求收缩后仍是简单图，才再删环、合并平行边。添加一条边也可能产生平行边。
 
 \subsection{通路、回路、路径与圈}
-一条长度为 $\ell$ 的通路写作 $v_0e_1v_1\cdots e_\ell v_\ell$，每条边须连接前后顶点，有向图还须与行进方向一致。允许 $\ell=0$ 来表示顶点到自身的可达性；谈及回路与圈时，除特别说明外取正长度。按课件用语区分如下。
+一条长度为 $\ell$ 的通路写作 $v_0e_1v_1\cdots e_\ell v_\ell$，每条边须连接前后顶点，有向图还须与行进方向一致。允许 $\ell=0$ 来表示顶点到自身的可达性；谈及回路与圈时，除特别说明外取正长度。本书对这些术语作如下区分。
 \begin{center}
 \begin{tabularx}{\linewidth}{l Y}
 \toprule 概念 & 额外条件\\\midrule
@@ -2538,6 +2668,7 @@ d_{\overline G}(v)=n-1-d_G(v).
 \draw (v1)--(v2)--(v3)--(v4)--(v1);
 \draw (v3)--node[above]{$e_5$}(v5)--node[above]{$e_6$}(v6);
 \end{tikzpicture}
+\diagramcaption{四边形的边可绕行，尾链上的边不能绕行}\label{fig:lecture-19}
 \end{center}
 $v_3,v_5$ 是割点，$e_5,e_6$ 是桥。$\{v_2,v_4\}$ 也是点割集：分别删除都不破坏连通，但一起删除使 $v_1$ 脱离其余顶点。它不是最小大小的点割集，因为删 $v_3$ 一个就足够。四边形中的边均非桥：删任意一条后，仍可绕四边形到达其两端。一般地，一条无向边是桥当且仅当它不在任何圈上；若删边后其两端仍能通过其他边相连，那条路径加回原边便构成圈。
 
@@ -2568,7 +2699,7 @@ $v_3,v_5$ 是割点，$e_5,e_6$ 是桥。$\{v_2,v_4\}$ 也是点割集：分别�
 强连通当且仅当存在经过每个顶点的闭通路，单向连通当且仅当存在经过每个顶点的通路；这里允许重复，单点情形可取零长通路。强连通时可依任意顺序拼接连接各点的通路，再回到起点；反向按闭通路的行进方向即可从任一点走到其余点。对于单向连通，把强连通分支缩成点得到无有向圈的图，按拓扑次序排列。由于任意两个分支至少一个方向可达，前一分支必能到后一分支，故可依次拼接，并在各分支内走遍其顶点。反向则取覆盖通路中某对顶点的出现顺序，先出现的可达后出现的。
 
 \subsection{极大路径与二部图}
-从一条路径出发，只在端点接入路径外的顶点，直至两端都不能延伸，得到\term{极大路径}。极大只表示在当前路径上不能继续向两端添加顶点；不同延伸顺序可能得到不同长度，它不一定是全图的最长路径。设无向简单图的最小度为 $\delta\ge2$，在极大路径 $v_0,\ldots,v_\ell$ 中，$v_0$ 的所有邻点均在路径上。至少有 $\delta$ 个不同邻点，故最远邻点 $v_j$ 的下标 $j\ge\delta$；用边 $v_jv_0$ 闭合，得到至少长 $\delta+1$ 的圈。这给出课件中 $\delta\ge3$ 时存在长度至少为 $4$ 的圈。
+从一条路径出发，只在端点接入路径外的顶点，直至两端都不能延伸，得到\term{极大路径}。极大只表示在当前路径上不能继续向两端添加顶点；不同延伸顺序可能得到不同长度，它不一定是全图的最长路径。设无向简单图的最小度为 $\delta\ge2$，在极大路径 $v_0,\ldots,v_\ell$ 中，$v_0$ 的所有邻点均在路径上。至少有 $\delta$ 个不同邻点，故最远邻点 $v_j$ 的下标 $j\ge\delta$；用边 $v_jv_0$ 闭合，得到至少长 $\delta+1$ 的圈。特别地，$\delta\ge3$ 时必有长度至少为 $4$ 的圈。
 
 有向简单图可用同样方法，但向前接点需有弧指向起点，向后接点需有弧由终点指出。若最小入度、最小出度均为正，取起点最远先驱或终点最远后继，分别得到至少长 $\delta^-+1$、$\delta^++1$ 的有向圈。因此至少有一个圈长不小于 $\max\{\delta^-,\delta^+\}+1$。
 
@@ -2583,11 +2714,12 @@ $v_3,v_5$ 是割点，$e_5,e_6$ 是桥。$\{v_2,v_4\}$ 也是点割集：分别�
 \node at (0,1.8) {$V_1$};\node at (3.2,1.8) {$V_2$};
 \node[align=left,anchor=west] at (4,0){$K_{2,3}$：异侧全部相连。\\线条交叉处没有顶点。};
 \end{tikzpicture}
+\diagramcaption{完全二部图 $K_{2,3}$ 的两侧划分}\label{fig:lecture-20}
 \end{center}
 \term{判定定理：}无向图是二部图当且仅当不含奇圈。必要性是每走一步换一侧，回到原侧必须走偶数步。充分性可逐个分支证明：任选根，按与根的最短距离奇偶分组。若同组两点相邻，则两条根路径与这条边拼成一个奇长闭通路。奇长闭通路一定含奇圈：若有重复内部顶点，就分成两段更短的闭通路，至少一段长度为奇数；反复分割直到得到奇圈。矛盾，故每条边都跨组。孤立点所在分支没有边，无须强求它的两组都非空。
 
 \subsection{关联矩阵、邻接矩阵与可达矩阵}
-固定顶点顺序 $v_1,\ldots,v_n$，边顺序 $e_1,\ldots,e_m$。\term{关联矩阵} $M$ 的行对应点、列对应边。无向图中，元素为关联次数 $0,1,2$；环列只有一个 $2$，普通边列有两个 $1$。有向非环边按课件约定在始点行记 $+1$、终点行记 $-1$。若将有向环也纳入此种符号约定，始终点贡献相抵，该列为零，单靠该列无法识别环在哪个顶点。
+固定顶点顺序 $v_1,\ldots,v_n$，边顺序 $e_1,\ldots,e_m$。\term{关联矩阵} $M$ 的行对应点、列对应边。无向图中，元素为关联次数 $0,1,2$；环列只有一个 $2$，普通边列有两个 $1$。有向非环边在始点行记 $+1$、终点行记 $-1$。若将有向环也纳入此种符号约定，始终点贡献相抵，该列为零，单靠该列无法识别环在哪个顶点。
 
 \example{逐列填写关联矩阵}
 按 $v_1,v_2,v_3,v_4$ 排行，若无向图的边依次为 $11,12,12,13,34$，则
@@ -2618,7 +2750,9 @@ I+A+A^2+\cdots+A^{n-1}
 \]
 逐项按“正数变为 $1$、零仍为 $0$”处理得到 $P$。$I$ 表示零长通路，所以对角全为 $1$。判定强连通看 $P$ 是否全为 $1$；判定单向连通看每对 $i,j$ 是否至少有 $p_{ij},p_{ji}$ 之一为 $1$。若只需要存在性，可使用布尔运算；若需要条数，使用整数运算。
 
-\example{含平行弧的四顶点图（课件第 83--87 页）}
+例如从 $u$ 到 $v$ 的两步通路若可经 $a$ 或 $b$ 两个中间点，普通乘法把两个贡献相加得到 $2$，回答“有几条”；布尔乘法把两个真值取或得到 $1$，回答“有没有”。因此关系合成和通路计数虽然都使用矩阵相乘的结构，所得数字的含义不同。
+
+\example{含平行弧的四顶点图}
 \begin{center}
 \begin{tikzpicture}[>=Stealth,thick,every node/.style={font=\small}]
 \foreach \k/\x/\y in {1/0/1.5,2/0/0,3/2.7/0,4/2.7/1.5}
@@ -2633,6 +2767,7 @@ I+A+A^2+\cdots+A^{n-1}
 \end{tikzpicture}
 \qquad
 $\displaystyle A=\begin{pmatrix}1&2&0&0\\0&0&1&0\\1&0&0&1\\0&0&1&0\end{pmatrix}$
+\diagramcaption{含平行弧的有向图及其邻接矩阵}\label{fig:lecture-21}
 \end{center}
 $1\to2\to3\to4\to3\to1$ 经过每个顶点，因此强连通，$P$ 为 $4\times4$ 全 $1$ 矩阵。图有长度为 $1,2,3$ 的圈，分别为环、$3\to4\to3$ 与 $1\to2\to3\to1$。将这些圈按共享顶点拼接，会得到非圈的简单回路：合并长 $1$ 与长 $3$、长 $2$ 与长 $3$，或三者都合并，长度分别为 $4,5,6$。在保持边不重复的前提下，两条 $1\to2$ 平行弧无法同在一条闭通路中，因为这会迫使后续的 $2\to3$ 重复。
 
@@ -2683,67 +2818,66 @@ v_1\longrightarrow v_5\longrightarrow v_4\longrightarrow v_7.
 
 
 \subsection{图的并、交、差与环和}
-先区分顶点不交与边不交：两个图可共享顶点但没有公共边。按课件的\term{边导出约定}，在没有孤立点的输入图之间做运算，分别取边集的并、交、差、对称差，并以结果边的全部端点作为顶点集。于是
+先区分顶点不交与边不交：两个图可共享顶点但没有公共边。按本书的\term{边导出约定}，在没有孤立点的输入图之间做运算，分别取边集的并、交、差、对称差，并以结果边的全部端点作为顶点集。于是
 \[
 G_1\oplus G_2=(G_1\cup G_2)-(G_1\cap G_2).
 \]
 环和是对称差的名称，结果未必形成圈。例如 $E_1=\{ab,bc\}$、$E_2=\{bc,cd\}$ 时，交图只有 $bc$，差图 $G_1-G_2$ 只有 $ab$，环和有互不相接的 $ab,cd$。$G_1-G_1$ 的边集为空，按此约定得到空图；而从 $G_1$ 中逐条删除所有边的删边操作保留顶点，得到零图。若教材采用同时运算顶点集的约定，须按题目说明另行处理孤立点。
 
 \Needspace{9\baselineskip}
+\subsection{本章小结}
+图题先明确是否允许环与平行边、是否有方向，再选择度数、路径或矩阵的方法。割集的包含极小性和连通度的最小大小是两回事；矩阵乘方之前应先明确长度、起点和重复规则。
+
 \exercise
-\begin{enumerate}
-\item 无向图有 $16$ 条边、三个 $4$ 度点、四个 $3$ 度点，其余点度小于 $3$。能否确定阶数？\\
-\term{解：}其余顶点的度数和为 $32-12-12=8$，每点至多贡献 $2$，故至少有四个，$n\ge11$。不能确定确切阶数；添加孤立点不会改变已知条件。下界可达，例如取边集
-\[
-\{12,13,14,15,23,24,25,36,37,45,67,68,78\}
-\cup\{(9,10),(9,11),(10,11)\}.
-\]
-顶点 $1$ 至 $3$ 各为 $4$ 度，$4$ 至 $7$ 各为 $3$ 度，$8$ 至 $11$ 各为 $2$ 度。课件第 79 页的结论应读为下界，不是唯一值。
+\begin{enumerate}[label=10.\arabic*.,leftmargin=2.8em]
+\begin{samepage}
+\item  无向图有 $16$ 条边、三个 $4$ 度点、四个 $3$ 度点，其余点度小于 $3$。能否确定阶数？
+\end{samepage}
 
-\item 九阶图每个顶点的度为 $5$ 或 $6$。证明至少有五个 $6$ 度点或至少有六个 $5$ 度点。\\
-\term{解：}设 $5$ 度点有 $x$ 个。握手定理要求 $x$ 为偶数。若 $x\le4$，则 $6$ 度点有 $9-x\ge5$ 个；否则 $x\ge6$。
+\begin{samepage}
+\item  九阶图每个顶点的度为 $5$ 或 $6$。证明至少有五个 $6$ 度点或至少有六个 $5$ 度点。
+\end{samepage}
 
-\item 给出尽可能多的度数列为 $(3,3,2,2,2,2)$ 的非同构无向简单图。\\
-\term{解：}两个三角形之间加一条桥是一种。另三种是在两个 $3$ 度顶点之间放三条内部顶点互不相交的路径，三条路径长度分别取 $(1,2,4)$、$(1,3,3)$、$(2,2,3)$。后三图无桥，三条分支路径的长度多重集不同，所以互不同构。它们有六点七边，确实满足度数列。没有其他类型：最小度为 $2$ 迫使不连通时只能是两个三点分支，而两个三点简单图都无法有 $3$ 度点；在连通图中从任一 $3$ 度点沿 $2$ 度点追踪，三个分支或者全部通向另一 $3$ 度点，或者一条通向另一点、另两条组成回到本点的圈。前一种三条长度之和为 $7$，至多一条长为 $1$；后一种两端的圈各至少长 $3$，中间至少长 $1$，只可能是两个三角形加桥。
+\begin{samepage}
+\item  给出尽可能多的度数列为 $(3,3,2,2,2,2)$ 的非同构无向简单图。
+\end{samepage}
 
-\item 若 $G$ 是 $n$ 阶自补图，证明 $n\equiv0$ 或 $1\pmod4$。\\
-\term{解：}同构使 $|E(G)|=|E(\overline G)|$，故 $|E(G)|=n(n-1)/4$ 为整数。相邻整数之一为偶数，另一为奇数，因而偶数的那一个必须是 $4$ 的倍数。这个条件是必要条件，本题不需要反向构造。
-\end{enumerate}
+\begin{samepage}
+\item  若 $G$ 是 $n$ 阶自补图，证明 $n\equiv0$ 或 $1\pmod4$。
+\end{samepage}
 
-\newpage
-\begin{enumerate}[start=5]
-\item 求 $C_n$（$n\ge3$）和路径图 $P_n$（$n\ge2$）的点、边连通度。\\
-\term{解：}$C_n$ 删任一条边仍是连通路径，删两条边可断开，故 $\lambda=2$。当 $n\ge4$，删任一个点仍连通，删两个不相邻点可断开，故 $\kappa=2$；$C_3=K_3$ 按约定也为 $2$。$P_n$ 的每条边均为桥，故 $\lambda=1$；$n\ge3$ 时删内部点即可断开，$\kappa=1$，$P_2=K_2$ 按约定相同。
+\begin{samepage}
+\item  求 $C_n$（$n\ge3$）和路径图 $P_n$（$n\ge2$）的点、边连通度。
+\end{samepage}
 
-\item 课件第 72 页的七城市图中，用数字表示顶点下标，各点的出邻接表如下。列出从 $v_1$ 到 $v_7$ 的所有路径。若允许重复城市和车道，条数有何变化？
+\begin{samepage}
+\item  在一个七城市有向图中，用数字表示顶点下标，各点的出邻接表如下。列出从 $v_1$ 到 $v_7$ 的所有路径。若允许重复城市和车道，条数有何变化？
 \[
 \begin{array}{c|ccccccc}
 i&1&2&3&4&5&6&7\\\hline
 \text{去向}&2,5&\varnothing&2,6,7&1,3,5,7&1,4,6&3&6
 \end{array}
 \]
-\term{解：}以数字代替顶点下标。从 $1$ 出发，去 $2$ 无法继续，因此只能先去 $5$。去 $4$ 时，可直接到 $7$，也可经 $3$ 到 $7$；去 $6$ 时，只能经 $3$ 到 $7$。不重复顶点的序列恰为
-\[
-1,5,4,7;\qquad 1,5,4,3,7;\qquad 1,5,6,3,7.
-\]
-若允许重复，先绕 $1\to5\to1$ 任意次数，再走到 $7$，得到无限多条长度不同的通路。若限定长度，则可用邻接矩阵的幂计算。
+\end{samepage}
 
-\item 在前述四顶点有向图中，分类以 $v_1$ 为起点的长度 $1$ 至 $4$ 的闭通路。\\
-\term{解：}长度 $1$ 是环；长度 $2$ 只能将环走两遍，边重复；长度 $3$ 有一个三重环通路及两个三角圈（分别用 $e_1,e_2$）；长度 $4$ 有一个四重环通路，以及四个由环和三角圈拼接而成的非圈简单回路（两个平行弧选择乘以环放在三角圈之前或之后）。四个长度的数量为 $1,1,3,5$。
+\begin{samepage}
+\item  在图~\ref{fig:lecture-21} 的四顶点有向图中，分类以 $v_1$ 为起点的长度 $1$ 至 $4$ 的闭通路。
+\end{samepage}
 
-\item 判断 $C_5,C_6,K_{3,3}$ 是否二部图，并说明给图染色时如何检查所有分支。\\
-\term{解：}$C_5$ 含奇圈，不是二部图；$C_6$ 可按沿圈的奇偶位置分组；$K_{3,3}$ 按两侧分组。对一般图，从每个尚未染色的顶点开始，令邻点取相反颜色；若发现一条边两端同色，则该分支含奇圈。处理完一个分支后还须继续检查未处理的分支。
+\begin{samepage}
+\item  判断 $C_5,C_6,K_{3,3}$ 是否二部图，并说明给图染色时如何检查所有分支。
+\end{samepage}
 \end{enumerate}
-\note{图题先明确是否允许环与平行边、是否有方向，再选择度数、路径或矩阵的方法。割集的包含极小性和连通度的最小大小是两回事；矩阵乘方之前应先明确长度、起点和重复规则。}
+
 
 
 \chapterpage{欧拉图、哈密顿图与带权路径}
-本章对应课件第十五章。欧拉问题要求遍历边，哈密顿问题要求遍历顶点；同一张图可能满足其中一种、两种或都不满足。带权问题还要先明确是在两个指定点之间求最短路，还是访问所有顶点后返回起点。
+欧拉问题要求遍历边，哈密顿问题要求遍历顶点；同一张图可能满足其中一种、两种或都不满足。带权问题还要先明确是在两个指定点之间求最短路，还是访问所有顶点后返回起点。
 
 \subsection{欧拉通路与欧拉回路}
-\term{欧拉通路}经过每条边恰好一次，按本课程约定还要走遍所有顶点。若起终点相同，称为\term{欧拉回路}；有欧拉回路的图叫欧拉图。有开欧拉通路而无欧拉回路的图叫半欧拉图。顶点可以多次经过，平行边则必须逐条使用。单点无边的平凡图按课件约定以零长回路视作欧拉图。
+\term{欧拉通路}经过每条边恰好一次，按本书约定还要走遍所有顶点。若起终点相同，称为\term{欧拉回路}；有欧拉回路的图叫欧拉图。有开欧拉通路而无欧拉回路的图叫半欧拉图。顶点可以多次经过，平行边则必须逐条使用。单点无边的平凡图以零长回路视作欧拉图。
 
-许多教材只要求覆盖全部边，从而可以忽略孤立点；本讲义沿用课件“走遍所有顶点”的约定，故非平凡欧拉图或半欧拉图不能另有孤立点。若题目明说只覆盖边，则把下文的连通条件施加于非孤立顶点即可。环不改变度的奇偶性，但必须计入边数并在构造路线时走一次。
+许多教材只要求覆盖全部边，从而可以忽略孤立点；本书采用“走遍所有顶点”的约定，故非平凡欧拉图或半欧拉图不能另有孤立点。若题目明说只覆盖边，则把下文的连通条件施加于非孤立顶点即可。环不改变度的奇偶性，但必须计入边数并在构造路线时走一次。
 
 \example{七桥问题}
 把每块陆地记为一点，每座桥记为一条无向边。图中 $AC$ 和 $AD$ 各有两条平行边。
@@ -2755,6 +2889,7 @@ i&1&2&3&4&5&6&7\\\hline
 \draw (a) to[bend left=24](c);\draw (a) to[bend right=24](c);
 \draw (a) to[bend left=24](d);\draw (a) to[bend right=24](d);
 \end{tikzpicture}
+\diagramcaption{七桥问题的图模型}\label{fig:lecture-22}
 \end{center}
 四个点的度依次为 $5,3,3,3$。一条不重复边的通路中，除起终点外，每次到达都须与一次离开配成对。若要走完全部边，至多两个顶点可以是奇度，因此七桥问题连开欧拉通路也不存在。
 
@@ -2781,6 +2916,7 @@ i&1&2&3&4&5&6&7\\\hline
 \node (d) at (2,1){$d$};\node (e) at (2,-1){$e$};
 \draw (a)--(b)--(c)--(a) (c)--(d)--(e)--(c);
 \end{tikzpicture}
+\diagramcaption{在公共顶点拼接回路，边不重复而点可重复}\label{fig:lecture-23}
 \end{center}
 从 $a$ 走，第一次到达 $c$ 时插入 $c,d,e,c$，得到 $a,b,c,d,e,c,a$。这条欧拉回路重复顶点 $c$，但六条边各走一次。图的欧拉回路还可按重复顶点拆为边不相交的圈；反过来，连通且边能分解为圈的图，每个圈对各顶点贡献偶度。特别地，非平凡连通无向欧拉图的每条边都在某个圈上，所以没有桥。
 
@@ -2793,7 +2929,7 @@ i&1&2&3&4&5&6&7\\\hline
 有从 $s$ 到 $t$ 的开欧拉通路 & $b(s)=1$，$b(t)=-1$，其他顶点均为 $0$\\\bottomrule
 \end{tabularx}
 \end{center}
-必要性仍来自逐点配对，但必须配一条入弧与一条出弧。对于第一行，基图连通且各点平衡时，沿未用出弧行走不可能在非起点用尽出弧；以同样的回路拼接得到有向欧拉回路。该回路说明图强连通，所以也可用课件的“强连通且平衡”判据。对于第二行，临时加弧 $t\to s$，使所有顶点平衡，构造回路后删掉临时弧即可。课件用“单向连通且出入度满足条件”表述；实际判断只需先检验基图连通，因为上述度数条件保证可构造有向欧拉通路，进而推出单向连通。$s$ 是多一条出弧的点，不能与终点写反。
+必要性仍来自逐点配对，但必须配一条入弧与一条出弧。对于第一行，基图连通且各点平衡时，沿未用出弧行走不可能在非起点用尽出弧；以同样的回路拼接得到有向欧拉回路。该回路说明图强连通，所以也可用“强连通且平衡”判据。对于第二行，临时加弧 $t\to s$，使所有顶点平衡，构造回路后删掉临时弧即可。也可用“单向连通且出入度满足条件”表述；实际判断只需先检验基图连通，因为上述度数条件保证可构造有向欧拉通路，进而推出单向连通。$s$ 是多一条出弧的点，不能与终点写反。
 
 \term{Fleury 算法（无向图）。}先确认欧拉条件。全偶度时可从任一点出发；恰有两个奇度点时从一个奇度点出发。每走一条边，就把这条边从剩余图中删除。若当前点有多条可走的边，应选择不是\term{剩余图}的桥的边；只有没有其他选择时才过桥。理由是：若有其他边还留在当前这一侧，过桥之后就无法返回这一侧继续使用它们。桥的判定随删边变化，不能只在原图上标一次桥。上一节的回路拼接法则不需要在每一步检测桥。
 
@@ -2801,7 +2937,7 @@ i&1&2&3&4&5&6&7\\\hline
 对四边形 $abcd$ 加边 $ac$，奇度点为 $a,c$，故只有从其中之一出发的开欧拉通路。一条路线是 $a,b,c,d,a,c$。走完 $a,b,c$ 后，剩下 $c,d,a,c$ 是三角形，没有桥；再走 $cd$ 后只剩 $da,ac$，此时两边都是剩余图的桥，但每步都只有一个选择。
 
 \subsection{哈密顿通路与欧拉通路的区别}
-\term{哈密顿通路}是一条经过全部顶点且各一次的路径；\term{哈密顿回路}是经过全部顶点的圈，首尾为同一点，其余顶点各一次。含哈密顿回路的图叫哈密顿图；有哈密顿通路而没有哈密顿回路的图叫半哈密顿图。按课件约定单点平凡图是特例；本节的判定定理讨论至少三点的无向简单图。有向版本还要求每一步顺着弧的方向。
+\term{哈密顿通路}是一条经过全部顶点且各一次的路径；\term{哈密顿回路}是经过全部顶点的圈，首尾为同一点，其余顶点各一次。含哈密顿回路的图叫哈密顿图；有哈密顿通路而没有哈密顿回路的图叫半哈密顿图。单点平凡图约定为哈密顿图；本节的判定定理讨论至少三点的无向简单图。有向版本还要求每一步顺着弧的方向。
 
 \begin{center}
 \begin{tabularx}{\linewidth}{l Y Y}
@@ -2823,8 +2959,8 @@ p(G-S)\le |S|,
 直接推论：至少三点的无向哈密顿图没有割点或桥；二部图的哈密顿回路必须在两侧交替访问，所以两侧点数必须相等。对完全二部图 $K_{r,s}$（$r,s\ge1$），若 $r=s\ge2$，按两侧交替可构造哈密顿回路；若 $|r-s|=1$，可从较大侧开始并结束，得到开哈密顿通路；若差大于 $1$，连哈密顿通路也不可能。$K_{1,1}$ 只有一条边，是半哈密顿图。
 
 \Needspace{14\baselineskip}
-\example{课件十三点图与四阶棋盘}
-课件十三点图有二部划分 $\{a,c,e,h,j,l\}$ 和 $\{b,d,f,g,i,k,m\}$，下图分别以圆框和方框表示。两侧分别有 $6,7$ 点，不可能交替成一个覆盖全部顶点的圈。也可删去六点的一侧，得到七个孤立点，违反分支数上界。
+\example{二部划分与棋盘上的删点反证}
+下面的十三点图有二部划分 $\{a,c,e,h,j,l\}$ 和 $\{b,d,f,g,i,k,m\}$，下图分别以圆框和方框表示。两侧分别有 $6,7$ 点，不可能交替成一个覆盖全部顶点的圈。也可删去六点的一侧，得到七个孤立点，违反分支数上界。
 \begin{center}
 \begin{tikzpicture}[thick,every node/.style={font=\small}]
 \foreach \a/\b/\i in {a/g/0,b/h/1,c/i/2,d/j/3,e/k/4,f/l/5}{
@@ -2841,9 +2977,34 @@ p(G-S)\le |S|,
 \draw (a)--(g) (b)--(h) (c)--(i) (d)--(j) (e)--(k) (f)--(l);
 \draw (m)--(h) (m)--(j) (m)--(l);
 \end{tikzpicture}
+\diagramcaption{用圆框、方框区分二部图的两侧}\label{fig:lecture-24}
 \end{center}
 
-在 $4\times4$ 棋盘的马步图中，顶点是格子，合法马步为边。删去中央 $2\times2$ 的四格后，四个角格分别孤立，其余八个边格组成两个四圈，共有六个连通分支。因此 $6>4$，不可能存在走遍全部格子并回到起点的闭马步巡游。这个论证针对闭巡游，不能直接用作开巡游的判定。
+在 $4\times4$ 棋盘的马步图中，顶点是格子，合法马步为边。删去中央 $2\times2$ 的四格后，四个角格分别孤立，其余八个边格组成两个四圈，共有六个连通分支。因此 $6>4$，不可能存在走遍全部格子并回到起点的闭马步巡游。同一删点集合也满足 $6>4+1$，还违反哈密顿通路的必要条件，所以开巡游同样不存在。判断开、闭两种问题时，分别比较 $|S|+1$ 与 $|S|$。
+
+\begin{center}
+\begin{tikzpicture}[x=.85cm,y=.85cm,every node/.style={font=\small}]
+\foreach \r in {1,...,4}{\foreach \c in {1,...,4}{
+ \draw (\c-1,-\r+1) rectangle(\c,-\r);}}
+\fill[gray!25](1,-1)rectangle(3,-3);
+\draw (1,-1) grid[step=1] (3,-3);
+\foreach \r in {2,3}{\foreach \c in {2,3}{\node at(\c-.5,-\r+.5){$\times$};}}
+\foreach \r/\c/\v in {1/1/1,1/2/A,1/3/B,1/4/2,2/1/B,2/4/A,3/1/A,3/4/B,4/1/3,4/2/B,4/3/A,4/4/4}
+ \node at(\c-.5,-\r+.5){$\v$};
+\foreach \i in {1,...,4}{\node at(\i-.5,.35){$\i$};\node at(-.35,-\i+.5){$\i$};}
+\node[anchor=west,align=left]at(5,-1.8){灰格：被删去的四个顶点\\$1,2,3,4$：四个孤立分支\\四个 $A$ 格构成一个圈\\四个 $B$ 格构成另一个圈};
+\end{tikzpicture}
+\diagramcaption{四阶马步图删去中央四格后，有六个连通分支}\label{fig:lecture-25}
+\end{center}
+用 $(r,c)$ 表示第 $r$ 行第 $c$ 列，两个四圈分别为
+\[
+\begin{aligned}
+A:&\ (1,2)\to(2,4)\to(4,3)\to(3,1)\to(1,2),\\
+B:&\ (1,3)\to(2,1)\to(4,2)\to(3,4)\to(1,3).
+\end{aligned}
+\]
+逐一检查合法马步可知，删点后两圈之间没有边，而四个角格已无邻点。
+
 
 \subsection{度数和充分条件、加边定理与竞赛图}
 \term{加边定理。}在 $n\ge3$ 阶无向简单图中，若不相邻的 $u,v$ 满足 $d(u)+d(v)\ge n$，则 $G$ 有哈密顿回路当且仅当加边 $uv$ 后的图有。正向直接成立。反向只需处理回路用了新边的情况：删去该边，得到原图中的路径
@@ -2858,6 +3019,8 @@ v_1,\ldots,v_i,v_n,v_{n-1},\ldots,v_{i+1},v_1
 
 \term{Ore 型充分条件。}若每对不相邻点的度数和都至少为 $n$，可逐次加边直至完全图。度只会增加，以上加边定理每步都适用；完全图有哈密顿回路，故原图也有。若只保证度数和至少为 $n-1$，则可添加一个与所有原顶点相邻的新点。扩充后的图有 $n+1$ 点，原来每对不相邻点的度数和至少变为 $n+1$，故有哈密顿回路。删去新点，得到原图的一条哈密顿通路。两个阈值都是充分条件：$n\ge5$ 的圈已有哈密顿回路，尽管非邻接点度数和 $4<n$。
 
+由此还得到常用的 Dirac 条件：若 $n\ge3$ 阶无向简单图的最小度 $\delta\ge n/2$，则任意不相邻点的度数和至少为 $n$，所以图有哈密顿回路。使用时必须区分结论方向：满足条件可以确认存在，不满足条件只能说明这一判据没有给出答案。
+
 \example{八人圆桌}
 用顶点表示参会者，有共同语言的两人连一条边。若每人至少与其他七人中的四人有共同语言，则任意不相邻的两点度数和至少为 $8$，满足八阶图的回路充分条件。因此可沿哈密顿回路安排圆桌座位，使每个人都能与左右相邻者交流。
 
@@ -2870,10 +3033,25 @@ v_1,\ldots,v_i,v_n,v_{n-1},\ldots,v_{i+1},v_1
 \[
 d(v)\quad\text{与}\quad d(u)+w(u,v).
 \]
-若后者更小，则更新 $d(v)$ 并记录前驱为 $u$。当目标点的标号被确定即可结束；如果当前最小标号为 $\infty$，剩余点均不可达。设一条到 $u$ 的候选路线首次离开已确定集合时到达 $x$。该段的代价至少为 $d(x)$，因为前一顶点已定值且已经用该边尝试更新 $d(x)$。又因 $u$ 的暂定距离最小，$d(x)\ge d(u)$，而后续非负边权不会降低代价，故没有更短的路线。非负整数权时可按暂定距离分桶，按距离由小到大取出顶点；这是课件提及的 Dial 实现思路。
+若后者更小，则更新 $d(v)$ 并记录前驱为 $u$。当目标点的标号被确定即可结束；如果当前最小标号为 $\infty$，剩余点均不可达。设一条到 $u$ 的候选路线首次离开已确定集合时到达 $x$。该段的代价至少为 $d(x)$，因为前一顶点已定值且已经用该边尝试更新 $d(x)$。又因 $u$ 的暂定距离最小，$d(x)\ge d(u)$，而后续非负边权不会降低代价，故没有更短的路线。非负整数权时可按暂定距离分桶，按距离由小到大取出顶点；这就是 Dial 算法的基本思路。
 
 \example{少走一条边不一定更短}
-设无向图有边 $12,13,23,24,34,45,25$，边权依次为 $4,1,2,1,5,3,7$。从 $v_1$ 出发，标号更新如下，表中距离按 $v_1$ 至 $v_5$ 排列。
+设无向图有边 $12,13,23,24,34,45,25$，边权依次为 $4,1,2,1,5,3,7$。
+\begin{center}
+\begin{tikzpicture}[every node/.style={font=\small},thick]
+\foreach \v/\x/\y in {1/0/0,2/2/1.2,3/2/-1.2,4/4.4/0,5/6.7/0}
+ \node[circle,draw,fill=white,inner sep=3pt](v\v) at(\x,\y){$v_\v$};
+\draw[dashed](v1)--node[above left]{$4$}(v2);
+\draw[very thick](v1)--node[below left]{$1$}(v3);
+\draw[very thick](v3)--node[left,fill=white,inner sep=2pt]{$2$}(v2);
+\draw[very thick](v2)--node[above right]{$1$}(v4);
+\draw[dashed](v3)--node[below right]{$5$}(v4);
+\draw[very thick](v4)--node[below]{$3$}(v5);
+\draw[dashed](v2) to[bend left=28] node[above]{$7$}(v5);
+\end{tikzpicture}
+\diagramcaption{粗实线表示从 $v_1$ 到 $v_5$ 的最短路线，边旁数字为权}\label{fig:lecture-26}
+\end{center}
+从 $v_1$ 出发，标号更新如下。每行表示确定该顶点并更新其邻点后的状态，距离按 $v_1$ 至 $v_5$ 排列；尚未确定的数值只是已找到路线中的最好结果，仍可能减小。
 \begin{center}
 \begin{tabular}{c c l}
 \toprule 刚确定的点 & 当前距离标号 & 本轮改进\\\midrule
@@ -2886,12 +3064,14 @@ $v_5$ & $(0,3,1,4,7)$ & 目标点定值\\\bottomrule
 \end{center}
 从目标沿前驱倒推，再反转，得 $1\to3\to2\to4\to5$，总代价 $7$。两步路线 $1\to2\to5$ 的代价却为 $11$。
 
+例如确定 $v_3$ 后，经 $v_3$ 到 $v_2$ 的候选代价为 $1+2=3$，小于原标号 $4$，故把 $v_2$ 的标号改为 $3$、前驱改为 $v_3$。第一次发现目标时标号为 $10$，此时还不能结束；到它被选为最小未定标号并确定时，才得到最终距离 $7$。
+
 \subsection{货郎担问题：最短哈密顿回路}
 货郎担问题（TSP）要求访问每个顶点一次并返回起点，在所有可行的哈密顿回路中使总权最小。给定无向完全带权图，可把不可用的边看成权为 $\infty$；只有找到总权有限的回路才算有可行解。固定起点后有 $(n-1)!$ 个其余顶点排列，若无向且正走、反走视为同一圈，则 $n\ge3$ 时有 $(n-1)!/2$ 个候选。最短路只约束起点和终点；货郎担问题还约束访问全部顶点并返回，不能用一次 Dijkstra 求解。
 
 \Needspace{15\baselineskip}
 \example{枚举四个顶点的全部回路}
-课件第 31 页的边权是 $ab=2,ac=2,ad=1,bc=3,bd=3,cd=4$。从 $a$ 出发，忽略反向，每个圈只列一次。
+设四点完全图的边权为 $ab=2,ac=2,ad=1,bc=3,bd=3,cd=4$。从 $a$ 出发，忽略反向，每个圈只列一次。
 \begin{center}
 \begin{tikzpicture}[every node/.style={font=\small}]
 \foreach \v/\x/\y in {a/0/1.5,b/0/0,c/3/0,d/3/1.5}
@@ -2902,6 +3082,7 @@ $v_5$ & $(0,3,1,4,7)$ & 目标点定值\\\bottomrule
 \draw[thick] (b)--node[above,pos=.29]{$3$}(d);
 \node[anchor=west,align=left] at (4,.75){实线组成最优回路。\\斜线的交叉处不是顶点。};
 \end{tikzpicture}
+\diagramcaption{四点货郎担问题：粗实线给出最优回路}\label{fig:lecture-27}
 \end{center}
 \begin{center}
 \begin{tabular}{c c c}
@@ -2913,29 +3094,36 @@ $a\,c\,b\,d\,a$ & $2+3+3+1$ & $9$\\\bottomrule
 \end{center}
 最优回路为 $a,c,b,d,a$，权为 $9$。应先说明枚举覆盖了所有候选，再比较权值；仅展示一条较短回路不能证明它最优。
 
-\clearpage
+\subsection{本章小结}
+先分清覆盖边还是顶点，再判定是否必须回到起点。欧拉问题先查连通和度；哈密顿问题可用必要条件排除、用充分条件或实际回路确认。带权题比较总权，并在题面中区分起终点限制。
+
 \exercise
-\begin{enumerate}
-\item 判断 $C_5$、$K_4$、两个不相交的三角形是否为欧拉图。\\
-\term{解：}$C_5$ 连通且全为 $2$ 度，是欧拉图；$K_4$ 有四个 $3$ 度点，不是；两个三角形虽全偶度，但不连通，也不是。
+\begin{enumerate}[label=11.\arabic*.,leftmargin=2.8em]
+\begin{samepage}
+\item  判断 $C_5$、$K_4$、两个不相交的三角形是否为欧拉图。
+\end{samepage}
 
-\item 有向图的弧为 $a\to b,b\to c,c\to a,a\to c$。求欧拉通路并判断能否闭合。\\
-\term{解：}$a$ 的出度比入度多 $1$，$c$ 的入度比出度多 $1$，其余点平衡且基图连通。因此有开通路 $a,b,c,a,c$，不能闭合。
+\begin{samepage}
+\item  有向图的弧为 $a\to b,b\to c,c\to a,a\to c$。求欧拉通路并判断能否闭合。
+\end{samepage}
 
-\item 不用求具体回路，分别判定 $K_{3,3},K_{3,4},K_{3,5}$ 的哈密顿性质。\\
-\term{解：}$K_{3,3}$ 可两侧交替成圈；$K_{3,4}$ 两侧相差一，可从四点的一侧出发并结束，故为半哈密顿图；$K_{3,5}$ 相差二，任何交替路径都不能遍历全图。
+\begin{samepage}
+\item  不用求具体回路，分别判定 $K_{3,3},K_{3,4},K_{3,5}$ 的哈密顿性质。
+\end{samepage}
 
-\item 用删点条件说明三个叶子都与同一中心相邻的星形图为何没有哈密顿通路。\\
-\term{解：}取 $S$ 为中心点。删除后剩三个孤立点，有 $p(G-S)=3>|S|+1=2$，违反哈密顿通路的必要条件。
+\begin{samepage}
+\item  用删点条件说明三个叶子都与同一中心相邻的星形图为何没有哈密顿通路。
+\end{samepage}
 
-\item 景点 $A,B,C,D$ 的路程为 $AB=5,AC=18,AD=7,BC=14,BD=8,CD=10$ 千米。求访问全部景点并返回的最短路线。若起终点均不限且不返回，最短路程是多少？\\
-\term{解：}闭合路线忽略反向后，$ABCDA,ABDCA,ACBDA$ 的路程分别为 $36,41,47$，故最优是 $ABCDA$ 或其反向。若不返回，一条路径与其反向等价；按无序端点对枚举，每对有两种内部排列。对端点对 $AB,AC,AD,BC,BD,CD$，最小值分别为 $31,23,29,22,33,26$，故全局最优是 $B,A,D,C$ 或其反向，路程 $22$。两问的差别在于是否要求返回。
+\begin{samepage}
+\item  景点 $A,B,C,D$ 的路程为 $AB=5,AC=18,AD=7,BC=14,BD=8,CD=10$ 千米。求访问全部景点并返回的最短路线。若起终点均不限且不返回，最短路程是多少？
+\end{samepage}
 \end{enumerate}
-\note{先分清覆盖边还是顶点，再判定是否必须回到起点。欧拉问题先查连通和度；哈密顿问题可用必要条件排除、用充分条件或实际回路确认。带权题比较总权，并在题面中区分起终点限制。}
 
 
-\chapterpage{补充：布尔可满足性与建模}
-本节保留此前讲义中的 SAT 与数独内容，作为命题逻辑和范式的应用补充，不替代逻辑、集合与关系部分的基本要求。
+
+\chapterpage{布尔可满足性与建模}
+命题公式不仅能表达陈述，也能表示一组必须同时满足的约束。把问题中的选择设为布尔变量，再把限制写成公式，就能将“寻找可行方案”转化为“寻找满足赋值”。本章用数独说明这一过程。
 
 \subsection{SAT、子句与满足赋值}
 \term{布尔可满足性问题}（SAT）是判断给定命题公式是否存在满足赋值，不要求满足赋值唯一。\term{子句}是若干文字的析取，CNF 是子句的合取。3-SAT 常规定每个子句含三个文字，也有教材采用至多三个文字的约定，应说明所用版本。
@@ -2959,6 +3147,13 @@ s_{r,c,d}=1\quad\Longleftrightarrow\quad
 \]
 前半是至少一个，后半是任意一对不能同真。
 
+取三个候选 $p,q,r$，上述编码就是
+\[
+(p\lor q\lor r)\land(\neg p\lor\neg q)
+\land(\neg p\lor\neg r)\land(\neg q\lor\neg r).
+\]
+$000$ 被第一项排除；任意含两个或三个 $1$ 的赋值被某个二元子句排除；只剩 $100,010,001$。由此可见，“至少一个”和“至多一个”必须同时写入。
+
 数独的全部约束为：每格恰好一个数字；每行每个数字恰好一次；每列每个数字恰好一次；每个 $3\times3$ 宫中每个数字恰好一次；已知数字对应变量为真。例如
 \begin{align*}
 \text{格子 }(r,c):&\quad\operatorname{ExactlyOne}(s_{r,c,1},\ldots,s_{r,c,9}),\\
@@ -2967,205 +3162,319 @@ s_{r,c,d}=1\quad\Longleftrightarrow\quad
 \end{align*}
 宫约束对该宫的九个格子应用同一形式。已知 $(r,c)$ 填 $d$，添加单位子句 $s_{r,c,d}$。全部约束合取后为 CNF，满足赋值与数独解对应。
 
+若已经得到一组解，记该解在格子 $(r,c)$ 中的数字为 $d_{r,c}$，加入
+\[
+\bigvee_{r=1}^{9}\bigvee_{c=1}^{9}\neg s_{r,c,d_{r,c}}.
+\]
+这个子句要求至少一格与原解不同，恰好排除这组完整数独解。在保留全部数独约束的前提下，再次找到满足赋值就意味着存在另一组解。
+
 是否存在解和解是否唯一是不同问题。若已有满足赋值，可增加阻断该完整解的子句后再次判断可满足性：若仍可满足，则还有其他解；若不可满足，则原解唯一。这说明形式化建模要同时明确变量、约束与所问性质。
 
-\chapterpage{综合复习、符号与课件索引}
-\subsection{逻辑、集合、关系、函数与基数之间的联系}
-命题逻辑以真值建立联结词与公式的语义；等值演算把公式化成可比较、可计算的范式；推理理论区分有效性与形式证明。一阶逻辑增加对象、关系和量词，量词演算依赖变量绑定及对象任意性。集合代数则把逻辑条件转成对象的集合关系，并通过容斥进行有限计数。二元关系将对象间的联系表示为有序对集合；等价关系产生划分与商集，偏序关系则通过可比性和覆盖结构研究次序。函数是在关系中加入输入覆盖与单值性得到的结构；函数的纤维形成划分，单射、满射和双射分别约束输出的合并与覆盖，复合描述映射的顺次作用。基数比较进一步用单射、双射描述集合大小，并通过枚举与对角线法区分可数无穷和不可数。
-
-逻辑等值、有效推理、集合相等是不同层次的关系：等值保持全部真值；推理只要求前提真时结论真；集合相等要求元素完全一致。它们之间可通过“任取一个对象并判断属于关系”建立联系。
-
-\subsection{关键公式与判定条件}
-\begin{enumerate}
-\item 蕴涵仅在前真后假时假；$p\to q\equiv\neg p\lor q\equiv\neg q\to\neg p$。
-\item 重言式一定可满足；可满足式不一定重言；矛盾式等同不可满足式。
-\item 公式层次由嵌套深度确定，二元公式为两子公式层次的最大值加一。
-\item 固定变元及顺序后，PDNF 取成真行的 $m_i$，PCNF 取成假行的 $M_i$；两者编号互补，$M_i\equiv\neg m_i$。
-\item $n$ 变元有 $2^n$ 种赋值，$2^{2^n}$ 个真值函数；与非、或非各自完备。
-\item 推理有效当且仅当前提合取蕴涵结论为重言式；反例要求全部前提真而结论假。
-\item 等值式可置换，推理定律通常不可逆；$\vdash$ 与 $\models$ 的定义不同。
-\item 一阶解释必须包含非空论域、常项、函数、谓词的解释；开放公式还需自由变量赋值。
-\item 否定穿过量词时互换量词；量词跨蕴涵前件时互换，跨后件时不换；移动必须满足自由变量条件。
-\item 全称对合取分配，存在对析取分配；另外两个方向一般只能单向推出。
-\item 前束化先避免同名变量冲突，再移动量词；不能捕获原自由变量，也不能任意交换混合量词。
-\item 全称引入要求对象任意；存在消去使用新见证并解除假设，最终结论不能依赖其名字。
-\item $\in$ 是隶属，$\subseteq$ 是包含；$\varnothing$ 与 $\{\varnothing\}$ 不同；$|\mathcal P(A)|=2^{|A|}$ 对有限集成立。
-\item $A\subseteq B$ 等价于 $A\cup B=B$、$A\cap B=A$、$A\setminus B=\varnothing$。
-\item $A\triangle B=\varnothing$ 当且仅当 $A=B$；差不能任意交换或结合。
-\item 容斥交集要用真实重叠数；整除交集取最小公倍数；只会一类与至少一类的计数公式不同。
-\item 等价关系要求自反、对称、传递；偏序要求自反、反对称、传递。
-\item $aRb\Longleftrightarrow[a]_R=[b]_R$；不同等价类互不相交，$A/R$ 是 $A$ 的划分。
-\item $R_1\subseteq R_2$ 当且仅当对应划分满足 $\pi_1\le\pi_2$，关系越小，划分越细。
-\item 哈斯图只画覆盖对；恢复有限偏序要加入自环和全部向上可达对。
-\item 最大元、最小元属于所考察子集；上下界在整个承载集中寻找；有界不保证有确界。
-\item 非空有限偏序有极大、极小元；最长链长度等于最少反链划分块数。
-\item 良序要求每个非空子集有最小元；有限时全序与良序等价，无限时一般不等价。
-\item $f:A\to B$ 要求每个输入恰有一个输出；陪域 $B$ 与值域 $f(A)$ 应区分。
-\item $|B^A|=|B|^{|A|}$（有限集）；空集出发恰有一个函数，非空集合到空集没有函数。
-\item 像保持并，交与差一般只有包含式；原像保持并、交、差及相对补。
-\item $S\subseteq f^{-1}(f(S))$，$f(f^{-1}(T))=T\cap f(A)$；完全原像不要求反函数存在。
-\item 有限等势集合间单射等价于满射；无限集合上此结论不成立。
-\item 本课程 $(f\circ g)(x)=g(f(x))$；复合单射推出 $f$ 单射，复合满射推出 $g$ 满射。
-\item $f:A\to B$ 可逆当且仅当双射；$f\circ f^{-1}=I_A$，$f^{-1}\circ f=I_B$；复合求逆时次序反转。
-\item $A\approx B$ 当且仅当存在双射；$|A|\le|B|$ 当且仅当存在单射 $A\to B$；双向单射保证等势。
-\item $\mathbb N,\mathbb Z,\mathbb Q,\mathbb N^2$ 都为可数无穷集，基数为 $\aleph_0$。
-\item 可数并及有限积保持可数性；可数无穷积未必可数，$\{0,1\}^{\mathbb N}$ 即为反例。
-\item $|\mathcal P(\mathbb N)|=2^{\aleph_0}=\mathfrak c=|\mathbb R|$；康托定理给出 $|A|<|\mathcal P(A)|$。
-\item 无穷集与真子集可能等势；非退化实数区间均与 $\mathbb R$ 等势；不存在最大的基数。
-\item 图中环对无向度贡献 $2$，对有向出、入度各贡献 $1$。度数和为偶数不足以判定可简单图化。
-\item 无向简单图有 $\kappa(G)\le\lambda(G)\le\delta(G)$；有向强连通推出单向连通，单向连通推出弱连通。
-\item 无向图为二部图当且仅当无奇圈。邻接矩阵的整数幂计定长通路；可达矩阵只记是否可达。
-\item 欧拉通路覆盖边；哈密顿通路覆盖点。无向欧拉判定先查连通，再数奇度点。
-\item 哈密顿回路的删点分支数上界是必要条件；度数和至少为 $n$ 是充分条件。
-\item 非负权最短路可用 Dijkstra 标号法；货郎担问题还要求访问全部顶点并返回。
+\subsection{本章练习}
+\begin{enumerate}[label=12.\arabic*.,leftmargin=2.8em]
+\begin{samepage}
+\item 写出三个命题变元 $p,q,r$ 中“至少两个为真”的 DNF 与 CNF，并说明两者为何表达同一条件。
+\end{samepage}
+\begin{samepage}
+\item 对公式 $(p\lor q)\land(\neg p\lor r)$，验证赋值 $101$ 满足它；写出只排除该完整赋值的一个子句，并给出加入后仍满足的新赋值。
+\end{samepage}
 \end{enumerate}
 
-\Needspace{8\baselineskip}
-\subsection{常用符号及与课件记法的对应}
-\begin{longtable}{p{0.22\linewidth}p{0.71\linewidth}}
-\toprule 符号 & 含义与记号说明\\\midrule\endhead
-$\neg,\land,\lor$ & 否定、合取、相容析取\\
-$\to,\leftrightarrow$ & 公式内部的蕴涵、双条件\\
-$\equiv$ & 逻辑等值；课件记作 $\Leftrightarrow$\\
-$\models$ & 语义蕴涵；课件重言蕴涵常记作 $\Rightarrow$\\
-$\vdash$ & 在指定证明系统中可形式推出\\
-$\oplus$ & 命题排斥或；课件也用此符号表示集合对称差\\
-$\uparrow,\downarrow$ & 与非、或非\\
-$\forall,\exists$ & 全称、存在量词\\
-$FV(A)$ & 公式 $A$ 的自由变量集合\\
-$A[t/x]$ & 将 $x$ 的自由出现用项 $t$ 合法代替\\
-$m_i,M_i$ & 编号 $i$ 的极小项、极大项\\
-$\Sigma m,\Pi M$ & 主析取、主合取范式的编号表示\\
-$\in,\notin$ & 属于、不属于\\
-$\subseteq,\subsetneq$ & 包含、真包含；课件真包含也记作 $\subset$\\
-$\cup,\cap,\setminus$ & 并、交、差；课件差记作减号\\
-$A^c$ & 相对于固定全集的补；课件记作 $\sim A$\\
-$\triangle$ & 集合对称差；课件记作 $\oplus$\\
-$\mathcal P(A)$ & 幂集；课件记作 $P(A)$\\
-$\bigcup\mathcal A,\bigcap\mathcal A$ & 集合族的广义并、广义交\\
-$|A|$ & 集合基数，有限集合时为元素数\\
-$A\times B,I_A,E_A$ & 笛卡尔积、恒等关系、全域关系\\
-$R^{-1},R\circ S,R^n$ & 逆、合成、关系幂；本章合成为先 $R$ 后 $S$\\
-$r(R),s(R),t(R)$ & 自反、对称、传递闭包\\
-$[a]_R,A/R$ & 等价类、以不同等价类为元素的商集\\
-$\pi_1\le\pi_2$ & 划分细分；不是普通集合族包含\\
-$\preceq,\prec$ & 偏序与对应的严格偏序\\
-$U_A(B),L_A(B)$ & 相对于承载集 $A$ 的上界、下界集合\\
-$\sup_A B,\inf_A B$ & 上确界、下确界\\
-$B^A,\operatorname{dom}f,\operatorname{ran}f$ & 函数集合、定义域、值域；陪域由 $f:A\to B$ 指定\\
-$f(S),f^{-1}(T)$ & 集合的像、完全原像；$f^{-1}(\{b\})$ 是纤维\\
-$\chi_S,q:A\to A/R$ & 子集的特征函数、自然映射\\
-$f^n,f^{-1}$ & 函数迭代、逆关系；双射的逆关系为整个陪域上的反函数\\
-$A\approx B$ & 集合等势，即存在双射 $A\to B$\\
-$|A|\le|B|$ & 基数比较，即存在单射 $A\to B$；课件记作 $A\preceq B$\\
-$\aleph_0,\mathfrak c$ & 自然数集基数、连续统基数；$\mathfrak c=2^{\aleph_0}$\\
-$2^{|A|}$ & 二元函数集合 $\{0,1\}^A$ 的基数，也等于幂集基数\\
-$d(v),d^+(v),d^-(v)$ & 顶点度数、出度、入度\\
-$p(G),\kappa,\lambda,\delta$ & 连通分支数、点连通度、边连通度、最小度\\
-$M(G),A(G),P(G)$ & 图的关联矩阵、邻接矩阵、可达矩阵\\\bottomrule
-\end{longtable}
+\chapterpage{综合练习}
+以下问题把前面各章的方法联系起来。解题时先说明所讨论的对象和条件，再选择真值、元素、映射或图上的路径作为证明依据。等值变形需要双向成立，反驳一个全称结论则只需一个符合条件的反例。
 
-\subsection{课件覆盖索引}
-本讲义以前六章课件、第七章 7.6--7.7 节及其习题课，第八章 8.1--8.3 节及其习题课，以及第十四、十五章图论课件与邻接矩阵补充课件为依据，页数指 PDF 中的页面顺序，包含习题页。行政信息、上课联系方式和仅用于课程导入的材料不作为数学正文。图像习题已按题目含义整理；明显的文字、括号或条件疏漏按数学定义规范表述。
-\begin{longtable}{p{0.25\linewidth}p{0.68\linewidth}}
-\toprule 课件与页码 & 对应讲义内容\\\midrule\endhead
-第一章，4--16 页 & 命题与分类、五种联结词、相容或与排斥或、条件符号化\\
-第一章，17--26 页 & 合式公式、层次、赋值、真值表与公式类型\\
-第一章，27--34 页 & 第一章例题、练习和类型判定\\
-第二章，1--11 页 & 等值式、十六组等值律、置换、等值演算与反例\\
-第二章，12--30 页 & 普通范式、极小项与极大项、主范式求法及应用\\
-第二章，31--39 页 & 选派建模、真值函数、完备集、与非和或非\\
-第二章，40--53 页 & 主范式练习、指定联结词改写、五人选派例题\\
-第三章，1--17 页 & 推理形式、有效性判定、推理定律与二难式\\
-第三章，18--28 页 & 形式系统、P 系统、直接证明、附加前提与归谬\\
-第三章，29--36 页 & 推理反例与构造证明练习\\
-第四章，1--10 页 & 个体词、谓词、论域、量词与符号化\\
-第四章，11--20 页 & 项、公式、变量出现、闭式、解释、类型、代换实例\\
-第四章，21--30 页 & 不同论域解释、量词顺序、成真与成假解释\\
-第五章，1--11 页 & 量词等值律、辖域、换名与代替、有限论域展开\\
-第五章，12--15 页 & 前束范式及变量冲突处理\\
-第五章，16--26 页 & 一阶推理、N 系统、四类量词规则与证明\\
-第五章，27--29 页 & 给定解释求值与前束化练习\\
-第六章，7--31 页 & 集合概念、表示、隶属、包含、空集、全集、幂集\\
-第六章，32--42 页 & 五种运算、文氏图、广义运算与算律\\
-第六章，43--55 页 & 包含与恒等式的各类证明方法\\
-第六章，56--71 页 & 基数、容斥原理、语言与整除计数、等同规则\\
-第六章，72--88 页 & 扫描习题中的层次判断、候选集合、充分必要条件及综合证明\\
-第七章 7.6--7.7 文件，1--14 页 & 等价关系、同余、等价类及其基本性质\\
-同上，15--33 页 & 商集、划分、一一对应、关系计数、细分\\
-同上，34--49 页 & 偏序、全序、覆盖、哈斯图与关系恢复\\
-同上，50--62 页 & 链、反链、四类极值、有限分解定理\\
-同上，63--73 页 & 上下界、确界、综合图例、良序\\
-同上，75--87 页 & 关系运算与闭包、积集分类、偏序直积、包含式证明\\
-第八章 8.1--8.2 文件，1--16 页 & 函数定义、相等、指定定义域、函数集合与计数\\
-同上，17--31 页 & 像、完全原像、集合运算、单满性、有限等势定理\\
-同上，32--37 页 & 常函数、恒等函数、单调、特征函数、自然映射与双射构造\\
-同上，38--52 页 & 复合的定义域、作用顺序、结合律、迭代、单满性与消去律\\
-同上，53--61 页 & 逆关系、反函数存在条件、恒等式、复合求逆与计算例题\\
-同上，62--69 页 & 单满性、平面双射、平方差原像、纤维划分及哈斯图习题\\
-第八章 8.3 文件，1--9 页 & 等势、整数与自然数对编号、有理数枚举、区间双射\\
-同上，10--17 页 & 对角线、幂集定理、基数比较、二元序列与连续统\\
-同上，18--24 页 & 自然数的集合构造、有限与无穷集、基数记号与比较\\
-同上，25--29 页 & 可数集、封闭性、有限计数、可数集与有限集的积\\
-同上，31--36 页（新版 30--35 页） & 幂集等势、七次幂与一百零九次幂集合、差集基数习题\\
-第十四章，1--26 页 & 无向与有向图、邻域、度数、握手定理、度数列\\
-同上，27--37 页 & 同构、完全图、竞赛图、正则图、子图、补图与收缩\\
-同上，38--48 页 & 通路、路径、圈、连通分支与距离\\
-同上，49--67 页 & 割集、连通度、有向连通性、极大路径、二部图\\
-同上，68--77 页 & 关联、邻接与可达矩阵，图的集合运算\\
-同上，79--87 页 & 度数下界、非同构实现、有向圈与通路计数\\
-邻接矩阵补充，1--9 页 & 置换矩阵、共同后继与前驱、矩阵幂的意义\\
-同上，10--14 页 & 七城市例题、定长计数、回溯与最短距离\\
-第十五章，1--11 页 & 七桥模型、欧拉判定、回路拼接与 Fleury 算法\\
-同上，12--27 页 & 哈密顿通路与回路、删点条件、度数和、加边与竞赛图\\
-同上，28--37 页 & 带权最短路、货郎担问题与习题\\\bottomrule
-\end{longtable}
-一阶逻辑中自由变量改名按对应赋值理解，避免将其误作固定赋值下的等值；空族广义交明确区分是否固定全集；硬币与着色的计数明确区分对象是否有编号、是否按旋转等同。这些条件用于保证课件中的演算与应用在相应语境下正确。
+\exercise
 
-\subsection{第七章课件的条件与记号修正}
-课件第 28 页求商集的选元步骤，应从已求等价类的并集之外选择新代表元；第 50 页反链定义应限定两个不同元素。第 52 页的“没有连线”必须理解为不存在向上可达路径，不能仅检查覆盖边。第 57 页极值的判断不能依赖画图时是否处于同一高度。
+\begin{enumerate}[label=13.\arabic*.,leftmargin=2.8em]
+\begin{samepage}
+\item  证明 $\Gamma\models C$ 当且仅当 $\bigwedge\Gamma\land\neg C$ 不可满足。
+\end{samepage}
 
-第 58 页有限集存在极大元、极小元的结论须补充“非空”；本章给出严格上升链终止的证明，避免第 59 页归纳论证中未检查新元素上方其他元素的缺口。第 60 页分解定理的“至少 $h$ 块”和“恰有 $h$ 块的构造”须同时成立，本章以最长链秩函数给出证明。第 62 页的反链结论来自对反链划分应用抽屉原理，不能理解为每块都含 $m+1$ 个元素。
+\begin{samepage}
+\item  已知 $F\equiv\Sigma m(0,2,5,7)$（变元顺序为 $p,q,r$）。求其 PCNF，并用简单公式表示 $F$。
+\end{samepage}
 
-第 70 页的良序对应 well-order；良基性一般只要求非空子集有极小元，不能与“有最小元”混同。第 73 页良序化定理讨论存在某种次序，不改变给定次序的性质。第 79 页积集分类题的商集承载对象应写成 $(A\times A)/R$。习题课合成运算沿用先左关系、后右关系的约定，避免与其他教材的相反记号混用。
+\begin{samepage}
+\item  证明 $\forall x(P(x)\to Q(x)),\forall x(Q(x)\to R(x))\models\forall x(P(x)\to R(x))$。
+\end{samepage}
 
-\subsection{第八章课件的条件与记号修正}
-课件第 5 页从“关系自身的定义域”定义函数，第 7--11 页再指定 $A\to B$；两种语境须区分。例如 $x+y=10$ 在自然数上给出有限定义域的函数，并不是整个 $\mathbb N$ 上的全函数。函数相等按关系图像判断，仍须保留定义域；约分不允许悄悄补入原先无定义的点。第 22--23 页的 $\ln n$ 定义域为正整数，不能把其值域误认为整个实数集；第 37 页的平方根与倒数若写成 $\mathbb R\to\mathbb R$，须先修正定义域：平方根限于非负实数，倒数排除 $0$。
+\begin{samepage}
+\item  将 $\neg\exists x(P(x)\land\forall yR(x,y))$ 化为前束范式。
+\end{samepage}
 
-第 17 页的完全原像 $f^{-1}(T)$ 不以可逆为前提；$f^{-1}(f(S))=S$ 需要单射等附加条件。第 19 页交、差公式的包含方向不同，不能互换。第 31 页有限等势定理的满射推出单射一向，正文用输出数不足的反证补足论证。第 34 页偏序幂集的集合大小函数只保留包含次序，不是单射，不能把实数全序上严格单调的结论用于不可比元素。
+\begin{samepage}
+\item  证明 $A\subseteq B$ 当且仅当 $A\cap B^c=\varnothing$，并用一阶逻辑写出它。
+\end{samepage}
 
-第 42 页文字说明易使人误解复合顺序；以其定义与后续计算为准，本课程统一为先 $f$ 后 $g$，$(f\circ g)(x)=g(f(x))$。第 46--47 页函数幂指迭代，不是数值乘方；“等幂”统一称为“幂等”。第 53--57 页须区分在值域上存在逆函数与在整个指定陪域上存在反函数，后者要求双射，恒等函数的下标依作用起点确定。第 58--59 页分段例题明确采用含 $0$ 的自然数集，并完整写出复合在各分支的取值。第 65--66 页的自然映射输出是等价类，不能与原函数的数值输出混同。
-
-\Needspace{16\baselineskip}
-\subsection{基数课件的条件与记号修正}
-8.3 节第 9 页关于实数区间的等势结论应限于非退化区间，排除空区间与单点。第 11 页对角线构造须避免十进制表示的尾 $9$ 二义性，本章固定规范表示并只用数字 $1,2$ 构造新数。第 15--16 页证明二元序列与区间等势时，规范二进制展开只给出一个方向的单射，任意序列的十进制编码给出另一方向，最后使用康托--伯恩斯坦定理。
-
-第 24 页列出的基数是已知严格增长链，不应理解为完整列举了全部相邻基数；连续统基数统一记作 $\mathfrak c$。第 26 页“可数个可数集的笛卡尔积仍可数”不成立，应限定为有限个因子；可数并则仍可数。幂集不可数的结论须以原集合无穷为条件。第 35 页幂集合习题中的映射 $n\mapsto n^{109}$ 的陪域应为 $B$；交集本身是 $\{n^{763}\mid n\in\mathbb N\}$，其基数再写为 $\aleph_0$。
-
-\Needspace{12\baselineskip}
-\subsection{图论课件的条件与记号修正}
-课件第 22 页度数和为偶数的充分性允许使用环，不适用于简单图。第 42 页讨论闭通路的长度上界时，应明确正长度，并区分重复用边的闭通路和圈。第 56 页证明 $\kappa\le\lambda$ 时，任意从跨侧边各选一个端点可能删掉整侧；正文给出了保留两侧各一点的构造。第 67 页的奇偶分组须允许孤立点分支只有一种颜色。
-
-第 69 页有向关联矩阵采用始点 $+1$、终点 $-1$。第 73 页没有指定“不同道路”是否允许重复，正文分别给出路径数与任意长度通路数。第 79 页给出的阶数结论是下界 $n\ge11$；第 85--87 页的矩阵条数是按起点、终点和边序列计数，并且长度从 $1$ 开始。
- 
-\Needspace{24\baselineskip}
-\subsection{邻接矩阵补充与第十五章的口径说明}
-矩阵补充课件第 3 页的交换矩阵恰好对称；一般重排使用 $QAQ^{\mathsf T}$。第 4--5 页以非零项数求度，使用的是简单图的 $0$-$1$ 矩阵；多重图须按重数求和。第 6、9 页的矩阵幂数的是允许重复顶点或边的通路。第十五章第 9 页的有向开欧拉通路可用基图连通加出入度差判定；判定结果本身会推出单向连通。第 18 页两侧点数相差一的完全二部图有哈密顿通路；相差至少二时则没有。第 37 页给出的 $36$ 千米按闭合巡游计算，若不要求返回，须另做比较。
-
-\Needspace{20\baselineskip}
-\subsection{综合练习与解答}
-\begin{enumerate}
-\item 证明 $\Gamma\models C$ 当且仅当 $\bigwedge\Gamma\land\neg C$ 不可满足。\\
-\term{解：}若右式可满足，该赋值使全部前提真、结论假，是无效推理的反例。反之，无效推理的反例恰好使该式真。两者取否定即得结论。
-\item 已知 $F\equiv\Sigma m(0,2,5,7)$（变元顺序为 $p,q,r$）。求其 PCNF，并用简单公式表示 $F$。\\
-\term{解：}PCNF 为 $\Pi M(1,3,4,6)$；四个成真行均满足 $p=r$，$q$ 不影响真值，故 $F\equiv p\leftrightarrow r$。
-\item 证明 $\forall x(P(x)\to Q(x)),\forall x(Q(x)\to R(x))\models\forall x(P(x)\to R(x))$。\\
-\term{解：}取任意 $u$，全称消去得到两个蕴涵，假言三段论得 $P(u)\to R(u)$；因 $u$ 不受前提限制，全称引入得结论。
-\item 将 $\neg\exists x(P(x)\land\forall yR(x,y))$ 化为前束范式。\\
-\term{解：}$\forall x(\neg P(x)\lor\exists y\neg R(x,y))\equiv\forall x\exists y(\neg P(x)\lor\neg R(x,y))$。
-\item 证明 $A\subseteq B$ 当且仅当 $A\cap B^c=\varnothing$，并用一阶逻辑写出它。\\
-\term{解：}$A\cap B^c=A\setminus B$，使用包含的等价条件即可。逻辑形式为 $\forall x(x\in A\to x\in B)\Longleftrightarrow\neg\exists x(x\in A\land x\notin B)$。
-\item 求 $1$ 至 $100$ 中至少被 $2,3,5$ 中一个整除的数目，以及三者都不能整除的数目。\\
-\term{解：}至少一个为 $50+33+20-16-10-6+3=74$；均不能整除者为 $100-74=26$。
+\begin{samepage}
+\item  求 $1$ 至 $100$ 中至少被 $2,3,5$ 中一个整除的数目，以及三者都不能整除的数目。
+\end{samepage}
 \end{enumerate}
+\chapterpage{习题参考解答}
+解答按章和题号排列。比较自己的证明时，除了核对结论，还应检查所用条件是否完整、推理是否覆盖全部情形，以及图中的关系是否与定义一致。
+
+\subsection*{第 1 章\quad 命题逻辑基本概念}
+\begin{enumerate}[label=1.\arabic*.,leftmargin=2.8em]
+\item $\neg p\to\neg q$、$\neg q\to\neg p$、$q\to p$。第一式与第三式等值；第二式与 $p\to q$ 等值。
+
+\item $p\to q$ 假要求 $p=1,q=0$，但合取又要求 $q=1$，故无成真赋值，是矛盾式。
+
+\item $p=0$ 时两侧均真；$p=1$ 时比较 $q,r$。仅 $101,110$ 使公式为假，故为非重言式的可满足式。
+
+\item 层次为 $3$；要求 $p\lor q=1,r=0$，成真赋值为 $010,100,110$。
+\end{enumerate}
+
+\subsection*{第 2 章\quad 命题逻辑等值演算}
+\begin{enumerate}[label=2.\arabic*.,leftmargin=2.8em]
+\item $F\equiv\Sigma m(1,2,7)\equiv\Pi M(0,3,4,5,6)$。
+
+\item 两者的编号都是 $0,3,5,6,7$，但前者使用 $m_i$，后者使用 $M_i$。
+
+\item 公式等值于 $\neg p$，故为 $m_0\lor m_1$，也为 $M_2\land M_3$。
+
+\item 错误，CNF $p\land\neg p$ 不可满足。普通范式的结构并不保证可满足性。
+
+\item $p\to q\equiv\neg(p\land\neg q)\equiv p\uparrow(q\uparrow q)$。
+\end{enumerate}
+
+\subsection*{第 3 章\quad 命题逻辑的推理理论}
+\begin{enumerate}[label=3.\arabic*.,leftmargin=2.8em]
+\item 假设 $q$，由 $q\to r$ 得 $r$，由 $p\to\neg r$ 与 $r$ 得 $\neg p$；解除假设得 $q\to\neg p$。
+
+\item 由 $p$ 得 $q\lor r$，由 $s$ 得 $\neg q$，析取三段论得 $r$，附加律得 $r\lor t$。
+
+\item 构造性二难得 $r\lor r$，幂等律置换得 $r$。
+
+\item 无效，取 $p=0,q=0,r=1$，全部前提真而结论假。
+\end{enumerate}
+
+\subsection*{第 4 章\quad 一阶逻辑的基本概念}
+\begin{enumerate}[label=4.\arabic*.,leftmargin=2.8em]
+\item $\forall x(P(x)\to C(x))$；$\exists x(H(x)\land T(x))$，其中 $P,C,H,T$ 分别表示大熊猫、可爱、人、爱发脾气。
+
+\item 前者按括号为 $(\forall xP(x))\to Q(x)$，$Q(x)$ 中的 $x$ 自由；后者无自由变量，二者含义不同。
+
+\item 第一式真，见证为 $z=x+y$；第二式假，不同的 $x,y$ 可有不同的和，不存在统一的 $z$。
+
+\item 取 $D=\{a,b\}$。$P=Q=\{a\}$ 时真；$P=\{a\},Q=\{b\}$ 时假。
+\end{enumerate}
+
+\subsection*{第 5 章\quad 一阶逻辑等值演算与推理}
+\begin{enumerate}[label=5.\arabic*.,leftmargin=2.8em]
+\item $\forall x\exists y\neg R(x,y)$。
+
+\item $\forall x(P(x)\to Q)$。
+
+\item 为第二前提取新见证 $c$，假设 $\neg Q(c)$。由第一前提得 $P(c)\to Q(c)$，拒取式得 $\neg P(c)$，存在引入得 $\exists x\neg P(x)$，最后解除见证假设。
+
+\item 有效。对任意 $u$ 全称消去得 $P(u)\lor Q(u)$ 和 $\neg P(u)$，析取三段论得 $Q(u)$，全称引入即可。
+
+\item 原来自由的 $y$ 会被量词捕获；应取尚未使用的新变量 $z$，得到 $\forall zR(z,y)$。
+\end{enumerate}
+
+\subsection*{第 6 章\quad 集合代数}
+\begin{enumerate}[label=6.\arabic*.,leftmargin=2.8em]
+\item 依次为真、假、真、真。若 $A=\{a,b,c,\{a,b\}\}$，则 $\{a,b\}\subseteq A$ 与 $\{a,b\}\in A$ 同时成立。
+
+\item 依次为 $S_2$；$S_5$；$S_1,S_2,S_4$；$S_3,S_5$；无候选。若不限制为候选，前四题通常有更多解，不能据上述条件断言唯一集合。
+
+\item 错误，必要条件应为 $A\cap B=\varnothing$。反例 $A=\{1\},B=\{2\}$。
+
+\item 均错误。对任意 $A$ 都有 $A\triangle A=\varnothing$，只有 $A=\varnothing$ 时才等于 $A$；取 $A=\{1\}$ 可反驳；后者只要求 $B\subseteq A$，取 $U=\{1,2\},A=B=\{1\}$ 可反驳。
+
+\item $x\in\{x\}\subseteq A$，故属于关系成立；$x\subseteq\{x\}\cup x=A$，故包含关系也成立。
+
+\item $X\subseteq A\cap B$ 当且仅当 $X\subseteq A$ 且 $X\subseteq B$。对并一般只有 $\mathcal P(A)\cup\mathcal P(B)\subseteq\mathcal P(A\cup B)$；取 $A=\{1\},B=\{2\}$，子集 $\{1,2\}$ 仅属于右侧。
+
+\item 并集人数为 $25+20+18-10-8-6+3=42$，未参加者 $8$；恰好两项者 $24-9=15$；恰好一项者 $63-48+9=24$。再加三项者 $3$，总数为 $42$。
+\end{enumerate}
+
+\subsection*{第 7 章\quad 二元关系}
+\begin{enumerate}[label=7.\arabic*.,leftmargin=2.8em]
+\item 三块非空、互斥且覆盖 $A$，由划分对应定理可知 $R$ 是等价关系。商集为
+\[
+A/R=\bigl\{\{1,4\},\{2,3,6\},\{5\}\bigr\}.
+\]
+有序对数为 $2^2+3^2+1^2=14$。
+
+\item 按和 $s=2,\ldots,8$ 分类，得
+\begin{align*}
+C_2&=\{(1,1)\},&C_3&=\{(1,2),(2,1)\},\\
+C_4&=\{(1,3),(2,2),(3,1)\},&C_5&=\{(1,4),(2,3),(3,2),(4,1)\},\\
+C_6&=\{(2,4),(3,3),(4,2)\},&C_7&=\{(3,4),(4,3)\},\\
+C_8&=\{(4,4)\}.&&
+\end{align*}
+商集为 $(A\times A)/R=\{C_2,\ldots,C_8\}$，不是 $A/R$。承载集合的元素本身就是有序对。
+
+\item 五个划分为
+\[
+\{\{1\},\{2\},\{3\}\},\quad\{\{1,2\},\{3\}\},\quad
+\{\{1,3\},\{2\}\},\quad\{\{2,3\},\{1\}\},\quad\{\{1,2,3\}\}.
+\]
+对应关系依次为 $I_A$，$I_A\cup\{(1,2),(2,1)\}$，$I_A\cup\{(1,3),(3,1)\}$，$I_A\cup\{(2,3),(3,2)\}$，$A^2$。
+
+\item 交集保留自反、对称和传递性，故是等价关系。并集未必传递：在 $\{1,2,3\}$ 上，分别取划分 $\{\{1,2\},\{3\}\}$ 与 $\{\{1\},\{2,3\}\}$ 所对应的关系；并集包含 $(1,2),(2,3)$，却不含 $(1,3)$。
+
+\item 关系为
+\[
+R=I_A\cup\{(e,c),(e,a),(d,c),(d,b),(d,a),(c,a),(b,a)\}.
+\]
+七个判断依次为假、真、假、假、假、真、真。全集的最大元与唯一极大元为 $a$，极小元为 $d,e$，无最小元。
+\begin{center}\small
+\begin{tabular}{c c c c c}
+\toprule 子集 & 上界 & 下界 & 上确界 & 下确界\\\midrule
+$B_1$ & $\{c,a\}$ & $\varnothing$ & $c$ & 无\\
+$B_2$ & $\{a\}$ & $\{d\}$ & $a$ & $d$\\
+$B_3$ & $\{a\}$ & $\varnothing$ & $a$ & 无\\\bottomrule
+\end{tabular}
+\end{center}
+
+\item 仅画 $c$ 向上连接 $a,d$ 的两条边，$b,e$ 为孤立点。极大元为 $a,b,d,e$，极小元为 $b,c,e$，无最大元与最小元。孤立点同时为极大元和极小元。
+
+\item 极小元为所有单元素集；极大元为所有 $X\setminus\{x\}$，$x\in X$。若一个集合至少含两元素，可删去其中一个而仍非空，故非极小；若至少缺两个元素，可增加其中一个而仍不等于 $X$，故非极大。最大元、最小元均不存在。
+
+\item $13=4\cdot3+1$，取 $m=4,n=3$，由分解定理的推论立即得到。若所有链均至多三元，可划为至多三个反链，由抽屉原理至少一块含五个元素。
+\end{enumerate}
+
+\subsection*{第 8 章\quad 函数：定义、性质、复合与反函数}
+\begin{enumerate}[label=8.\arabic*.,leftmargin=2.8em]
+\item $F_1$ 是函数，因 $3,5$ 同映到 $9$ 而非单射，又遗漏输出 $7$ 而非满射。$F_2$ 不是函数：输入 $1$ 对应两个输出、输入 $3$ 缺失，且 $5\notin B$。$F_3$ 缺少输入 $5$，不是给定定义域上的函数。
+
+\item 它是函数，但 $f(2)=f(1/2)=2/5$，故不单射。由 $(x-1)^2\ge0$ 得 $0<f(x)\le1/2$，故不满射。它在 $(0,1]$ 上连续递增且从趋近 $0$ 到 $1/2$，所以值域恰为 $(0,1/2]$。
+
+\item 像为 $\{0,2\}$。偶数分支由 $n/2=2$ 得 $n=4$；奇数分支由 $n+1=2$ 得 $n=1$。因此完全原像为 $\{1,4\}$，并非单个“反函数值”。
+
+\item 解 $u=x+y,v=x-y$ 得 $x=(u+v)/2,y=(u-v)/2$，每个 $(u,v)$ 恰有一个原像，故为双射。在线 $L$ 上写 $y=x+1$，得 $u=2x+1,v=-1$，所以 $f(L)=\{(u,-1)\mid u\in\mathbb R\}$。
+
+\item $f(1,0)=f(0,1)=1$，故不单射。平方模 $4$ 仅为 $0,1$，平方差及其绝对值不可能模 $4$ 余 $2$，故 $2$ 无原像，不满射。像为 $\{n^2\mid n\in\mathbb N\}$，零的原像为 $\{(n,n)\mid n\in\mathbb N\}$。这里利用 $x,y\ge0$ 才能由 $x^2=y^2$ 推出 $x=y$。
+
+\item $f(1)=f(2)=1$，不单射；任给 $y\ge1$，取 $n=y+1$ 即有 $f(n)=y$，所以满射。后继函数单射但遗漏 $1$，不满射。无限等势集合上单满性并不等价。
+
+\item $(f\circ g)(x)=x^2+2$，$(g\circ f)(x)=(x+4)^2-2=x^2+8x+14$。前者值域为 $[2,+\infty)$，后者为 $[-2,+\infty)$，且都有两个不同输入映到同一输出，均非单非满。$f$ 也不可逆；仅 $g$ 可逆，$g^{-1}(x)=x-4$。
+
+\item 先求 $f$ 再求 $g$，得到
+\[
+(f\circ g)(n)=\begin{cases}
+0,&n=4,\\1,&n=1,\\2,&n=3,\\3,&n=0,2\text{ 或 }n\ge5\text{ 且为奇数},\\n/2,&n\ge6\text{ 且为偶数}.
+\end{cases}
+\]
+$0,1,2$ 分别由 $4,1,3$ 取到；$y\ge3$ 可取 $n=2y$。所以复合满射；$0,2$ 都映到 $3$，故不单射。所求集合像为 $\{1,3\}$。
+
+\item 单射时，$f(x)\in f(S)$ 意味着存在 $s\in S$ 使 $f(x)=f(s)$，故 $x=s\in S$；结合总成立的包含式即得等号。反之取 $S=\{a\}$，若 $f(b)=f(a)$，则 $b\in f^{-1}(f(S))=\{a\}$，所以 $a=b$。第二个等价由 $f(f^{-1}(T))=T\cap f(A)$ 得到；反向只须取 $T=B$。
+
+\item 记 $\pi_i=\mathbb R/E_i$，则
+\begin{align*}
+\pi_1&=\{(-\infty,0),[0,+\infty)\},&
+\pi_2&=\{\{x\}\mid x\in\mathbb R\},\\
+\pi_3&=\{\mathbb Z,\mathbb R\setminus\mathbb Z\},&
+\pi_4&=\{\mathbb R\}.
+\end{align*}
+\begin{center}
+\begin{tikzpicture}[every node/.style={font=\small}]
+\node (p2) at (0,0) {$\pi_2$};\node (p1) at (-1.6,1.2) {$\pi_1$};\node (p3) at (1.6,1.2) {$\pi_3$};\node (p4) at (0,2.4) {$\pi_4$};
+\draw (p2)--(p1)--(p4)--(p3)--(p2);
+\end{tikzpicture}
+\diagramcaption{四种纤维划分之间的细分关系}\label{fig:lecture-28}
+\end{center}
+向上表示划分变粗：单元素划分细分其余划分，单块划分最粗。$\pi_1,\pi_3$ 不可比，因为非负半轴跨越整数与非整数两块，而整数块跨越正负两半轴。自然映射 $q_i(x)=[x]_{E_i}$，故
+\[
+q_1(0)=[0,+\infty),\quad q_2(0)=\{0\},\quad
+q_3(0)=\mathbb Z,\quad q_4(0)=\mathbb R.
+\]
+四个自然映射均满射，其中只有 $q_2$ 为单射和双射。注意 $q_1(0)$ 是等价类这一集合，不能写成数值 $f_1(0)=1$。
+
+\item 单射时由 $f(f(x))=f(x)$ 消去 $f$ 得 $f(x)=x$。满射时任取 $y\in A$，选 $x$ 使 $f(x)=y$，得 $f(y)=f(f(x))=f(x)=y$。故任一条件均足够。
+
+\item 令 $h=g^{-1}\circ f^{-1}:C\to A$。按结合律，$(f\circ g)\circ h=f\circ(g\circ g^{-1})\circ f^{-1}=I_A$，且 $h\circ(f\circ g)=g^{-1}\circ(f^{-1}\circ f)\circ g=I_C$。由双向逆的唯一性得结论。
+\end{enumerate}
+
+\subsection*{第 9 章\quad 集合的基数}
+\begin{enumerate}[label=9.\arabic*.,leftmargin=2.8em]
+\item $T=\{B,A,S,E,L\}$，故 $|T|=5$，重复字母只算一次。$x^2=9$ 给出 $x=\pm3$，$2x=8$ 要求 $x=4$，不能同时满足，故 $B=\varnothing$、$|B|=0$。最后一个集合的基数为 $2^4=16$。
+
+\item 固定 $A=\{a_0,a_1,\ldots\}$ 的无重复枚举，令 $(a_i,b_j)\mapsto ri+j$。给定 $k\in\mathbb N$，除法算法唯一给出 $k=ri+j$、$0\le j<r$，即唯一原像。所以 $|A\times B|=\aleph_0$。条件 $B\ne\varnothing$ 不可删去；若 $B=\varnothing$，则 $A\times B=\varnothing$。
+
+\item 取双射 $f:A\to B$，定义 $\Phi(S)=f(S)$。若两像相等，由 $f$ 单射得 $S$ 相等，故 $\Phi$ 单射。任给 $T\subseteq B$，取 $S=f^{-1}(T)$，由 $f$ 满射得 $\Phi(S)=T$，所以满射。其逆就是把子集取完全原像。
+
+\item $n\mapsto n^7$ 与 $n\mapsto n^{109}$ 分别为到 $A,B$ 的双射，二者均为可数无穷。并集可数且包含无穷集 $A$，故 $|A\cup B|=\aleph_0$。
+
+对正整数公共元素，若 $a^7=b^{109}$，比较每个素数的指数，因 $\gcd(7,109)=1$，该公共元素的素因数指数都能被 $7\cdot109=763$ 整除。加上公共元素 $0$，得到
+\[
+A\cap B=\{n^{763}\mid n\in\mathbb N\},\qquad |A\cap B|=\aleph_0.
+\]
+这里“集合等于某个幂集合”与“集合的基数为 $\aleph_0$”应分两步写，不能把集合表达式直接当成基数。
+
+\item $|B|<\aleph_0$ 意味着 $B$ 有限。因 $A\cap B$ 有限，而 $A=(A\setminus B)\cup(A\cap B)$，若 $A\setminus B$ 有限，则 $A$ 有限，矛盾。又 $A\setminus B\subseteq A$ 可数，故为可数无穷。这里不要求 $B\subseteq A$，只须从 $A$ 中删去 $A\cap B$。
+
+\item 前两项可数；第三项不成立，$\{0,1\}^{\mathbb N}$ 的基数为 $\mathfrak c$。二维编号只处理有限元组，无穷序列不能直接用同一个有限配对过程编码成一个自然数。
+
+\item 若无理数集也可数，则它与可数集 $\mathbb Q$ 的并 $\mathbb R$ 可数，与对角线结论矛盾。该证明只需反证不可数，不应把“有理数稠密”当作理由。
+
+\item 每个 $n\in F(n)$，所以 $D=\varnothing$。空集当然属于 $\mathcal P(\mathbb N)$，但不等于任何非空的 $F(n)$，所以它不在该 $F$ 的值域中。未被某函数取到与不属于陪域是不同结论。
+
+\item 有限串按长度分组，每个长度 $n$ 只有 $2^n$ 个，故全体是可数并且无穷，基数为 $\aleph_0$。无限序列的全体基数为 $\mathfrak c$，二者不等势。“长度没有统一上界”不等于“每个元素自身有无限长度”。
+\end{enumerate}
+
+\subsection*{第 10 章\quad 图的基本概念}
+\begin{enumerate}[label=10.\arabic*.,leftmargin=2.8em]
+\item 其余顶点的度数和为 $32-12-12=8$，每点至多贡献 $2$，故至少有四个，$n\ge11$。不能确定确切阶数；添加孤立点不会改变已知条件。下界可达，例如取边集
+\[
+\{12,13,14,15,23,24,25,36,37,45,67,68,78\}
+\cup\{(9,10),(9,11),(10,11)\}.
+\]
+顶点 $1$ 至 $3$ 各为 $4$ 度，$4$ 至 $7$ 各为 $3$ 度，$8$ 至 $11$ 各为 $2$ 度。这里确定的是阶数下界，不能据此确定唯一的阶数。
+
+\item 设 $5$ 度点有 $x$ 个。握手定理要求 $x$ 为偶数。若 $x\le4$，则 $6$ 度点有 $9-x\ge5$ 个；否则 $x\ge6$。
+
+\item 两个三角形之间加一条桥是一种。另三种是在两个 $3$ 度顶点之间放三条内部顶点互不相交的路径，三条路径长度分别取 $(1,2,4)$、$(1,3,3)$、$(2,2,3)$。后三图无桥，三条分支路径的长度多重集不同，所以互不同构。它们有六点七边，确实满足度数列。没有其他类型：最小度为 $2$ 迫使不连通时只能是两个三点分支，而两个三点简单图都无法有 $3$ 度点；在连通图中从任一 $3$ 度点沿 $2$ 度点追踪，三个分支或者全部通向另一 $3$ 度点，或者一条通向另一点、另两条组成回到本点的圈。前一种三条长度之和为 $7$，至多一条长为 $1$；后一种两端的圈各至少长 $3$，中间至少长 $1$，只可能是两个三角形加桥。
+
+\item 同构使 $|E(G)|=|E(\overline G)|$，故 $|E(G)|=n(n-1)/4$ 为整数。相邻整数之一为偶数，另一为奇数，因而偶数的那一个必须是 $4$ 的倍数。这个条件是必要条件，本题不需要反向构造。
+
+\item $C_n$ 删任一条边仍是连通路径，删两条边可断开，故 $\lambda=2$。当 $n\ge4$，删任一个点仍连通，删两个不相邻点可断开，故 $\kappa=2$；$C_3=K_3$ 按约定也为 $2$。$P_n$ 的每条边均为桥，故 $\lambda=1$；$n\ge3$ 时删内部点即可断开，$\kappa=1$，$P_2=K_2$ 按约定相同。
+
+\item 以数字代替顶点下标。从 $1$ 出发，去 $2$ 无法继续，因此只能先去 $5$。去 $4$ 时，可直接到 $7$，也可经 $3$ 到 $7$；去 $6$ 时，只能经 $3$ 到 $7$。不重复顶点的序列恰为
+\[
+1,5,4,7;\qquad 1,5,4,3,7;\qquad 1,5,6,3,7.
+\]
+若允许重复，先绕 $1\to5\to1$ 任意次数，再走到 $7$，得到无限多条长度不同的通路。若限定长度，则可用邻接矩阵的幂计算。
+
+\item 长度 $1$ 是环；长度 $2$ 只能将环走两遍，边重复；长度 $3$ 有一个三重环通路及两个三角圈（分别用 $e_1,e_2$）；长度 $4$ 有一个四重环通路，以及四个由环和三角圈拼接而成的非圈简单回路（两个平行弧选择乘以环放在三角圈之前或之后）。四个长度的数量为 $1,1,3,5$。
+
+\item $C_5$ 含奇圈，不是二部图；$C_6$ 可按沿圈的奇偶位置分组；$K_{3,3}$ 按两侧分组。对一般图，从每个尚未染色的顶点开始，令邻点取相反颜色；若发现一条边两端同色，则该分支含奇圈。处理完一个分支后还须继续检查未处理的分支。
+\end{enumerate}
+
+\subsection*{第 11 章\quad 欧拉图、哈密顿图与带权路径}
+\begin{enumerate}[label=11.\arabic*.,leftmargin=2.8em]
+\item $C_5$ 连通且全为 $2$ 度，是欧拉图；$K_4$ 有四个 $3$ 度点，不是；两个三角形虽全偶度，但不连通，也不是。
+
+\item $a$ 的出度比入度多 $1$，$c$ 的入度比出度多 $1$，其余点平衡且基图连通。因此有开通路 $a,b,c,a,c$，不能闭合。
+
+\item $K_{3,3}$ 可两侧交替成圈；$K_{3,4}$ 两侧相差一，可从四点的一侧出发并结束，故为半哈密顿图；$K_{3,5}$ 相差二，任何交替路径都不能遍历全图。
+
+\item 取 $S$ 为中心点。删除后剩三个孤立点，有 $p(G-S)=3>|S|+1=2$，违反哈密顿通路的必要条件。
+
+\item 闭合路线忽略反向后，$ABCDA,ABDCA,ACBDA$ 的路程分别为 $36,41,47$，故最优是 $ABCDA$ 或其反向。若不返回，一条路径与其反向等价；按无序端点对枚举，每对有两种内部排列。对端点对 $AB,AC,AD,BC,BD,CD$，最小值分别为 $31,23,29,22,33,26$，故全局最优是 $B,A,D,C$ 或其反向，路程 $22$。两问的差别在于是否要求返回。
+\end{enumerate}
+
+\subsection*{第 12 章\quad 布尔可满足性与建模}
+\begin{enumerate}[label=12.\arabic*.,leftmargin=2.8em]
+\item DNF 为 $(p\land q)\lor(p\land r)\lor(q\land r)$；CNF 为 $(p\lor q)\land(p\lor r)\land(q\lor r)$。前者要求至少一对同时为真；后者禁止任意一对同时为假。三个变元中，这两个要求都恰好表示至少两个为真。
+\item $101$ 使两子句都真。阻断子句为 $\neg p\lor q\lor\neg r$，仅在 $p=1,q=0,r=1$ 时为假。加入后，赋值 $010$ 仍满足全部子句，因此原式的满足赋值不唯一。
+\end{enumerate}
+
+\subsection*{第 13 章\quad 综合练习}
+\begin{enumerate}[label=13.\arabic*.,leftmargin=2.8em]
+\item 若右式可满足，该赋值使全部前提真、结论假，是无效推理的反例。反之，无效推理的反例恰好使该式真。两者取否定即得结论。
+
+\item PCNF 为 $\Pi M(1,3,4,6)$；四个成真行均满足 $p=r$，$q$ 不影响真值，故 $F\equiv p\leftrightarrow r$。
+
+\item 取任意 $u$，全称消去得到两个蕴涵，假言三段论得 $P(u)\to R(u)$；因 $u$ 不受前提限制，全称引入得结论。
+
+\item $\forall x(\neg P(x)\lor\exists y\neg R(x,y))\equiv\forall x\exists y(\neg P(x)\lor\neg R(x,y))$。
+
+\item $A\cap B^c=A\setminus B$，使用包含的等价条件即可。逻辑形式为 $\forall x(x\in A\to x\in B)\Longleftrightarrow\neg\exists x(x\in A\land x\notin B)$。
+
+\item 至少一个为 $50+33+20-16-10-6+3=74$；均不能整除者为 $100-74=26$。
+\end{enumerate}
+
 \end{document}
