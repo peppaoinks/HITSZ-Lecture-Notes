@@ -55,6 +55,7 @@
 \setcounter{tocdepth}{1}\setcounter{secnumdepth}{2}
 \linespread{1.22}\setlength{\parindent}{2em}\setlength{\parskip}{2pt}
 \setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.20}
+\clubpenalty=10000\widowpenalty=10000\displaywidowpenalty=10000
 \setlength{\emergencystretch}{1.5em}\allowdisplaybreaks[2]\raggedbottom
 \setlist{itemsep=3pt,topsep=4pt,parsep=0pt,leftmargin=2em}
 \setlist[enumerate]{label=\arabic*.}
@@ -68,6 +69,9 @@
 \newcommand{\sol}{\par\noindent\textbf{解}\quad}
 \newcommand{\code}[1]{\allowbreak{\small\texttt{\detokenize{#1}}}\allowbreak}
 \newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcounter{diagram}[section]
+\renewcommand{\thediagram}{\thesection-\arabic{diagram}}
+\newcommand{\diagramcaption}[1]{\par\smallskip\refstepcounter{diagram}{\small\color{ThemeMain}图\thediagram\quad #1\par}}
 \begin{document}
 \begin{titlepage}\thispagestyle{empty}\vspace*{0.28\textheight}
 \begin{center}{\fontsize{36}{45}\selectfont\bfseries 数字逻辑设计}\end{center}
@@ -86,6 +90,8 @@
 \term{正逻辑}把高电平解释为 $1$、低电平解释为 $0$；负逻辑采用相反的对应。逻辑值不是电压的数值本身。电平有效性应按器件规定的输入、输出电压范围判断，处于未定义区间的输入不能可靠地解释为 $0$ 或 $1$。
 \end{infobox}
 数字信号的抗干扰能力来自电平区间与门限之间的余量，并非能够抵抗任意噪声。数字信号也不必仅在离散时刻变化；同步系统在时钟边沿采样、更新状态，而异步输入可以在任意时刻变化。
+
+例如采用正逻辑时，低有效复位端 $RST_n=0$ 表示“正在复位”，$RST_n=1$ 表示“退出复位”。这里仍是低电平对应逻辑0，只是控制动作在0时发生。\term{低电平有效}规定动作何时生效，\term{负逻辑}规定电平如何映射为逻辑值，两者不能混为一谈。
 
 \subsection{信息转换与分辨率}
 模拟物理量进入数字系统通常经历采样、量化和编码；\term{模数转换}（A/D）把模拟输入转换为数字代码，\term{数模转换}（D/A）把代码转换为相应的模拟输出。数字系统适于存储、复制、运算和可编程控制，但接口的转换误差仍会影响最终结果。
@@ -113,8 +119,32 @@ A/D 输入范围为 $0$ 至 $5\,\mathrm{V}$，位数为 $8$，求理想量化间
 \]
 其中 $\symbf{X}$ 是输入向量，$\symbf{Z}$ 是输出向量，$\symbf{Q}$ 是现态，$\symbf{Q}^{+}$ 是次态。上标 $+$ 表示下一次状态更新后的值，并非算术加法。
 
+判断是否需要状态，可比较“当前输入完全相同、过去输入不同”的两种情况：若此时要求的输出不同，就必须记忆历史。例如开关直接控制灯亮灭可用组合逻辑；同一个按钮每按一次使灯亮灭切换，则须保存灯原来的状态。
+
+\par\medskip
+\noindent\begin{minipage}{\linewidth}\centering
+\begin{tikzpicture}[x=1cm,y=1cm]
+\node[block,text width=28mm] (g) at (1,0){组合次态逻辑\\$g(Q,X)$};
+\node[block,text width=25mm] (r) at (5,0){状态寄存器};
+\node[block,text width=28mm] (h) at (9,0){输出逻辑\\$h(Q,X)$};
+\draw[->,ThemeMain] (-1.6,0) node[left]{$X$}--(g.west);
+\draw[->,ThemeMain] (g.east)--(r.west) node[midway,above]{$Q^+$};
+\draw[->,ThemeMain] (r.east)--(h.west) node[midway,above]{$Q$};
+\draw[->,ThemeMain] (h.east)--(11,0) node[right]{$Z$};
+\draw[->,ThemeMain] (5,-1.5) node[below]{时钟}--(r.south);
+\draw[ThemeMain] (7,0)--(7,-1)--(1,-1);
+\draw[->,ThemeMain] (1,-1)--(g.south);
+\fill[ThemeMain] (7,0) circle(1.2pt);
+\draw[ThemeMain] (-1,0)--(-1,1.2)--(9,1.2);
+\draw[->,ThemeMain] (9,1.2)--(h.north);
+\fill[ThemeMain] (-1,0) circle(1.2pt);
+\end{tikzpicture}
+\diagramcaption{时序电路用寄存器保存现态；组合逻辑算出次态，时钟沿使次态成为新的现态。}
+\end{minipage}\par\medskip
+
 设计可分为三个层次：系统设计划分功能模块并确定接口；逻辑设计利用门、触发器及功能部件实现模块；电路设计确定器件、电气连接与物理实现。硬件描述语言描述结构和行为，电子设计自动化工具辅助仿真、综合、布局布线和时序分析。
-\begin{center}
+\par\medskip
+\noindent\begin{minipage}{\linewidth}\centering
 \begin{tikzpicture}[node distance=7mm]
 \node[block,text width=25mm] (a) {需求与接口};
 \node[block,text width=25mm,right=of a] (b) {组合逻辑\\与状态存储};
@@ -122,7 +152,8 @@ A/D 输入范围为 $0$ 至 $5\,\mathrm{V}$，位数为 $8$，求理想量化间
 \node[block,text width=25mm,right=of c] (d) {时序与功能\\验证};
 \draw[->,ThemeMain] (a)--(b);\draw[->,ThemeMain] (b)--(c);\draw[->,ThemeMain] (c)--(d);
 \end{tikzpicture}
-\end{center}
+\diagramcaption{从需求到实现，再以时序和功能验证结果反馈修改设计。}
+\end{minipage}\par\medskip
 
 \subsection{集成规模与可编程逻辑器件}
 小规模、中规模、大规模和超大规模集成电路分别常记作 SSI、MSI、LSI、VLSI。门数划分随技术和统计口径变化，课件给出的范围用于说明规模层次，不作为所有技术通用的严格边界。
@@ -192,6 +223,8 @@ $r^i$ 是第 $i$ 位的\term{权}，$d_i$ 是该位数符的数值。二、八�
 (59)_{10}=(111011)_2.
 \]
 BCD 的分组应按十进制数码处理，不能把整串 BCD 当作普通二进制数。
+
+同一串位 $0101\,1001$，按无符号二进制解释是 $89$，按8421 BCD解释是十进制数 $59$；若把它看成某个设备的控制代码，其含义又由接口约定决定。码位本身不会说明采用哪一种解释，题目必须给出码制。
 
 \term{有权码}的数值等于各位权值之和，但仅给权值不一定能唯一确定码表。例如 2421 码中 $0101$ 与 $1011$ 的位权和都为 $5$，必须约定选用哪一个码字。下表采用课件的非括号方案。
 \begin{center}
@@ -322,6 +355,8 @@ A\oplus B=A'B+AB',\qquad A\odot B=AB+A'B'=(A\oplus B)'.
 \subsection{逻辑函数、真值表与逻辑图}
 \term{布尔表达式}由变量、常量和逻辑运算组成。\term{真值表}列出全部输入组合与相应输出，含 $n$ 个不同输入的完全给定函数有 $2^n$ 行。两个表达式在全部组合上的输出相同，才表示同一个逻辑函数。
 
+把表达式转换为电路时，可从最内层运算开始，给每个中间结果命名。例如 $F=A(B+C')$ 先形成 $u=C'$，再形成 $v=B+u$，最后得到 $F=Av$。反向读图也按同样顺序逐级代入，避免把整张图中的门符号一次性拼成一个长式。
+
 逻辑图以门符号和连线表示结构。输入端或输出端的小圆圈表示反相或低电平有效；国际标准矩形符号常用“\&”表示与、“$\ge1$”表示或、“$=1$”表示两输入异或。识图时须同时读取门功能、反相标记和输入顺序。
 \begin{infobox}{例题：从文字建立逻辑函数}
 报警开关打开且门未关，或者已过下午六点且窗未关时报警。设 $A$ 表示开关打开，$B$ 表示门关闭，$C$ 表示已过六点，$D$ 表示窗关闭，报警输出为 $Z$。
@@ -351,6 +386,20 @@ A\oplus B=A'B+AB',\qquad A\odot B=AB+A'B'=(A\oplus B)'.
 &=A+BC &&\text{吸收律}.
 \end{align*}
 共识定理的依据是 $BC=BC(A+A')=ABC+A'BC$，这两项分别被 $AB$、$A'C$ 吸收。
+
+\par\medskip
+\noindent\begin{minipage}{\linewidth}\centering
+\begin{tikzpicture}[x=1cm,y=1cm]
+\foreach \kind/\xx/\yy/\title in {and/0/1.7/与门,nand/4/1.7/与非门,or/8/1.7/或门,nor/0/0/或非门,xor/4/0/异或门,xnor/8/0/同或门}{
+ \node[\kind\space gate US,draw=ThemeMain,logic gate inputs=nn,minimum width=12mm,minimum height=9mm] (g) at (\xx,\yy) {};
+ \draw[ThemeMain] ([xshift=-4mm]g.input 1)--(g.input 1);
+ \draw[ThemeMain] ([xshift=-4mm]g.input 2)--(g.input 2);
+ \draw[ThemeMain] (g.output)--++(.4,0);
+ \node[right] at (\xx+.95,\yy){\title};
+}
+\end{tikzpicture}
+\diagramcaption{常见门符号。输出小圆圈表示取反；异或门比或门在输入侧多一条曲线。}
+\end{minipage}\par\medskip
 
 \subsection{代入、反演与对偶规则}
 \term{代入规则}允许把恒等式中的同一变量一致替换成同一逻辑表达式。\term{反演规则}求表达式的反：把与、或互换，$0,1$ 互换，每个变量取反，并保持原运算层次。它来自逐层使用德摩根定律。
@@ -426,6 +475,8 @@ $n$ 个变量的\term{最小项} $m_i$ 是包含全部变量且每个变量只�
 \term{最大项} $M_i$ 是包含全部变量且每个变量只出现一次的和项，仅在编号 $i$ 的输入上为 $0$。编号位为 $0$ 写原变量，为 $1$ 写反变量。始终有 $M_i=m_i'$。
 \end{infobox}
 例如 $5=(101)_2$，故 $m_5=AB'C$、$M_5=A'+B+C'$。$AB$ 对三变量函数而言不是最小项，$A+C$ 也不是最大项。
+
+两套写法的符号相反，是因为目标不同：$m_5$ 要在 $101$ 时让每个相与因子都为1，故写 $A,B',C$；$M_5$ 要在同一输入时让每个相或因子都为0，故写 $A',B,C'$。先检查这一行是否确实成一或成零，比孤立记忆“0取反还是1取反”更可靠。
 \[
 \sum_{i=0}^{2^n-1}m_i=1,\qquad \prod_{i=0}^{2^n-1}M_i=0.
 \]
@@ -524,6 +575,15 @@ Y=\prod M(1,2,3,5,6,7,9,10,11).
 
 按逐格逻辑运算，也可得到 $F'$、$F+G$、$FG$、$F\oplus G$ 的图。这种运算须使用相同变量次序和坐标。
 
+\subsection{为什么相邻格能消去变量}
+以三变量图中的 $m_4=AB'C'$ 与 $m_5=AB'C$ 为例，两格只有 $C$ 不同：
+\[
+m_4+m_5=AB'(C'+C)=AB'.
+\]
+因此二格合并消去一个变量。四格若让两个变量遍历全部四种组合，就连续使用两次互补律，消去两个变量。格数必须为 $2$ 的整数次幂，还须满足相邻结构；任意取四个1并不一定能组成四格圈。按普通二进制顺序排列时，$01$ 与 $10$ 同时改变两位，无法这样直接合并，这就是坐标采用格雷顺序的原因。
+
+圈0也可从“先化简 $F'$，再整体取反”理解。例如两个零格固定 $A=0,C=1$，则它们为 $F'$ 提供乘积项 $A'C$；回到 $F$ 就得到和项 $(A'C)'=A+C'$。这解释了圈0时原变量、反变量的选择规则。
+
 \subsection{读取与或式与或与式}
 \begin{infobox}{方法：卡诺圈的规则}
 与或化简圈 $1$，或与化简圈 $0$。圈必须构成变量自由变化的矩形组，格数为 $1,2,4,8,\ldots$；允许跨边界、允许重叠。圈 $1$ 时不能含规定的 $0$，圈 $0$ 时不能含规定的 $1$，无关项可按需加入。必须覆盖全部规定目标格。
@@ -537,7 +597,8 @@ $n$ 变量图中 $2^k$ 格合法圈消去 $k$ 个变化变量，剩余 $n-k$ 个
 \end{infobox}
 \sol 卡诺图如下。
 \begingroup\setlength{\topsep}{3pt}
-\begin{center}
+\par\medskip
+\noindent\begin{minipage}{\linewidth}\centering
 \begin{tikzpicture}[x=18mm,y=10mm,
  every node/.style={font=\normalsize},
  kgrid/.style={draw=ThemeMain!55!black,line width=0.65pt},
@@ -565,7 +626,8 @@ $n$ 变量图中 $2^k$ 格合法圈消去 $k$ 个变化变量，剩余 $n-k$ 个
 \node[font=\small,align=center] at (2,-.40)
  {实线：跨边界四格 $C'$\qquad 虚线：底行二格 $AB$};
 \end{tikzpicture}
-\end{center}
+\diagramcaption{三变量卡诺图：实线表示跨边界的一个四格圈，虚线表示与其重叠的二格圈。}
+\end{minipage}\par\medskip
 \endgroup
 左右两端的四个 $1$ 组成跨边界圈，其中只有 $C=0$ 不变，得 $C'$；底行 $m_6,m_7$ 组成二格圈，得 $AB$。因此
 \[
@@ -602,15 +664,24 @@ Y(A,B,C,D)=\sum m(0,1,2,3,4,6,8,9,10,11,12,14)
 的最简与或式，$A$ 为最高位。
 \end{infobox}
 \sol 行取 $AB$、列取 $CD$，均按 $00,01,11,10$ 排列。逐格按编号填写：
-\begin{center}
-\begin{tabular}{c|cccc}
-\toprule $AB\backslash CD$&00&01&11&10\\\midrule
-00&1&1&1&1\\
-01&1&0&0&1\\
-11&1&0&0&1\\
-10&1&1&1&1\\\bottomrule
-\end{tabular}
-\end{center}
+\par\medskip
+\noindent\begin{minipage}{\linewidth}\centering
+\begin{tikzpicture}[x=16mm,y=10mm]
+\draw[step=1,ThemeBorder] (0,0) grid (4,4);
+\foreach \i/\v in {0/00,1/01,2/11,3/10}{
+ \node at (\i+.5,4.3){$\v$};\node at (-.35,3.5-\i){$\v$};}
+\node at (-.4,4.3){$AB\backslash CD$};
+\foreach \x/\y in {.5/.5,1.5/.5,2.5/.5,3.5/.5,.5/1.5,3.5/1.5,.5/2.5,3.5/2.5,.5/3.5,1.5/3.5,2.5/3.5,3.5/3.5}\node at (\x,\y){1};
+\foreach \x/\y in {1.5/1.5,2.5/1.5,1.5/2.5,2.5/2.5}\node at (\x,\y){0};
+\draw[ThemeMain,thick,rounded corners=2pt] (.12,4.08)--(.12,3.12)--(3.88,3.12)--(3.88,4.08);
+\draw[ThemeMain,thick,rounded corners=2pt] (.12,-.08)--(.12,.88)--(3.88,.88)--(3.88,-.08);
+\draw[ThemeMain,thick,dashed,rounded corners=2pt] (-.08,.20)--(.80,.20)--(.80,3.8)--(-.08,3.8);
+\draw[ThemeMain,thick,dashed,rounded corners=2pt] (4.08,.20)--(3.20,.20)--(3.20,3.8)--(4.08,3.8);
+\node[right,align=left] at (4.5,2.8){实线：首尾两行\\八格合并为 $B'$};
+\node[right,align=left] at (4.5,1.2){虚线：首尾两列\\八格合并为 $D'$};
+\end{tikzpicture}
+\diagramcaption{跨边界的两个八格圈。每对同线型的开口轮廓表示一个圈，四角可被重复覆盖。}
+\end{minipage}\par\medskip
 第一行与最后一行跨边界相邻，构成八格圈
 \[
 \{0,1,2,3,8,9,10,11\}\longrightarrow B'.
@@ -673,6 +744,8 @@ F=A'B'D'+B'D'E'+CE'+A'BC'DE+ABCD.
 
 \term{竞争}指多条路径的信号变化存在先后差异并可能产生相互影响；若输出因此出现逻辑上不应有的短脉冲或额外跳变，称为\term{冒险}或险象（hazard）。静态逻辑等价不保证瞬态波形等价。
 
+分析一次跳变时应分清三个阶段：输入改变前的稳定输出、各路径尚未到齐时的过渡输出、全部路径稳定后的输出。真值表比较第一和第三阶段；冒险分析关注中间阶段。下文波形的竖直跳变是理想画法，脉冲宽度由题设延迟模型决定。
+
 \subsection{静态、动态与功能冒险}
 \begin{center}
 \begin{tabularx}{\linewidth}{l Y Y}
@@ -693,7 +766,8 @@ F=A'B'D'+B'D'E'+CE'+A'BC'DE+ABCD.
 F_{\mathrm{safe}}=AB+A'C+BC.
 \]
 由共识定理，它与原函数稳态等价；$B=C=1$ 时，$BC$ 持续提供 $1$，覆盖两项交接的空隙。
-\begin{center}
+\par\medskip
+\noindent\begin{minipage}{\linewidth}\centering
 \begin{tikzpicture}[x=10mm,y=7mm]
 \node[left] at (0,2.5){理想输出};\node[left] at (0,.5){有冒险输出};
 \draw[ThemeMain,thick] (0,2.5)--(8,2.5);
@@ -701,7 +775,8 @@ F_{\mathrm{safe}}=AB+A'C+BC.
 \draw[->] (0,-1)--(8.5,-1) node[right] {$t$};
 \draw[dashed,ThemeBorder] (3,3)--(3,-1);
 \end{tikzpicture}
-\end{center}
+\diagramcaption{静态1冒险示意：预期持续为1，实际可能短暂降为0；横向长度不代表特定延迟。}
+\end{minipage}\par\medskip
 
 \subsection{代数判别与卡诺图判别}
 代数判别可寻找在固定其他输入后变成 $X+X'$ 或 $XX'$ 的不同信号路径。仅看到某变量及其反变量出现，不足以直接断言有冒险，还须分析实现结构和固定条件。
@@ -735,7 +810,8 @@ $t\ge7\,\mathrm{ns}$&1&0&0\\\bottomrule
 \end{tabular}
 \end{center}
 中间四纳秒出现 $p=q=1$。按题定纯传输模型，两个跳变均延后 $2\,\mathrm{ns}$，因此 $F$ 在 $5\le t<9\,\mathrm{ns}$ 为 $1$，形成宽度 $4\,\mathrm{ns}$ 的错误高脉冲。这是静态0冒险。
-\begin{center}
+\par\medskip
+\noindent\begin{minipage}{\linewidth}\centering
 \begin{tikzpicture}[x=9mm,y=7mm,every node/.style={font=\small}]
 \foreach \y/\lab in {4/p,2/q,0/F}
  {\node[left] at (0,\y+.4){$\lab$};}
@@ -746,7 +822,8 @@ $t\ge7\,\mathrm{ns}$&1&0&0\\\bottomrule
 \foreach \t in {0,3,5,7,9}
  {\draw (\t,-.55)--(\t,-.7);\node[below] at (\t,-.7){$\t$};}
 \end{tikzpicture}
-\end{center}
+\diagramcaption{静态0冒险的纯传输模型：先标中间节点变化，再把输出变化整体延后2ns。}
+\end{minipage}\par\medskip
 或与结构可加入冗余和项 $B+C$：
 \[
 F_{\mathrm{safe}}=(A+B)(A'+C)(B+C).
@@ -767,6 +844,8 @@ F_{\mathrm{safe}}=(A+B)(A'+C)(B+C).
 \end{enumerate}
 \end{infobox}
 规模、速度、功耗、价格和可靠性可能相互制约。不同实现可具有相同真值表而物理性能不同。
+
+例如“至少两人同意”包含两人同意和三人同意，必须把 $111$ 列入成一集合；“恰好两人同意”则必须把 $111$ 列入成零集合。文字中的“至少”“恰好”“只有”“同时”会改变真值表，不能在列清这些边界之前直接套用多数函数。
 
 \subsection{表决器、裁判电路与操作码形成器}
 三人多数表决输出为 $F=AB+AC+BC$。若主裁判 $A$ 与副裁判 $B,C$ 按课件规则控制红、绿灯，红灯为 $R$、绿灯为 $G$，则
@@ -816,6 +895,12 @@ $C_{-1}$ 表示最低位的外部输入进位，与课件编号一致。
 \end{center}
 四位数 $1011+1110$ 的五位结果为 $11001$；最低位和到最高位和构成 $1001$，末级进位为 $1$。输出宽度若只有四位，最高进位会被截去。
 
+全加器的两位输出可用算术等式检查：
+\[
+a_i+b_i+C_{i-1}=2C_i+S_i\qquad\text{（本式中的加号为算术加法）}.
+\]
+例如三个输入都是1时，总和为3，必须输出 $C_iS_i=11$，而不能只写和位1。多位相加从最低位开始，把本级 $C_i$ 送到下一级的进位输入；和位与进位属于不同位权。
+
 多个全加器\term{串行进位}时，高位必须等待低位进位，最坏延迟随位数线性增长。设\term{进位传递} $P_i=a_i\oplus b_i$、\term{进位产生} $G_i=a_ib_i$，则 $C_i=G_i+P_iC_{i-1}$。逐层展开得
 \begin{align*}
 C_0&=G_0+P_0C_{-1},\\
@@ -856,7 +941,8 @@ E=x_2x_1'x_0+x_3'x_2'x_1'x_0'.
 \begin{infobox}{例题：四个或非门组成的比较电路}
 2024秋期末回忆版，简答题6。分析下图，写出 $Y_1,Y_2,Y_3$ 的最简与或式及逻辑功能。输入 $A,B$ 均为一位无符号数。
 \end{infobox}
-\begin{center}
+\par\medskip
+\noindent\begin{minipage}{\linewidth}\centering
 \begin{tikzpicture}[every node/.style={font=\small},
  ng/.style={nor gate US,draw=ThemeMain,line width=.75pt,
  logic gate inputs=nn,minimum width=15mm,minimum height=12mm}]
@@ -880,7 +966,8 @@ E=x_2x_1'x_0+x_3'x_2'x_1'x_0'.
 \draw[ThemeMain] (g2.output)--(9.4,0) node[right]{$Y_2$};
 \foreach \p in {a,b,t,y1,y3}\fill[ThemeMain] (\p) circle (1.2pt);
 \end{tikzpicture}
-\end{center}
+\diagramcaption{四个或非门的一位比较器。实心点为连接点，门输出处空心圈为反相。}
+\end{minipage}\par\medskip
 \sol 门输出端的小圆圈表示取反。先给第一级输出命名 $T$，再写后级函数；导线分支上的实心点表示电气连接。
 \begin{align*}
 T&=(A+B)',\\
@@ -917,7 +1004,8 @@ Y=(A'B+AB')C=A'BC+AB'C=(A\oplus B)C.
 \end{tabular}
 \end{center}
 用一个异或门判断方向不同，再用与门加入关门条件：
-\begin{center}
+\par\medskip
+\noindent\begin{minipage}{\linewidth}\centering
 \begin{tikzpicture}[every node/.style={font=\small}]
 \node[xor gate US,draw=ThemeMain,logic gate inputs=nn,
  minimum width=16mm,minimum height=12mm] (x) at (2,0) {};
@@ -929,7 +1017,8 @@ Y=(A'B+AB')C=A'BC+AB'C=(A\oplus B)C.
 \draw[ThemeMain] (3.5,-1) node[left]{$C$}|-(g.input 2);
 \draw[ThemeMain] (g.output)--(6.5,0) node[right]{$Y$};
 \end{tikzpicture}
-\end{center}
+\diagramcaption{缆车启动条件：先判断方向不同，再与关门条件相与。}
+\end{minipage}\par\medskip
 若仅允许与、或、非门，就把异或展开为 $A'B+AB'$，再与 $C$ 相与。验算 $AB=11,C=1$ 必须输出零；误写为 $(A+B)C$ 会在这一组合错误地允许启动。本题实现逻辑条件；实际设备还须由完整控制系统处理故障与执行过程，题目未要求状态存储。
 
 
@@ -947,6 +1036,8 @@ Y=(A'B+AB')C=A'BC+AB'C=(A\oplus B)C.
 S=(y_1y_2y_4y_7)',\qquad C_{\mathrm{out}}=(y_3y_5y_6y_7)'.
 \]
 全减器的差位同样使用 $1,2,4,7$，借位使用 $1,2,3,7$。低有效输出不能直接用普通或门合成成一最小项。
+
+以地址 $CBA=011$ 为例，只有 $y_3=0$，其余输出全为1。要判断“选中3或5”，相应高有效函数为 $F=m_3+m_5=y_3'+y_5'=(y_3y_5)'$。把实际引脚电平先写成表达式，再用德摩根律转换，就能确定末级应使用与非门。
 
 \subsection{译码扩展与地址译码}
 两片74LS138共用低三位地址 $CBA$，第四位 $D$ 分别启用低组、高组，可构成四线—十六线译码器。令低组 $G_1=1,G_{2A}=D,G_{2B}=0$；高组 $G_1=D,G_{2A}=G_{2B}=0$。$D=0$ 时只有低组启用，$D=1$ 时只有高组启用。
@@ -979,6 +1070,22 @@ a=A+C+BD+B'D',\quad b=B'+CD+C'D',\quad c=B+C'+D.
 \]
 其他段按对应列分别化简。若非法输入须熄灭，必须把相应输出指定为零，而不能继续作无关项。
 
+\par\medskip
+\noindent\begin{minipage}{\linewidth}\centering
+\begin{tikzpicture}[x=1cm,y=1cm]
+\draw[ThemeMain,line width=3pt] (.2,3)--(1.8,3) node[midway,above=3pt]{$a$};
+\draw[ThemeMain,line width=3pt] (2,2.8)--(2,1.7) node[midway,right=3pt]{$b$};
+\draw[ThemeMain,line width=3pt] (2,1.3)--(2,.2) node[midway,right=3pt]{$c$};
+\draw[ThemeMain,line width=3pt] (.2,0)--(1.8,0) node[midway,below=3pt]{$d$};
+\draw[ThemeMain,line width=3pt] (0,.2)--(0,1.3) node[midway,left=3pt]{$e$};
+\draw[ThemeMain,line width=3pt] (0,1.7)--(0,2.8) node[midway,left=3pt]{$f$};
+\draw[ThemeMain,line width=3pt] (.2,1.5)--(1.8,1.5) node[midway,above=3pt]{$g$};
+\fill[ThemeMain] (2.7,0) circle(2pt) node[right=3pt]{$dp$};
+\node[align=left,text width=80mm,right] at (4,1.5){段名先对应位置，再对应总线位序。\\[3pt]例如低有效、位序为 $abcdefg\,dp$：\\数字0为 $00000011_2=03_{16}$；\\数字1为 $10011111_2=9F_{16}$。};
+\end{tikzpicture}
+\diagramcaption{七段位置与段码读法。此处码值采用实验部分的低有效约定，不能直接替代前面的高有效真值表。}
+\end{minipage}\par\medskip
+
 \subsection{多路选择器与函数实现}
 \term{多路选择器}（MUX，也称多路复用器、数据选择器）按 $n$ 位选择信号，在 $2^n$ 路数据中选一路输出。启用时
 \[
@@ -992,7 +1099,9 @@ $\symbf{S}$ 是选择向量，$m_k$ 是其最小项，$I_k$ 是第 $k$ 路输入
 \end{infobox}
 \sol 固定 $AB$，依次得到 $I_0=0,I_1=C,I_2=C,I_3=1$。这比八选一直接接八个常量少用一个选择输入。
 
-四变量函数降成三变量图时，每格是关于余下变量 $D$ 的函数。若 $F|_{D=0},F|_{D=1}$ 分别为 $0,0$、$0,1$、$1,0$、$1,1$，该数据端分别接 $0,D,D',1$。再少一个选择位时，数据端须实现两变量余因子，而非只能接上述四种值。
+四变量函数降成三变量图时，每格是关于余下变量 $D$ 的函数。
+
+例如选择字 $ABC=010$ 时，MUX固定选择 $I_2$，但变量 $D$ 仍可变化。因此 $I_2$ 应承载这一组两行真值表的变化规律，而不是随意选其中一行的0或1。若 $F|_{D=0},F|_{D=1}$ 分别为 $0,0$、$0,1$、$1,0$、$1,1$，该数据端分别接 $0,D,D',1$。再少一个选择位时，数据端须实现两变量余因子，而非只能接上述四种值。
 
 74LS151为八选一，低有效选通端 $G=0$ 时，同相输出 $Y=I_k$，反相输出 $W=I_k'$；$G=1$ 时 $Y=0,W=1$，两者均不是高阻。这依据\href{https://www.ti.com/lit/ds/symlink/sn74ls151.pdf}{TI 74LS151数据手册}。74LS153包含两个四选一单元，公共选择端、独立低有效使能，禁用输出为零。
 
@@ -1056,14 +1165,16 @@ L&=l_3+e_3l_2+e_3e_2l_1+e_3e_2e_1l_0.
 
 FPGA含 LUT、触发器、选择器、进位链与可编程互连，还可能含块存储、DSP、输入输出块和时钟网络。可配置逻辑块CLB及slice的具体构成依器件系列而定；课件中的7系列例子说明一种架构，不是所有FPGA的统一规格。实现功能仍受资源数量、接口和时序限制。
 
+\Needspace{100mm}
 \subsection{复杂使能条件的地址译码}
 \begin{infobox}{例题：由使能门与译码编号求地址范围}
 2024秋期末回忆版，简答题4。地址为 $A_{15}\cdots A_0$，外设内部接低八位 $A_7\cdots A_0$。电路连接见图：$G_1=(A_{14}+A_{12})'$，$G_{2A}=A_{13}$，$G_{2B}=(A_{15}A_{11})'$；设备1接低有效输出 $Y_3$。题面明确规定译码器 $A$ 端为高位、$C$ 端为低位。求全地址译码范围及设备1范围，并与通常74LS138编号约定比较。
 \end{infobox}
-\begin{center}
+\par\medskip
+\noindent\begin{minipage}{\linewidth}\centering
 \begin{tikzpicture}[every node/.style={font=\small}]
 \draw[ThemeMain,fill=ThemeBack] (5,0) rectangle (8,4.8);
-\node at (6.5,4.45){74LS138};
+\node[align=center,font=\footnotesize] at (6.5,4.45){题面译码块\\按 $ABC$ 编号};
 \foreach \y/\lab/\in in {3.8/C/A_{10},3.15/B/A_9,2.5/A/A_8}
  {\node[right] at (5,\y){$\lab$};\draw[ThemeMain] (4,\y) node[left]{$\in$}--(5,\y);}
 \node[right] at (5,1.8){$G_1$};
@@ -1090,7 +1201,8 @@ FPGA含 LUT、触发器、选择器、进位链与可编程互连，还可能含
 }
 \draw[ThemeMain] (8.6,2.5)--(9.6,2.5) node[right]{设备1};
 \end{tikzpicture}
-\end{center}
+\diagramcaption{回忆题的地址译码接线。框内按题面ABC编号，真实74LS138的CBA编号另见解答。}
+\end{minipage}\par\medskip
 \sol 先求启用条件。$G_1=1$ 要求 $A_{14}=A_{12}=0$；两个低有效使能输入必须为零，故 $A_{13}=0$ 且 $A_{15}=A_{11}=1$。所以
 \[
 A_{15}A_{14}A_{13}A_{12}A_{11}=10001.
@@ -1204,12 +1316,14 @@ Verilog基本仿真值为 \code{0}、\code{1}、\code{x}、\code{z}，分别表�
 \code{wire} 表示由驱动源决定值的连线，通常由 \code{assign} 或子模块输出驱动。传统Verilog的 \code{reg} 表示在过程块中赋值的变量，\textbf{并不保证}综合成寄存器；完整赋值的组合过程仍对应组合逻辑。按边沿保持状态的过程通常综合成触发器，电平敏感且不完整赋值的过程可能综合成锁存器。
 
 \code{integer} 常用于仿真循环计数，\code{time} 用于时间，\code{real} 用于实数仿真模型。\code{parameter} 为可覆盖参数，\code{localparam} 为模块内部固定常量。\code{reg [7:0] mem [0:15]} 声明16个八位元素，实际是否推断成存储器取决于读写描述和器件支持。
+\par\noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
 wire [7:0] bus;
 reg  [3:0] q;
 parameter WIDTH = 8;
 localparam IDLE = 2'b00;
 \end{lstlisting}
+\end{minipage}\par
 向量 \code{[7:0]} 的第7位为所声明范围的高索引位，\code{bus[3:0]} 是部分选择。输入由父模块信号驱动；传统Verilog中子模块输出连接到父模块的连线。显式声明能避免隐式一位连线造成拼写错误。
 
 \subsection{常量、位宽与运算符}
@@ -1264,6 +1378,8 @@ endmodule
 \end{lstlisting}
 组合过程采用 \code{always @(*)}，使读取的输入变化时重新求值；使用阻塞赋值 \code{=}，并保证每条路径对每个输出赋值。先给默认值、再按条件覆盖也是完整赋值的一种方法。
 
+例如组合过程中只有 \code{if (en) y = d;} 时，\code{en=0}没有规定新输出，电路必须保留旧值，因而可能推断锁存器。若要求禁用时输出0，应补 \code{else y = 0;}。同样省略 \code{else} 若出现在边沿触发的寄存器过程中，则表示触发器保持；判断硬件类型时必须连同事件控制一起看。
+
 \code{if ... else if ... else} 可明确表达优先级。\code{case} 适于列举互斥码值。综合后的面积、延迟由逻辑函数、目标器件和优化决定，不能把所有 \code{if} 一概说成“资源少但慢”，也不能把所有 \code{case} 一概说成“资源多但快”。即使没有 \code{else}，若块开头已给默认值，仍可能是完整的组合描述；反之，写了 \code{default} 但遗漏某个输出的赋值，仍可能产生锁存器。
 
 \begin{lstlisting}
@@ -1291,6 +1407,7 @@ endmodule
 
 \subsection{阻塞与非阻塞赋值}
 \term{阻塞赋值} \code{=} 在当前过程执行中更新左值，后续语句读到新值。\term{非阻塞赋值} \code{<=} 先求右值并安排稍后的更新，使同一时钟事件下不同寄存器按旧状态计算次态。
+\par\noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
 always @(posedge clk) begin
   a <= d;
@@ -1298,7 +1415,10 @@ always @(posedge clk) begin
   c <= b;
 end
 \end{lstlisting}
-若时钟前 $a=5,b=3,c=10,d=2$，更新后 $a=2,b=5,c=3$；三句改成按同样顺序的阻塞赋值则都成为 $2$。非阻塞赋值并非对所有代码顺序都无关：若同一变量在同一过程被多次赋值，后执行的赋值会影响最终更新。一个变量应由单一过程负责，避免多个过程争用。
+\end{minipage}\par
+若时钟前 $a=5,b=3,c=10,d=2$，更新后 $a=2,b=5,c=3$；三句改成按同样顺序的阻塞赋值则都成为 $2$。
+
+可把一次边沿分成“读取旧值”和“写入新值”两步：先把右侧的 $d,a,b$ 记录为 $2,5,3$，再分别写给 $a,b,c$。三个寄存器在同一次边沿更新，但新数据只向前推进一级；并行更新不等于新数据在同一拍穿过全部级。非阻塞赋值并非对所有代码顺序都无关：若同一变量在同一过程被多次赋值，后执行的赋值会影响最终更新。一个变量应由单一过程负责，避免多个过程争用。
 
 采用“组合过程用阻塞、边沿时序过程用非阻塞”的约定。一个模块可以同时包含这两种过程，例如状态机的组合次态逻辑与时钟状态寄存器；不能把“模块中不能混用”理解为禁止这样的正常划分。
 
@@ -1337,6 +1457,8 @@ endmodule
 \subsection{现态、次态与特征方程}
 存储元件通过反馈维持状态。记 $Q$ 为现态，$Q^+$ 为次态，$Q'$ 为当前输出的补。\term{特征方程}给定输入和现态，求次态；\term{激励表}（驱动表）从要求的现态、次态反求输入条件。分析电路用前者，综合设计常用后者。
 
+分析JK电路时，应先由连线求出 $J,K$，再代入 $Q^+=JQ'+K'Q$；$J$ 通常不等于 $Q^+$。只有D触发器才有 $D=Q^+$。设计时若要求 $Q:0\to1$，D端必须为1，而JK只要求 $J=1$，$K$ 可任选；激励表正是利用这些自由度减少输入逻辑。
+
 \subsection{基本SR锁存器与门控D锁存器}
 两个交叉耦合或非门构成高有效SR锁存器。$S$ 为置位输入，$R$ 为复位输入：$S=R=0$ 保持；$S=1,R=0$ 置一；$S=0,R=1$ 清零；$S=R=1$ 时两个输出均为零，不满足互补要求，禁止作为正常输入。
 \begin{infobox}{公式：高有效SR锁存器}
@@ -1369,6 +1491,23 @@ T$'$ & $Q^+=Q'$ & 每个有效边沿均翻转\\\bottomrule
 \end{center}
 T触发器可由JK触发器令 $J=K=T$ 得到；T$'$ 是令 $T=1$ 的特例。$Q^+=D$ 并不表示D变化时Q立即变化，而是指有效采样边沿后的状态值。
 
+\par\medskip
+\noindent\begin{minipage}{\linewidth}\centering
+\begin{tikzpicture}[x=9mm,y=6mm]
+\fill[ThemeBack] (2,-.3) rectangle (5,7.4);
+\fill[ThemeBack] (7,-.3) rectangle (9,7.4);
+\foreach \x in {2,7}\draw[ThemeBorder,dashed] (\x,-.3)--(\x,7.5);
+\foreach \y/\lab in {6/{G\text{ 或 }CP},4/D,2/Q_L,0/Q_F}\node[left] at (0,\y+.4){$\lab$};
+\draw[ThemeMain,thick] (0,6)--(2,6)--(2,7)--(5,7)--(5,6)--(7,6)--(7,7)--(9,7)--(9,6)--(10,6);
+\draw[ThemeMain,thick] (0,4)--(1,4)--(1,5)--(3,5)--(3,4)--(4,4)--(4,5)--(6,5)--(6,4)--(8,4)--(8,5)--(10,5);
+\draw[ThemeMain,thick] (0,2)--(2,2)--(2,3)--(3,3)--(3,2)--(4,2)--(4,3)--(7,3)--(7,2)--(8,2)--(8,3)--(10,3);
+\draw[ThemeMain,thick] (0,0)--(2,0)--(2,1)--(7,1)--(7,0)--(10,0);
+\draw[->] (0,-.8)--(10.5,-.8) node[right]{$t$};
+\node[above] at (3.5,7.5){透明区间};
+\end{tikzpicture}
+\diagramcaption{相同输入下，D锁存器输出 $Q_L$ 在高电平区间跟随D；上升沿D触发器输出 $Q_F$ 只在虚线处采样。两者初态均为0，忽略传播延迟。}
+\end{minipage}\par\medskip
+
 \subsection{激励表与类型转换}
 \begin{center}
 \begin{tabular}{cc cc cc cc}
@@ -1391,6 +1530,7 @@ T触发器可由JK触发器令 $J=K=T$ 得到；T$'$ 是令 $T=1$ 的特例。$Q
 Q^+=CE\cdot D+CE'Q.
 \]
 $CE=0$ 时保持。用组合门把任意使能直接与时钟相与可能产生短脉冲或额外边沿；器件支持的时钟使能或专用时钟控制资源更适合实现规定的同步行为。
+\par\noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
 module dff_ce(input wire clk, rst_n, ce, d,
               output reg q);
@@ -1400,11 +1540,13 @@ module dff_ce(input wire clk, rst_n, ce, d,
   end
 endmodule
 \end{lstlisting}
+\end{minipage}\par
 省略时序过程的 \code{else} 表示不更新该寄存器，正好实现保持。课件时钟使能示例中的 \code{else Q <= 0;} 实现禁用时同步清零，与上述使能保持功能不同，不能直接作为相同器件使用。
 
 \subsection{建立、保持与复位释放}
 可靠采样要求输入在有效时钟沿前稳定至少\term{建立时间} $t_{su}$，沿后保持至少\term{保持时间} $t_h$。触发器输出通常在\term{时钟到输出延迟} $t_{CQ}$ 后改变。违反时序约束可能产生\term{亚稳态}，即输出暂时不能可靠解释为确定逻辑电平。
-\begin{center}
+\par\medskip
+\noindent\begin{minipage}{\linewidth}\centering
 \begin{tikzpicture}[x=10mm,y=6mm]
 \draw[->] (0,0)--(9,0) node[right] {$t$};
 \draw[ThemeMain,thick] (0,1)--(4,1)--(4,2)--(6,2)--(6,1)--(9,1);
@@ -1416,8 +1558,10 @@ endmodule
 \draw[<->,ThemeMain] (2.5,4)--(4,4) node[midway,above] {$t_{su}$};
 \draw[<->,ThemeMain] (4,4)--(5,4) node[midway,above] {$t_h$};
 \end{tikzpicture}
-\end{center}
+\diagramcaption{有效采样沿前为建立窗口、沿后为保持窗口；输入须在两个窗口内稳定。图示不按比例。}
+\end{minipage}\par\medskip
 异步复位的释放也有恢复、移除等时序要求。常用“异步断言、同步释放”：两级触发器的异步端同时接受外部复位，释放后第一级装入 $1$、第二级再采样第一级，使本地复位按时钟释放。
+\par\noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
 reg [1:0] reset_pipe;
 always @(posedge clk or negedge rst_async_n) begin
@@ -1426,6 +1570,7 @@ always @(posedge clk or negedge rst_async_n) begin
 end
 wire rst_sync_n = reset_pipe[1];
 \end{lstlisting}
+\end{minipage}\par
 两级结构降低亚稳态传播概率，不能宣称绝对消除。不同独立时钟域需要相应的释放同步。波形分析也须考虑真实传播延迟；课堂理想状态表只表示稳定状态。
 
 \subsection{按有效边沿分析波形}
@@ -1439,8 +1584,9 @@ wire rst_sync_n = reset_pipe[1];
 \begin{infobox}{例题：四种反馈接法与两种有效边沿}
 2024秋期末回忆版，简答题8。四个触发器的接线重绘如下。为明确波形起点，规定第一个待分析上升沿前 $Q_1=Q_2=Q_3=Q_4=0$，忽略传播延迟，画出四个完整时钟周期内的输出。
 \end{infobox}
-\begin{center}
-\begin{tikzpicture}[x=10mm,y=10mm,every node/.style={font=\small}]
+\par\medskip
+\noindent\begin{minipage}{\linewidth}\centering
+\begin{tikzpicture}[x=10mm,y=8.5mm,every node/.style={font=\small}]
 % Four independent storage elements; triangles are clock inputs.
 \foreach \x/\y/\id in {0/4/1,7/4/2,0/0/3,7/0/4}{
  \draw[ThemeMain,fill=ThemeBack] (\x,\y) rectangle ++(2.7,2.8);
@@ -1456,7 +1602,7 @@ wire rst_sync_n = reset_pipe[1];
 \draw[ThemeMain] (2.7,4.55)--(3.1,4.55);
 \node[right] at (7.05,6.1){$D$};
 \draw[ThemeMain] (9.7,4.55)--(10.5,4.55)--(10.5,7.3)--(6.4,7.3)--(6.4,6.1)--(7,6.1);
-\draw[ThemeMain] (9.7,6.1)--(10.2,6.1) node[right]{$Q_2$};
+\draw[ThemeMain] (9.7,6.1)--(10.2,6.1) node[above]{$Q_2$};
 \draw[ThemeMain] (6,5.35) node[left]{$CP$}--(6.84,5.35);
 \draw[ThemeMain] (6.92,5.35) circle (.08);
 \node[right] at (.05,2.1){$J$};\node[right] at (.05,.55){$K$};
@@ -1468,13 +1614,14 @@ wire rst_sync_n = reset_pipe[1];
 \draw[ThemeMain] (2.7,.55)--(3.1,.55);
 \node[right] at (7.05,2.1){$J$};\node[right] at (7.05,.55){$K$};
 \draw[ThemeMain] (9.7,2.1)--(10.5,2.1) coordinate (q4)--(10.5,3.35)--(6.4,3.35)--(6.4,2.1)--(7,2.1);
-\node[right] at (10.5,2.1){$Q_4$};
+\node[above right] at (10.5,2.1){$Q_4$};
 \draw[ThemeMain] (9.7,.55)--(10.5,.55)--(10.5,-.4)--(6.4,-.4)--(6.4,.55)--(7,.55);
 \draw[ThemeMain] (6,1.35) node[left]{$CP$}--(6.84,1.35);
 \draw[ThemeMain] (6.92,1.35) circle (.08);
 \fill[ThemeMain] (q4) circle (1.2pt);
 \end{tikzpicture}
-\end{center}
+\diagramcaption{四种反馈连接。时钟端三角表示边沿触发，三角前的小圆圈表示下降沿触发。}
+\end{minipage}\par\medskip
 \sol 先读时钟三角前是否有反相圈：FF1、FF3为上升沿触发，FF2、FF4为下降沿触发。$Q'$ 表示本触发器的反相输出；反馈并未把 $Q'$ 变成时钟。
 \begin{center}
 \begin{tabularx}{\linewidth}{c l Y}
@@ -1493,6 +1640,7 @@ Q_4^+=JQ_4'+K'Q_4=Q_4Q_4'+Q_4Q_4=Q_4.
 
 按上升沿与下降沿交替列表；非本触发器的有效边沿处须保持，不更新其状态：
 \begin{center}
+\renewcommand{\arraystretch}{1.1}
 \begin{tabular}{c cccc}
 \toprule 边沿之后 & $Q_1$&$Q_2$&$Q_3$&$Q_4$\\\midrule
 初态&0&0&0&0\\
@@ -1502,8 +1650,9 @@ Q_4^+=JQ_4'+K'Q_4=Q_4Q_4'+Q_4Q_4=Q_4.
 第4上升沿&1&1&0&0\\第4下降沿&1&0&0&0\\\bottomrule
 \end{tabular}
 \end{center}
-\begin{center}
-\begin{tikzpicture}[x=11mm,y=7mm,every node/.style={font=\small}]
+\par\medskip
+\noindent\begin{minipage}{\linewidth}\centering
+\begin{tikzpicture}[x=11mm,y=5mm,every node/.style={font=\small}]
 \foreach \x in {1,...,8}\draw[ThemeBorder,dashed] (\x,-.2)--(\x,9.3);
 \foreach \y/\lab in {8/CP,6/Q_1,4/Q_2,2/Q_3,0/Q_4}
  {\node[left] at (0,\y+.5){$\lab$};}
@@ -1514,8 +1663,9 @@ Q_4^+=JQ_4'+K'Q_4=Q_4Q_4'+Q_4Q_4=Q_4.
 \draw[ThemeMain,thick] (0,0)--(9,0);
 \draw[->] (0,-.6)--(9.4,-.6) node[right]{$t$};
 \end{tikzpicture}
-\end{center}
-波形由表中状态连成，输出仅在自身有效边沿跳变。理想图中省略 $t_{CQ}$，实际输出应在边沿之后经过传播延迟才改变。回忆版图中的短起始线不能替代明确初态；若分析起点移到已有若干脉冲之后，须先确定该点状态，再重复同样方法。
+\diagramcaption{按逐沿状态表连接的理想波形。初态均为0；每条输出只在自己的有效边沿更新。}
+\end{minipage}\par\medskip
+图中省略 $t_{CQ}$；实际输出在有效沿后经过传播延迟才改变。若分析起点不同，须先重新确定初态，不能把回忆图中的短起始线当作初态条件。
 
 
 \chapterpage{寄存器、计数器与节拍发生器}
@@ -1549,6 +1699,12 @@ X^+=\begin{cases}Y,&LD=1,\\X+Y,&LD=0,AD=1,\\X,&LD=AD=0.\end{cases}
 \symbf Q^+=\{Q_{n-2},\ldots,Q_0,L_{\mathrm{in}}\}.
 \]
 串行输入端分别补入右移时最高位、左移时最低位。右移通过串行输入装入完整数码时，应按最低位到最高位送入；左移则按最高位到最低位送入。
+
+例如四位寄存器初态为 $0000$，用右移装入 $1011$，串行输入按时间依次为 $1,1,0,1$；逐沿状态为
+\[
+0000\xrightarrow{1}1000\xrightarrow{1}1100\xrightarrow{0}0110\xrightarrow{1}1011.
+\]
+箭头上写本沿采样的串行位，箭头右侧写更新后的完整寄存器。先按这一规则列状态，再给数据位编号，可避免把纸面左右方向和时间先后顺序混淆。
 
 \term{串入串出}（SISO）可作延迟链，串入并出（SIPO）进行串到并转换，并入串出（PISO）进行并到串转换，并入并出（PIPO）进行整字传送。若在第一个沿装入第一级，$n$ 位链的末级在第 $n$ 个沿出现该位；相对第一级的输出时刻相差 $n-1$ 个周期。讨论“延迟 $n$ 周期”时须明确以输入准备时刻还是首次采样时刻为起点。
 
@@ -1607,6 +1763,9 @@ T_{\mathrm{clk}}\ge t_{CQ,\max}+t_{\mathrm{logic},\max}+t_{su}
 \]
 并应另计时钟偏斜与裕量。最小路径也须满足保持约束。多位输出的传播时间不完全一致，其组合译码仍可能出现毛刺。
 
+“同步”表示各级由同一个有效时钟沿触发，不表示每一位都翻转。例如 $0000\to0001$ 只改变最低位，$0111\to1000$ 才改变四位。后一转换中各位实际到达时刻仍有差异，因此直接译码这些位的输出需要等待稳定。
+
+\par\noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
 module counter4(
   input wire clk, clr, load, enp, ent, up,
@@ -1625,6 +1784,7 @@ module counter4(
   assign rco = ent && (up ? (q == 4'd15) : (q == 4'd0));
 endmodule
 \end{lstlisting}
+\end{minipage}\par
 该模型的控制优先级是同步清零、同步装载、计数、保持。递增终值为 $15$，递减终值为 $0$；\code{rco} 是当前终值指示，不是一个自动保持一个周期的寄存输出。
 
 十进制递增计数使 $0,1,\ldots,9$ 循环，计到 $9$ 后下一沿回零，终值判断也改为 $9$。余3十进制计数使代码 $3,4,\ldots,12$ 循环，复位装入 $3$，$12$ 后回到 $3$，终值判断为 $12$。若允许装载非法代码，须说明是限制输入，还是规定非法状态恢复。
@@ -1673,7 +1833,8 @@ $0000$ 下一沿进入 $1000$，之后形成四个单一有效位的循环。对
 \begin{infobox}{例题：三触发器串联电路的六拍状态}
 2024秋期末回忆版，分析题2。电路初态 $Q_0=Q_1=Q_2=0$，共用上升沿时钟。六个采样沿的输入 $X$ 依次为 $1,0,1,0,0,1$。求逐拍输出并判断功能。
 \end{infobox}
-\begin{center}
+\par\medskip
+\noindent\begin{minipage}{\linewidth}\centering
 \begin{tikzpicture}[x=10mm,y=10mm,every node/.style={font=\small}]
 \foreach \x/\k in {1/0,5/1,9/2}{
  \draw[ThemeMain,fill=ThemeBack] (\x,0) rectangle ++(2,2.4);
@@ -1699,7 +1860,8 @@ $0000$ 下一沿进入 $1000$，之后形成四个单一有效位的循环。对
 \draw[ThemeMain] (11,.45)--(11.4,.45);
 \draw[ThemeMain] (-.8,-.7) node[left]{$CP$}--(8.6,-.7);
 \end{tikzpicture}
-\end{center}
+\diagramcaption{三级JK接成D功能，共用一个时钟；数据连接不等于时钟级联。}
+\end{minipage}\par\medskip
 \sol 先读取接线，而非直接把三个触发器认作计数器：
 \[
 J_0=X,\ K_0=X';\qquad
@@ -1719,7 +1881,8 @@ Q_0^+=X,\qquad Q_1^+=Q_0,\qquad Q_2^+=Q_1.
 \end{tabular}
 \end{center}
 输出波形如下，输入在采样沿之间改变，以避开建立、保持窗口：
-\begin{center}
+\par\medskip
+\noindent\begin{minipage}{\linewidth}\centering
 \begin{tikzpicture}[x=8mm,y=6mm,every node/.style={font=\small}]
 \foreach \x in {1,3,5,7,9,11}\draw[ThemeBorder,dashed] (\x,1.7)--(\x,11.3);
 \foreach \y/\lab in {10/CP,8/X,6/Q_0,4/Q_1,2/Q_2}
@@ -1732,7 +1895,8 @@ Q_0^+=X,\qquad Q_1^+=Q_0,\qquad Q_2^+=Q_1.
 \foreach \x/\k in {1/1,3/2,5/3,7/4,9/5,11/6}
  {\node[below] at (\x,1.5){第\k 沿};}
 \end{tikzpicture}
-\end{center}
+\diagramcaption{三级移位寄存器波形。虚线为采样沿，数据在相邻采样沿之间改变。}
+\end{minipage}\par\medskip
 该电路是三位同步串入并出移位寄存器，也可从 $Q_2$ 串行读出。若 $X[k]$ 表示第 $k$ 沿采样的输入，则 $Q_2[k]=X[k-2]$（$k\ge3$）。首个输入在第1沿进入第一级，在第3沿到达第三级；从首沿到末沿相隔两个周期，不能与“经过三级存储”混为三周期。
 
 
@@ -1775,7 +1939,16 @@ $S_2$&$S_0/0$&$S_1/1$\\\bottomrule
 \end{tabular}
 \end{center}
 上表是\term{可重叠}Mealy检测器。完成 $101$ 后，末尾的 $1$ 可作为下一次匹配的起点，因此回到 $S_1$。输入 $10101$ 在第3、第5位各输出一次。
-\begin{center}
+
+以每一位被接受时的边沿编号为准，转移过程为：
+\begin{center}\begin{tabular}{c c c c c}
+\toprule 第几位 & 本位 $X$ & 沿前状态 & 本次检测事件 & 沿后状态\\\midrule
+1&1&$S_0$&0&$S_1$\\2&0&$S_1$&0&$S_2$\\3&1&$S_2$&1&$S_1$\\
+4&0&$S_1$&0&$S_2$\\5&1&$S_2$&1&$S_1$\\\bottomrule
+\end{tabular}\end{center}
+表中的事件按沿前现态和本位输入判定。若直接使用组合Mealy输出，它可能在边沿到来之前、输入已稳定时就为1；若要求沿后维持一拍，则需在该沿寄存这个条件。
+\par\medskip
+\noindent\begin{minipage}{\linewidth}\centering
 \begin{tikzpicture}[node distance=33mm]
 \node[state,initial,initial text={}] (s0) {$S_0$};
 \node[state,right=of s0] (s1) {$S_1$};
@@ -1787,13 +1960,16 @@ $S_2$&$S_0/0$&$S_1/1$\\\bottomrule
  (s2) edge[bend left] node[below] {$1/1$} (s1)
  edge[bend left=35] node[below] {$0/0$} (s0);
 \end{tikzpicture}
-\end{center}
+\diagramcaption{可重叠101检测器。边上标注输入/输出，每个状态的0、1输入均有确定去向。}
+\end{minipage}\par\medskip
 \term{不可重叠}检测器在完成后丢弃本次已使用的三位，将 $S_2$ 在 $X=1$ 时的次态改为 $S_0$，仍输出 $1$。此时 $10101$ 只在第3位报告，不能在第5位复用上一匹配的末位。
 
 若采用Moore型，另设 $S_3$ 表示已检测到 $101$，$S_3$ 的输出为 $1$，其他状态为 $0$。可重叠时 $S_3$ 收到 $0$ 转到 $S_2$，收到 $1$ 转到 $S_1$；不可重叠时，收到 $0$ 转到 $S_0$、收到 $1$ 转到 $S_1$。两种模型的输出时间须在波形中标明，不能把“进入检测状态”与“由当前边产生检测输出”混写。
 
 \subsection{等价状态与隐含表法}
 对于完全给定的确定状态机，两个状态\term{等价}，是指从它们出发，对任意后续输入序列产生相同输出序列。判别需同时满足：每个输入下当前输出相同；相应次态也等价。当前输出相同仅是必要条件。
+
+例如两个状态现在都输出0，但输入一个1后分别进入输出0和输出1的状态，就不能合并：后续序列“1”已经能区分它们。隐含表中记录次态对，正是把“以后能否区分”的问题逐步传回当前状态对。
 
 \term{隐含表法}对全部不同状态对建立三角表：先把存在输出差异的状态对标为不等价；对其他状态对记录其各输入下的次态对。若记录中任何次态对已不等价，当前对也不等价。反复传播到不再变化，未被排除的状态对等价。只互相依赖且没有矛盾输出的封闭链可以保留。等价关系具有传递性，最后按最大等价类合并。
 \begin{infobox}{例题：课件七状态表的化简}
@@ -1885,6 +2061,7 @@ Q_1^+&=XQ_2Q_1'+XQ_1=X(Q_2+Q_1).
 \end{align*}
 未用 $01$ 在 $X=0$ 时进入 $00$，在 $X=1$ 时进入 $11$，一步即可恢复。然而在 $01,X=0$ 时原输出 $Z=1$，恢复期间可能给出一次无效检测。若要求非法状态不报检测，可把输出改为 $Z=X'Q_2Q_1$；合法状态上功能不变。
 
+\par\noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
 module detect110(
   input wire clk, rst_n, x,
@@ -1901,6 +2078,7 @@ module detect110(
   assign z = (~x) & q2 & q1;
 endmodule
 \end{lstlisting}
+\end{minipage}\par
 此代码按化简次态用D触发器表达，与上述JK方案的状态行为相同。$z$ 为组合Mealy输出，在采样边沿前当 $x=0$ 且现态为 $11$ 时有效；边沿后状态回零。若需沿后保持一个完整周期的检测脉冲，应另用寄存器在该沿采样条件，并说明输出接口的时序。
 
 \subsection{非法状态、自启动与功能验证}
@@ -1908,57 +2086,42 @@ endmodule
 
 状态机验证可将编码实现的每个合法状态、每个输入组合，与抽象状态表逐项比较，再使用有代表性的连续输入验证历史意义。例如110检测输入 $1110$ 只在最后一个 $0$ 处报告，因为最后三位是 $110$；输入 $110110$ 报告两次。非阻塞更新须用旧状态，避免在同一沿错误提前推进多个匹配阶段。
 
+\Needspace{140mm}
 \subsection{从两级D触发器电路识别可逆计数}
 \begin{infobox}{例题：含异或门与与非门的同步电路}
 2024秋期末回忆版，分析题1。按下图求次态方程、输出方程、状态表及状态图。两触发器共用上升沿时钟，$Q_1Q_0$ 为从高到低的现态，$A$ 为控制输入。复位或起始状态须由外部条件确定。
 \end{infobox}
-\begin{center}
-\begin{tikzpicture}[x=9mm,y=9mm,every node/.style={font=\small}]
-\foreach \x/\k in {2.5/0,8.3/1}{
- \draw[ThemeMain,fill=ThemeBack] (\x,-1.1) rectangle ++(1.8,2.2);
- \node at (\x+.9,0){FF\k};
- \node[right] at (\x+.05,.55){$D$};
- \node[left] at (\x+1.75,.55){$Q$};\node[left] at (\x+1.75,-.55){$Q'$};
- \draw[ThemeMain] (\x,-.75)--++(.28,.2)--++(-.28,.2);
-}
-\node[xor gate US,draw=ThemeMain,logic gate inputs=nn,
- minimum width=8mm,minimum height=8mm] (x0) at (5.4,.55) {};
-\node[xor gate US,draw=ThemeMain,logic gate inputs=nn,
- minimum width=8mm,minimum height=8mm] (x1) at (7.0,.55) {};
-\node[not gate US,draw=ThemeMain,minimum width=8mm] (iv) at (2,3.4) {};
-\node[nand gate US,draw=ThemeMain,logic gate inputs=nnn,
- minimum width=12mm,minimum height=13mm] (n0) at (12.2,2.3) {};
-\node[nand gate US,draw=ThemeMain,logic gate inputs=nnn,
- minimum width=12mm,minimum height=13mm] (n1) at (12.2,-2.2) {};
-\node[nand gate US,draw=ThemeMain,logic gate inputs=nn,
- minimum width=12mm,minimum height=11mm] (ny) at (14.3,0) {};
-\draw[ThemeMain] (0,3.4) node[left]{$A$}--(iv.input);
-\draw[ThemeMain] (iv.output)--(11.0,3.4)|-(n0.input 1);
-\draw[ThemeMain] (.7,3.4)--(.7,-3.35)--(11.0,-3.35)|-(n1.input 3);
-\draw[ThemeMain] (.7,-2.8)--(4.7,-2.8)|-(x0.input 2);
-\fill[ThemeMain] (.7,3.4) circle (1.1pt);\fill[ThemeMain] (.7,-2.8) circle (1.1pt);
-\draw[ThemeMain] (4.3,.55)--(4.55,.55) coordinate (q0)|-(x0.input 1);
-\draw[ThemeMain] (q0)--(4.55,2.3)--(n0.input 2);
-\node[above] at (4.55,2.3){$Q_0$};
-\draw[ThemeMain] (x0.output)--(6.15,.55)|-(x1.input 2);
-\draw[ThemeMain] (10.1,.55)--(10.45,.55) coordinate (q1)--(10.45,1.55)--(6.35,1.55)|-(x1.input 1);
-\draw[ThemeMain] (q1)--(10.45,2.0)|-(n0.input 3);
-\node[above] at (10.45,2.0){$Q_1$};
-\draw[ThemeMain] (x1.output)--(8.3,.55);
-\draw[ThemeMain] (4.3,-.55)--(4.55,-.55) coordinate (b0)--(4.55,-1.7)--(1.7,-1.7)--(1.7,.55)--(2.5,.55);
-\draw[ThemeMain] (b0)--(4.9,-.55)--(4.9,-1.95)|-(n1.input 1);
-\draw[ThemeMain] (10.1,-.55)--(10.5,-.55)--(10.5,-2.2)--(n1.input 2);
-\draw[ThemeMain] (n0.output)--(13.25,2.3)|-(ny.input 1);
-\draw[ThemeMain] (n1.output)--(13.25,-2.2)|-(ny.input 2);
-\draw[ThemeMain] (ny.output)--(15.5,0) node[right]{$Y$};
-\draw[ThemeMain] (0,-3) node[left]{$CP$}--(7.8,-3);
-\draw[ThemeMain] (2.2,-3)--(2.2,-.55)--(2.5,-.55);
-\draw[ThemeMain] (7.8,-3)--(7.8,-.55)--(8.3,-.55);
-\foreach \p in {q0,q1,b0}\fill[ThemeMain] (\p) circle (1.1pt);
-\fill[ThemeMain] (2.2,-3) circle (1.1pt);
+\par\medskip
+\noindent\begin{minipage}{\linewidth}\centering
+\begin{tikzpicture}[x=1cm,y=1cm]
+\node[block,minimum width=24mm,minimum height=19mm] (f0) at (1.5,2.5){D触发器0};
+\node[block,minimum width=24mm,minimum height=19mm] (f1) at (9.7,2.5){D触发器1};
+\draw[->,ThemeMain] (-.2,2.5) node[left]{$Q_0'$}--(f0.west);
+\draw[->,ThemeMain] (f0.east)--(3.25,2.5) node[below]{$Q_0$};
+\draw[->,ThemeMain] (f1.east)--(11.6,2.5) node[right]{$Q_1$};
+\node[xor gate US,draw=ThemeMain,logic gate inputs=nn,minimum width=10mm] (x0) at (5,2.5) {};
+\node[xor gate US,draw=ThemeMain,logic gate inputs=nn,minimum width=10mm] (x1) at (7,2.5) {};
+\draw[ThemeMain] (x0.output)--(x1.input 2);
+\draw[ThemeMain] (x1.output)--(f1.west);
+\draw[ThemeMain] (4,3.4) node[above]{$Q_0$}|-(x0.input 1);
+\draw[ThemeMain] (4,1.4) node[below]{$A$}|-(x0.input 2);
+\draw[ThemeMain] (6.1,3.4) node[above]{$Q_1$}|-(x1.input 1);
+\draw[->,ThemeMain] (1.5,.8) node[below]{$CP\uparrow$}--(f0.south);
+\draw[->,ThemeMain] (9.7,.8) node[below]{$CP\uparrow$}--(f1.south);
+\node[nand gate US,draw=ThemeMain,logic gate inputs=nnn,minimum width=13mm,minimum height=15mm] (n0) at (4,-1.5) {};
+\node[nand gate US,draw=ThemeMain,logic gate inputs=nnn,minimum width=13mm,minimum height=15mm] (n1) at (4,-4) {};
+\foreach \k/\lab in {1/A',2/Q_0,3/Q_1}\draw[ThemeMain] ([xshift=-12mm]n0.input \k) node[left]{$\lab$}--(n0.input \k);
+\foreach \k/\lab in {1/A,2/Q_0',3/Q_1'}\draw[ThemeMain] ([xshift=-12mm]n1.input \k) node[left]{$\lab$}--(n1.input \k);
+\node[nand gate US,draw=ThemeMain,logic gate inputs=nn,minimum width=13mm,minimum height=13mm] (ny) at (8,-2.75) {};
+\draw[ThemeMain] (n0.output)--(6,-1.5)|-(ny.input 1);
+\draw[ThemeMain] (n1.output)--(6,-4)|-(ny.input 2);
+\draw[->,ThemeMain] (ny.output)--(10,-2.75) node[right]{$Y$};
+\node[anchor=west] at (-.2,-.3){上：次态逻辑与状态存储};
+\node[anchor=west] at (-.2,-5){下：组合输出逻辑};
 \end{tikzpicture}
-\end{center}
-图中实心点表示导线相接；没有实心点的交叉线互不连接。
+\diagramcaption{可逆计数器的状态更新和输出逻辑分开绘制；同名信号相连，不增加寄存级。}
+\end{minipage}\par\medskip
+图中同名信号表示同一网络，$Q_0'$、$Q_1'$为相应现态的反。上半图与下半图共享这些信号，两个触发器共用同一上升沿时钟；分开绘制不增加寄存级。
 
 \sol 第一级D端接自己的反相输出，所以每沿翻转。第二级D端来自两个异或门，依次加入 $Q_0,A,Q_1$。因此
 \[
@@ -1976,7 +2139,8 @@ Y=A'Q_0Q_1+AQ_0'Q_1'.
 10&11/0&01/0\\11&00/1&10/0\\\bottomrule
 \end{tabular}
 \end{center}
-\begin{center}
+\par\medskip
+\noindent\begin{minipage}{\linewidth}\centering
 \begin{tikzpicture}[every node/.style={font=\small}]
 \node[state] (s0) at (0,2){00};\node[state] (s1) at (3.5,2){01};
 \node[state] (s2) at (3.5,0){10};\node[state] (s3) at (0,0){11};
@@ -1989,7 +2153,8 @@ Y=A'Q_0Q_1+AQ_0'Q_1'.
  (s3) edge[bend left=12] node[left] {0/1} (s0)
  (s0) edge[bend left=12] node[right] {1/1} (s3);
 \end{tikzpicture}
-\end{center}
+\diagramcaption{模4可逆计数状态图。边上为控制输入A/终值输出Y，沿箭头读取次态。}
+\end{minipage}\par\medskip
 边标记为 $A/Y$。$A=0$ 时按 $00\to01\to10\to11\to00$ 递增；$A=1$ 时反向递减。因此它是二位模4可逆计数器，$Y$ 是当前方向下的终值标志：递增时现态11有效，递减时现态00有效。由于 $Y$ 还依赖 $A$，属于Mealy输出；稳定的终值电平不等于已经存储的一周期进位脉冲。
 
 \subsection{从多路输出波形设计JK状态机}
@@ -2000,7 +2165,8 @@ Y=A'Q_0Q_1+AQ_0'Q_1'.
 \]
 复位后输出000。用JK触发器实现，给出所需触发器数、状态分配、驱动方程及非法状态恢复方式。
 \end{infobox}
-\begin{center}
+\par\medskip
+\noindent\begin{minipage}{\linewidth}\centering
 \begin{tikzpicture}[x=14mm,y=7mm,every node/.style={font=\small}]
 \foreach \x in {1,...,6}\draw[ThemeBorder,dashed] (\x,-.2)--(\x,7.3);
 \foreach \y/\lab in {6/CP,4/Y_0,2/Y_1,0/Y_2}
@@ -2012,7 +2178,8 @@ Y=A'Q_0Q_1+AQ_0'Q_1'.
 \foreach \x/\s in {0.5/S_0,1.5/S_1,2.5/S_2,3.5/S_3,4.5/S_4,5.5/S_0}
  {\node[below] at (\x,-.4){$\s$};}
 \end{tikzpicture}
-\end{center}
+\diagramcaption{五拍循环输出。状态标签对应有效沿之后的区间，输出字与内部编码分别确定。}
+\end{minipage}\par\medskip
 \sol 先读有效沿之间的完整输出组合，再确定循环状态。五个输出组合各不相同，至少需要五个状态；因 $2^2<5\le2^3$，须用三个触发器。设内部状态为 $Q_2Q_1Q_0$，按自然升序分配：
 \begin{center}
 \begin{tabular}{c c c c}
@@ -2075,6 +2242,8 @@ Q_2^+&=Q_2'Q_1Q_0.
 \subsection{反馈清零与反馈置数}
 \begin{infobox}{方法：终值判断的时机}
 若稳定循环要求 $0,1,\ldots,M-1$，异步清零方案通常译码 $M$，达到后立即清零；同步清零或同步装载方案须译码 $M-1$，使下一沿回零。两者稳定循环都含 $M$ 个状态，异步方案另经过极短的复位触发过渡。
+
+判断模值时，把每个有效沿后的稳定状态逐个列出并数一遍。同步反馈中，终值状态会占一个计数区间；异步反馈中，复位触发码通常只短暂出现。不能只看反馈门检测的十进制数就把它直接当成模值。
 \end{infobox}
 以模10为例：74LS161可在出现 $1010$ 时异步清零；从初态零开始计数时，可用 $Q_DQ_B$ 的首次成立判断10，清零引脚接 $(Q_DQ_B)'$。这是在正常可达计数路径上使用部分译码；若必须从任意非法初态恢复，应检查其他状态，或使用完整 $Q_DQ_C'Q_BQ_A'$ 译码。
 
@@ -2177,18 +2346,20 @@ F_7\cdots F_0=1111110D_6.
 Y=Q_2'Q_1'+Q_1Q_0.
 \]
 它在六个合法状态上依次为 $1,1,0,1,0,0$，$110,111$ 按实际次态进入合法循环。复位决定序列起点，不能只证明循环相同就忽略相位。
-\begin{center}
+\par\medskip
+\noindent\begin{minipage}{\linewidth}\centering
 \begin{tikzpicture}[node distance=18mm]
 \node[block,text width=29mm] (counter) {模$L$计数器};
 \node[block,text width=39mm,right=of counter] (mux) {MUX或ROM\\第$k$项存$s_k$};
-\draw[->,ThemeMain] (-1.8,0)--(counter) node[midway,above] {时钟};
-\draw[->,ThemeMain] (counter)--(mux) node[midway,above] {$k$};
-\draw[->,ThemeMain] (mux)--++(1.5,0) node[right] {$Y$};
+\draw[->,ThemeMain] ([xshift=-15mm]counter.west)--(counter.west) node[midway,above] {时钟};
+\draw[->,ThemeMain] (counter.east)--(mux.west) node[midway,above] {$k$};
+\draw[->,ThemeMain] (mux.east)--++(1.5,0) node[right] {$Y$};
 \end{tikzpicture}
-\end{center}
+\diagramcaption{计数器提供序列索引k，MUX或ROM输出对应表项；复位决定从哪一项开始。}
+\end{minipage}\par\medskip
 
 \subsection{移位寄存器加反馈产生序列}
-用 $n$ 位移位寄存器产生长度 $L$ 的周期串时，$2^n\ge L$ 只是必要条件。把循环位串的连续 $n$ 位作为状态窗口；若同一窗口的后续位不同，就不能仅由该窗口决定反馈，须增大 $n$ 或另加状态信息。
+用 $n$ 位移位寄存器产生最小周期为 $L$ 的位串时，$2^n\ge L$ 只是必要条件；若给出的位串可缩短周期，应先约简 $L$。把循环位串的连续 $n$ 位作为状态窗口；若同一窗口的后续位不同，就不能仅由该窗口决定反馈，须增大 $n$ 或另加状态信息。
 \begin{infobox}{例题：00010111序列的反馈设计}
 采用三位左移寄存器，状态 $Q_2Q_1Q_0$ 的最高位 $Q_2$ 为输出。
 \end{infobox}
@@ -2212,12 +2383,13 @@ L_{\mathrm{in}}=Q_2Q_1'Q_0+Q_2'Q_1+Q_2'Q_0'
 
 若同一状态窗口重复且后续位相同，可考虑合并，但仍须检查规定周期及相位含义。环形、扭环形适于规则序列；计数器加MUX/ROM适于按索引输出；反馈移位实现依赖窗口能唯一决定下一位。选择方法须同时考虑状态数、资源和所需输出。
 
-\clearpage
+\Needspace{110mm}
 \subsection{从反馈装载接线判断稳定模值}
 \begin{infobox}{例题：74LS161反馈装载计数器}
 2024秋期末回忆版，简答题5。$Q_dQ_cQ_bQ_a=Q_3Q_2Q_1Q_0$，初态0000。计数使能 $EP=ET=1$，并行输入 $DCBA=0000$，异步清零在计数期间不生效；与非门把 $Q_3,Q_2$ 译码到低有效装载端。求稳定状态序列与计数模值。
 \end{infobox}
-\begin{center}
+\par\medskip
+\noindent\begin{minipage}{\linewidth}\centering
 \begin{tikzpicture}[x=10mm,y=10mm,every node/.style={font=\small}]
 \draw[ThemeMain,fill=ThemeBack] (3,0) rectangle (8,3);
 \node at (5.5,1.4){74LS161};
@@ -2247,7 +2419,8 @@ L_{\mathrm{in}}=Q_2Q_1'Q_0+Q_2'Q_1+Q_2'Q_0'
 \draw[ThemeMain] (7.6,-.08) circle (.08);
 \draw[ThemeMain] (ng.output)--(11,4.7)--(11,-1.35)--(7.6,-1.35)--(7.6,-.16);
 \end{tikzpicture}
-\end{center}
+\diagramcaption{模13反馈装载：到达12后装载端有效，下一上升沿才装入0。}
+\end{minipage}\par\medskip
 \sol 装载控制的引脚电平是 $\mathrm{LD}_n=(Q_3Q_2)'$。$Q_3Q_2=11$ 时该端为零；其余情况为一。74LS161的并行装载是同步的，须在下一个上升沿读取低有效装载条件。
 
 从0000递增，第一次达到 $Q_3Q_2=11$ 的状态是1100，即十进制12。进入12的那一沿之前，现态为11（二进制1011），装载端仍为一，因此这次正常计数到12。到达12后装载端变为零，下一沿才装入0000：
@@ -2261,6 +2434,7 @@ L_{\mathrm{in}}=Q_2Q_1'Q_0+Q_2'Q_1+Q_2'Q_0'
 \end{center}
 所以稳定序列为 $0\to1\to\cdots\to12\to0$，共有13个状态，是模13计数器。1100维持一个完整的稳定计数区间，不能按“达到12就立即清零”误判为模12。其终值 $CO$ 只有在1111且相应使能条件满足时有效；本循环未达到1111，不能直接把 $CO$ 当作模13终值信号。
 
+\Needspace{85mm}
 \begin{infobox}{例题：设计二进制1001至1111循环计数器}
 2024秋期末回忆版，简答题7。用74LS161使稳定计数范围为 $1001_2$ 至 $1111_2$，下一沿由1111回到1001。说明并行输入、反馈条件、初态设置与模值。
 \end{infobox}
@@ -2270,7 +2444,8 @@ EP=ET=1,\qquad
 \mathrm{LD}_n=(Q_3Q_2Q_1Q_0)'=CO'.
 \]
 最后一项相等依赖 $ET=1$，不能在任意使能条件下照用。电路重绘如下，四输入与非门在1111产生装载低电平：
-\begin{center}
+\par\medskip
+\noindent\begin{minipage}{\linewidth}\centering
 \begin{tikzpicture}[x=10mm,y=10mm,every node/.style={font=\small}]
 \draw[ThemeMain,fill=ThemeBack] (3,0) rectangle (8,3);
 \node at (5.5,1.4){74LS161};
@@ -2296,7 +2471,8 @@ EP=ET=1,\qquad
 \draw[ThemeMain] (7.6,-.08) circle (.08);
 \draw[ThemeMain] (ng.output)--(11,4.7)--(11,-1.35)--(7.6,-1.35)--(7.6,-.16);
 \end{tikzpicture}
-\end{center}
+\diagramcaption{模7反馈装载：并行数据为1001，终值1111的下一上升沿装回1001。}
+\end{minipage}\par\medskip
 启动时先用外部装载控制使 $\mathrm{LD}_n=0$，在一个上升沿装入1001，然后交给终值反馈；单独异步清零只会装入0000，不能获得要求的初态。正常循环为
 \[
 1001\to1010\to1011\to1100\to1101\to1110\to1111\to1001,
@@ -2317,14 +2493,17 @@ EP=ET=1,\qquad
 6 & UART收发、最近六字符显示、字符串匹配选做 & 记忆游戏\\\bottomrule
 \end{longtable}
 \begin{infobox}{注意：开发板和个人信息必须与资料版本对应}
-2025年资料的板载100MHz时钟接\code{Y18}；2020年EGO1资料接\code{P17}。复位极性、数码管极性、拨码开关编号和约束文件不能跨板照搬。参考代码中的学号和尾号属于原作者；实际提交时必须替换成使用者本人的信息。尚未给出个人学号，本讲义不编造该信息。
+2025年资料的板载100MHz时钟接\code{Y18}；2020年EGO1资料接\code{P17}。复位极性、数码管极性、拨码开关编号和约束文件不能跨板照搬。参考代码中的学号和尾号属于原作者；实际提交时必须替换成使用者本人的信息。本讲义使用通用接口说明，个人信息按当次实验要求填写。
 \end{infobox}
 \subsection{代码文件与硬件结构}
+
+理论章节中的“现态、输入、次态”在代码中分别对应寄存器旧值、当前被采样的信号、非阻塞赋值的目标新值。阅读每个实验时，先列清哪些变量负责保存历史、哪些条件只负责本次更新，再追踪数据流。这样能把代码和前述逻辑方程一一对应。
 配套“实验代码/原始参考”按六次实验保留下载到的\code{.v}和\code{.xdc}文件，未经功能改写；“整理示例”放置本讲义的规范化教学示例。原代码和改写示例通过目录及正文说明区分，完整设计代码可在配套文件中查阅。各实验的\code{top}或\code{testbench}名称可能重复，应分别建立工程，不能把全部实验一次加入同一设计。
 
 \term{设计源文件}描述可综合的电路；\term{仿真源文件}产生激励并检查输出；\term{约束文件}指定引脚、电气标准和时钟。\code{always #5 clk = ~clk;}产生仿真时钟；它不生成FPGA内部的晶振。\code{#10}、\code{$display}、\code{$finish}用于测试，不能当作上板电路中的延时方案。实际延时依靠时钟和计数器。
 
 读代码时先确定端口及有效电平，再寻找\code{always @(posedge clk ...)}中的状态，随后读取组合逻辑和模块实例，最后追踪状态更新条件与输出。在一个时钟边沿上，非阻塞赋值\code{<=}先计算右侧旧值，再统一更新左侧；同一边沿工作的多个模块因此可以按寄存器连接关系分析。
+\par\noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
 // A two-stage pipeline: both right-hand sides use old values.
 always @(posedge clk) begin
@@ -2332,16 +2511,19 @@ always @(posedge clk) begin
   stage2 <= stage1;
 end
 \end{lstlisting}
+\end{minipage}\par
 若边沿前\code{stage1=0}、\code{data_in=1}，边沿后\code{stage1=1}而\code{stage2=0}。用\code{=}依次改写两句时，第二句会读取刚改写的\code{stage1}，不能按两级流水线理解。组合过程通常用\code{=}，时钟过程通常用\code{<=}。\code{reg}表示过程变量，完整组合赋值的\code{reg}仍可以综合成组合电路。
 \subsection{验证层次与仿真证据}
 \term{功能仿真}核对逻辑与时序协议；静态检查核对未声明信号、位宽、锁存器、多驱动及赋值习惯；综合和实现核对资源、时钟、引脚和时序；上板核对实际电平、抖动及连线。功能仿真通过只证明测试激励覆盖到的行为，不能替代后两层。
 
 测试程序宜在\code{negedge clk}改变输入，在\code{posedge clk}之后留出非阻塞赋值更新时间再检查。检查使用\code{!==}可以把\code{x}或\code{z}也作为失败，而普通\code{!=}可能产生未知的条件值。
+\par\noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
 @(negedge clk); en = 1'b1; d = 8'hA5;
 @(posedge clk); #1;
 if (q !== 8'hA5) $fatal(1, "write failed");
 \end{lstlisting}
+\end{minipage}\par
 波形分析应说明“哪个边沿、哪些输入、预期输出、实际输出及依据”。至少覆盖复位、正常路径、暂停或失能、边界和关键失败路径。缩小计数参数可加快仿真，但必须注明缩小比例，上板参数仍按实际100MHz时钟计算。
 
 \chapterpage{Lab 1：组合逻辑与加减多路复用器}
@@ -2349,6 +2531,8 @@ if (q !== 8'hA5) $fatal(1, "write failed");
 2025年实验包括3--8译码器和多路复用器。链接仓库的设计文件\code{mux.v}实现四位加减选择，\code{testbench.v}给出十组激励，\code{pin.xdc}连接开关和LED。译码器在指导书中给出接口与功能表，仓库未提供相应的独立设计文件；后文给出完整教学实现。
 
 多路复用器输入为\code{en}、\code{mux_sel}及两个四位无符号数\code{input_a}、\code{input_b}。失能\code{en=0}时输出\code{4'hF}；使能且\code{mux_sel=0}时相加；使能且\code{mux_sel=1}时相减。四位输出只保留结果低四位。
+
+在这个实验中，\code{en}与\code{mux_sel}决定选用哪条运算结果，\code{input_a}和\code{input_b}提供数据。输入稳定后输出直接确定，没有时钟或历史状态；LED显示的是四个位的电平，不能凭亮灯形式自动判断有符号数的正负。
 \begin{lstlisting}
 module mux(
   input wire en, mux_sel,
@@ -2370,15 +2554,18 @@ endmodule
 若需保留加法进位，必须扩展输入与输出，例如\code{wire [4:0] total = {1'b0,a} + {1'b0,b};}。实验接口规定四位输出时，丢弃进位符合该接口，不应擅自把端口改成五位。
 
 原仿真声明十位\code{switch}，再按以下连接拆分输入。
+\par\noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
 reg [9:0] switch;
 assign {en, mux_sel, input_a, input_b} = switch;
 \end{lstlisting}
+\end{minipage}\par
 拼接左侧总宽度为$1+1+4+4=10$，\code{switch[9]}对应\code{en}、\code{switch[8]}对应\code{mux_sel}，其后两组各四位。\code{10'b1_0_1000_0100}表示使能、加法、8、4，结果应为12。下划线只用于可读性，不占位宽。
 
 原十组激励覆盖使能和加减，但没有检查进位截断、负差及全部输入，也没有自动判错。完整穷举包含$2\times2\times16\times16=1024$组，逐组按真值规则计算预期四位结果；配套验证文件完成此检查。
 \subsection{3--8译码器与有效电平}
 指导书规定\code{en=3'b100}时使能，地址\code{data_in}选中的输出位为0，其余为1；失能时输出全1。这相当于低有效输出译码器，而不能把“选中”一律写成1。
+\par\noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
 module decoder_38(
   input wire [2:0] en, data_in,
@@ -2389,6 +2576,7 @@ module decoder_38(
                            : 8'hFF;
 endmodule
 \end{lstlisting}
+\end{minipage}\par
 例如地址5时，\code{8'b1 << 5}为\code{8'h20}，取反后\code{data_out=8'hDF}。八位常量确保移位与取反都发生在确定宽度内。2020年指导书的某些示例片段省略使能或输出反相，并把连续赋值输出声明为\code{reg}；完整传统Verilog实现应使用\code{wire}并遵从实际功能表。译码器穷举$8\times8=64$组地址及使能组合。
 \subsection{约束、检查与提交内容}
 上板验证先检查所有顶层端口都与本板引脚对应，再确认\code{IOSTANDARD}。总线端口在Tcl中使用花括号保护，例\code{[get_ports {input_a[0]}]}；括号中的端口名须与RTL完全相同。组合模块不需要伪造内部时钟。
@@ -2398,15 +2586,18 @@ endmodule
 \chapterpage{Lab 2：触发器与寄存器文件}
 \subsection{D触发器：复位、写入与保持}
 2025年\code{dff/dff.v}使用高有效异步复位\code{clr}和高有效同步使能\code{en}，输出为\code{q}。复位无需等待时钟；写入必须在上升沿满足使能；失能时保持。
+\par\noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
 always @(posedge clk or posedge clr) begin
   if (clr) q <= 1'b0;
   else if (en) q <= d;
 end
 \end{lstlisting}
+\end{minipage}\par
 没有\code{else}表示时钟触发器保持原值。原文件末尾的\code{q <= q;}功能等价但可以省略。\code{d}在两个时钟边沿之间变化不会立即改变\code{q}；复位在边沿之间变为1却会立即清零。异步复位释放在实际硬件中还应满足恢复、移除时序，功能仿真不显示亚稳态。
 \subsection{八个八位寄存器与地址选择}
 \code{reg8file/reg8file.v}中\code{reg [7:0] regfile [7:0];}声明八个元素，每个元素八位，共64位数据存储。前面的\code{[7:0]}是每个元素的位宽，后面的\code{[7:0]}是数组索引范围。\code{wsel}与\code{rsel}均为三位，分别选择写地址、读地址。
+\par\noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
 reg [7:0] regfile [0:7];
 integer i;
@@ -2417,9 +2608,12 @@ always @(posedge clk or posedge clr) begin
 end
 assign q = regfile[rsel]; // q is declared as output wire
 \end{lstlisting}
+\end{minipage}\par
 该规范化片段把原\code{always @(*) q <= regfile[rsel];}改成连续赋值：读端是组合逻辑，不应额外采用非阻塞更新。异步清零全部元素通常要求触发器资源，不能直接断言这种写法推断出块RAM。
 
-写地址决定哪一个寄存器在时钟边沿接收数据，其余七个保持。读地址改变时，读输出经过组合延迟跟随对应元素，不需要等下一个边沿。读写同址时，边沿前读出旧内容，非阻塞更新后读出新内容；这是本实现的行为，不代表所有RAM端口都如此。
+写地址决定哪一个寄存器在时钟边沿接收数据，其余七个保持。
+
+写地址译码相当于生成八条写使能：仅目标地址那一条有效。读地址则控制一个八选一的数据选择器，把选中寄存器的八位内容送到输出。因此写端与读端可以选择不同地址，两端功能相互独立。读地址改变时，读输出经过组合延迟跟随对应元素，不需要等下一个边沿。读写同址时，边沿前读出旧内容，非阻塞更新后读出新内容；这是本实现的行为，不代表所有RAM端口都如此。
 \begin{center}\begin{tabularx}{\linewidth}{c c c Y}
 \toprule 操作 & \code{en} & 地址与数据 & 边沿后的结果\\\midrule
 复位 & 任意 & \code{clr=1} & 八个元素均为0\\
@@ -2484,7 +2678,9 @@ always @(posedge clk or posedge rst) begin
   else if (pos_edge) flag <= ~flag;
 end
 \end{lstlisting}
-输入连续为1并传播到第二级而尚未传播到第三级时，\code{pos_edge}为1；下一拍第三级也为1，脉冲结束。\code{flag}每次上升沿脉冲翻转一次，持续按住不会反复翻转。前两级采样有助于同步异步输入，仍不能消除机械抖动；多个真实上升沿仍可能翻转多次。
+输入连续为1并传播到第二级而尚未传播到第三级时，\code{pos_edge}为1；下一拍第三级也为1，脉冲结束。\code{flag}每次上升沿脉冲翻转一次，持续按住不会反复翻转。
+
+若输入在第1沿前由0变为1且保持，三个采样寄存器沿后依次为 $100,110,111$（按 \code{sig_r0,sig_r1,sig_r2} 顺序）。\code{pos_edge}在第2沿后为1，使用它的另一个时钟过程到第3沿才读到这个1并翻转 \code{flag}。画波形时要区分脉冲形成的边沿和下游寄存器接收脉冲的边沿。前两级采样有助于同步异步输入，仍不能消除机械抖动；多个真实上升沿仍可能翻转多次。
 
 原代码没有显式声明\code{pos_edge}，传统Verilog会隐式建立一位\code{wire}。这种隐式声明掩盖拼写错误，整理示例显式声明并使用\code{`default_nettype none}检查未声明连线。
 \subsection{终值脉冲和循环移位}
@@ -2518,20 +2714,26 @@ end
 2025版从左到右为\code{DK7}至\code{DK0}：最高两位显示学号末两位；其后两位统计未消抖的\code{S3}上升沿；中间两位统计消抖后的\code{S3}上升沿；最低两位以0.1秒间隔从0数到30，再回0。\code{S2}每按一次在暂停与继续间切换；\code{SW0=0}关闭显示但内部逻辑继续运行；\code{S1=1}异步复位所有时序逻辑。
 
 设计由\code{top.v}、\code{debounce.v}、\code{edge_detect.v}、\code{led_ctrl_unit.v}组成。\code{top.v}分成输入处理、三组计数和显示拼接。\code{led_ctrl_unit}读取32位\code{display}，八个四位字段分别对应八个位置，最后形成\code{led_en}和\code{led_cx}。
+\par\noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
 assign display = {dig7,dig6,dig5,dig4,dig3,dig2,dig1,dig0};
 assign led_en = SW0 ? anode_out   : 8'hFF;
 assign led_cx = SW0 ? segment_out : 8'hFF;
 \end{lstlisting}
+\end{minipage}\par
 位号\code{dig0}位于拼接最右侧、总线最低四位。\code{SW0}只在输出处门控，因而关闭后重新打开可看到计数继续后的新值。这是“关闭显示”，不是“暂停计数”。原学号尾号为48，使用前需替换。
 \subsection{动态扫描及段码约定}
 \code{refresh_cnt}每100000拍归零并令三位\code{anode_select}加一；每个位置保持1ms，一轮八位为8ms，每位刷新125Hz。三位索引自然从7回0。
+
+扫描时每一时刻只选一个位置，段线提供该位置的字形。1ms是相邻两次换位的间隔；同一位置要等另外七位都扫描完才再次被选中，所以其刷新周期为8ms。位选回答“哪一位亮”，段选回答“这一位显示什么”。
+\par\noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
 if (refresh_cnt == time_max) begin
   refresh_cnt <= 0;
   anode_select <= anode_select + 1'b1;
 end else refresh_cnt <= refresh_cnt + 1'b1;
 \end{lstlisting}
+\end{minipage}\par
 以\code{anode_select=2}为例，选择\code{display[11:8]}，位选为\code{8'b11111011}，仅第2位为0。本版位选低有效，段选按\code{[7:0]={a,b,c,d,e,f,g,dp}}排列，也为低有效。字符0点亮a至f、熄灭g及dp，所以段码为\code{8'h03}；字符7点亮a、b、c，码为\code{8'h1F}。
 \begin{center}\begin{tabular}{c*{10}{c}}
 \toprule 数字 & 0&1&2&3&4&5&6&7&8&9\\\midrule
@@ -2544,6 +2746,7 @@ end else refresh_cnt <= refresh_cnt + 1'b1;
 原消抖模块保存\code{state}作为最近观察到的候选电平，输入不同时更新候选并清计数；连续相同足够久后将候选写入\code{button_out}。100MHz下\code{cnt_max=2_000_000}约为20ms。原计数从0增长到\code{cnt_max}后下一拍才更新输出，准确时刻还包含候选捕获拍；不能宣称恰好2000000拍。
 
 原\code{button_in}直接进入判断逻辑，没有先经过同步寄存器。规范化示例先二级同步，再对同步后的电平作连续稳定计数。
+\par\noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
 if (sync2 == stable) count <= 0;
 else if (count == STABLE_CYCLES-1) begin
@@ -2551,11 +2754,15 @@ else if (count == STABLE_CYCLES-1) begin
   count <= 0;
 end else count <= count + 1'b1;
 \end{lstlisting}
-这里\code{STABLE_CYCLES}为接受一次与当前稳定状态不同的新电平所需的连续周期数。任何一次回到旧稳定值都会清零，短抖动不会通过；释放也必须稳定后才接受。
+\end{minipage}\par
+这里\code{STABLE_CYCLES}为接受一次与当前稳定状态不同的新电平所需的连续周期数。
+
+例如把门限缩成3拍以便手算，初始 \code{stable=0,count=0}，连续三次读到 \code{sync2=1} 后，计数依次变成1、2、0，并在第三次把 \code{stable}改成1。第二拍之后若先读到0，则计数清零，后续的1必须重新连续满足3拍。任何一次回到旧稳定值都会清零，短抖动不会通过；释放也必须稳定后才接受。
 
 消抖输出是电平，持续按住期间为1；计数器必须使用该电平的上升沿事件。\code{edge_detect}延迟一拍并比较\code{sig_r0 & !sig_r1}，得到单拍脉冲。若直接\code{if (button_out) count <= count+1;}，持续按住会每个时钟加一。
 \subsection{BCD进位与0至30循环}
 \term{BCD计数}用独立四位数码保存个位和十位，个位9之后置0并使十位加1。原自动计数在十位3、个位0时归零，因而序列是\code{00,01,...,29,30,00}，共有31个值；一轮为3.1秒。
+\par\noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
 if (tick_100ms && !pause) begin
   if (tens == 4'd3 && ones == 4'd0) begin
@@ -2565,6 +2772,7 @@ if (tick_100ms && !pause) begin
   end else ones <= ones + 1'b1;
 end
 \end{lstlisting}
+\end{minipage}\par
 原两组按键计数只对个位做9回0，十位一直四位加一，到10以后产生非BCD十位，显示默认熄灭。若约定只显示末两位，须在\code{tens==9 && ones==9}时两位同时回0，形成模100计数。讲义的完整示例明确采用该约定。
 
 原\code{pause}仅阻止数字更新，0.1秒节拍计数继续运行，因此恢复后第一次加一可能不足0.1秒；Lab 3的暂停连同分频计数一起保持，两者的暂停语义不同。报告需解释自身实现，不能只写“计数暂停”。
@@ -2578,12 +2786,31 @@ end
 2025版要求9600波特率、三段式状态机，不断发送\code{hitsz+个人学号}。两个字符串发送之间至少等待0.2秒，同一字符串中相邻字符发送间隔不超过0.01秒。\code{S1}为高有效异步复位。仓库\code{uart_send.v}实现单字节发送，\code{top.v}调度15个ASCII字符并等待；该15字符长度来自原作者十位学号，实际学号长度变化时需同步改末地址与指针位宽。
 
 \term{UART}使用独立于系统时钟的串行位时序。此处采用\code{8N1}：空闲1、起始位0、8个数据位、无校验、停止位1，数据最低位先发。一个字节占10个位周期。
+
+这里的“一位”是串口线保持一个逻辑电平的时间段；系统时钟在该段内仍运行许多拍。\code{bit_cnt}选择当前发送第几个数据位，波特率计数器决定何时移动到下一个位，两种计数不能混用。
+\par\noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
 // Frame order in time: start, data[0],...,data[7], stop.
 wire [9:0] frame = {1'b1, data, 1'b0};
 // frame[0] is transmitted first.
 \end{lstlisting}
+\end{minipage}\par
 发送ASCII字符\code{'A'}时数据为\code{8'h41}，实际八个数据位按时间为\code{1,0,0,0,0,0,1,0}。发送十六进制数\code{8'h0A}不等于发送两个字符\code{'0'}、\code{'A'}；后者须发送\code{8'h30}与\code{8'h41}两个字节。
+\par\medskip
+\noindent\begin{minipage}{\linewidth}\centering
+\begin{tikzpicture}[x=10mm,y=8mm]
+\foreach \x in {0,...,10}\draw[ThemeBorder,dashed] (\x,-.3)--(\x,2.1);
+\draw[ThemeMain,thick] (-.7,1)--(0,1)--(0,0)--(1,0)--(1,1)--(2,1)--(2,0)--(7,0)--(7,1)--(8,1)--(8,0)--(9,0)--(9,1)--(10.7,1);
+\foreach \x/\lab in {1.5/d_0,2.5/d_1,3.5/d_2,4.5/d_3,5.5/d_4,6.5/d_5,7.5/d_6,8.5/d_7}\node[font=\footnotesize] at (\x,1.7){$\lab$};
+\node[font=\footnotesize] at (.5,1.7){起始};\node[font=\footnotesize] at (9.5,1.7){停止};
+\foreach \x/\v in {.5/0,1.5/1,2.5/0,3.5/0,4.5/0,5.5/0,6.5/0,7.5/1,8.5/0,9.5/1}{
+ \fill[ThemeMain] (\x,\v) circle(1.5pt);\node[below] at (\x,-.45){$\v$};}
+\draw[->] (-.7,-1.1)--(11,-1.1) node[right]{$t/T_b$};
+\foreach \x in {0,1,9,10}\node[below] at (\x,-1.1){$\x$};
+\end{tikzpicture}
+\diagramcaption{字符A（十六进制41）的8N1帧。时间从左向右，圆点为理想接收采样中心；数据从最低位 $d_0$ 开始。}
+\end{minipage}\par\medskip
+
 \subsection{波特率计数与状态转移}
 100MHz系统时钟下，每位周期数取
 \[
@@ -2599,10 +2826,12 @@ N_b=\left\lfloor\frac{100\,000\,000}{9600}\right\rfloor=10416,
 \code{STOP} & 输出1，停止位 & 一个位周期后回\code{IDLE}\\\bottomrule
 \end{tabularx}\end{center}
 状态寄存器用时钟过程更新\code{current_state}；组合过程根据\code{current_state}、\code{valid}、\code{baud_tick}和\code{bit_cnt}产生\code{next_state}；输出过程产生\code{dout}。三段式描述强调职责分离，输出过程是否寄存还需明确，不能凭块数直接判定Moore或Mealy。
+\par\noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
 if (current_state == IDLE && next_state == START)
   data_buf <= data;
 \end{lstlisting}
+\end{minipage}\par
 这条锁存使发送期间外部\code{data}改变不影响当前帧。原\code{dout}根据旧现态在边沿上寄存，所以相对于\code{current_state}改变延后一拍；数据位号也在同一边沿更新，输出读取旧位号。逐拍跟踪时必须包括这拍延迟，不能只读状态图便宣称输出在状态跳转的同一拍已改变。
 \subsection{字符串ROM与顶层调度}
 \code{top.v}以\code{pointer}访问\code{string_rom}，\code{case}为每个地址给出ASCII。它是组合查表，不是按时钟逐行执行。三个调度状态为\code{send_char}、\code{wait_char}和\code{s_delay}。在发送状态产生单拍\code{uart_valid}，等待一个字符帧时间后推进指针，最后一个字符后进入0.2秒等待。
@@ -2614,9 +2843,11 @@ if (current_state == IDLE && next_state == START)
 原接口没有\code{ready/busy}。\code{valid}在非\code{IDLE}状态出现时会被忽略；持续拉高则可能在回到空闲时重复发送。因此一次请求应只高一拍，并由上层保证当前可以接受。
 \subsection{测试程序的边界与报告内容}
 原测试用例包括\code{A5}、\code{3C}、\code{FF}、\code{00}、\code{5A}，逐位比较起始、数据及停止位。原测试按以下表达式计算等待参数：
+\par\noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
 localparam DIVIDER = CLOCK_FREQ / BAUD_RATE - 1;
 \end{lstlisting}
+\end{minipage}\par
 RTL每位实际10416拍，测试每次却等待10415拍；短帧可能仍通过，但比较时刻会逐位提前。规范测试应以实际位长计时，在每位中心采样。
 
 除原用例外，应验证输入数据在帧内改变、忙碌时请求、相邻帧边界、发送期间复位及字符串间隔。报告给出完整一帧、现态/次态、位计数、波特率计数、锁存数据和串行输出，而不能只展示\code{FF}连续高电平。
@@ -2637,7 +2868,9 @@ RTL每位实际10416拍，测试每次却等待10415拍；短帧可能仍通过�
 \code{mux} & 两条发送位流的模式选择\\\bottomrule
 \end{tabularx}\end{center}
 接收数据一路进入显示、另一路进入匹配；两套发送输出经\code{SW0}选择送往\code{uart_tx}。
-\begin{center}\begin{tikzpicture}[node distance=8mm]
+\par\medskip
+\noindent\begin{minipage}{\linewidth}\centering
+\begin{tikzpicture}[node distance=8mm]
 \node[block,text width=25mm] (rx) {\code{uart_recv}};
 \node[block,text width=31mm,right=of rx] (disp) {\code{display_logic}};
 \node[block,text width=32mm,right=of disp] (scan) {\code{led_ctrl_unit}};
@@ -2647,7 +2880,9 @@ RTL每位实际10416拍，测试每次却等待10415拍；短帧可能仍通过�
 \draw[->,ThemeMain] (disp)--(scan);
 \draw[->,ThemeMain] (rx)|-(match);
 \draw[->,ThemeMain] (match)--(tx);
-\end{tikzpicture}\end{center}
+\end{tikzpicture}
+\diagramcaption{原参考Lab 6的接收与匹配数据流简图。时钟、复位和按键发送支路在此省略，完整接口见模块表。}
+\end{minipage}\par\medskip
 原\code{send_ctrl}发送的是\code{hitsz+原作者学号}，而本实验必做要求为“个人学号”。Lab 5的前缀不能直接当成Lab 6的要求；交付前应移除前缀或明确验证方接受的格式，并替换个人数据。
 \subsection{接收状态机与位中心采样}
 接收引脚是异步输入，应先二级同步。原\code{uart_recv.v}直接用\code{din}判断和采样，功能仿真可能正常，硬件仍有亚稳态传播风险；同步不会消除亚稳态本身，但可以降低其传播概率。
@@ -2663,10 +2898,13 @@ $9.5T_b$ & 停止位 & 应为1\\\bottomrule
 表中$T_b=10416$个系统周期；实际实现增加同步和检测延迟，通常仅若干系统拍，远小于一个串行位。原\code{START && cyc_half}清零计数，故接收状态每次\code{cyc_flag}发生在下一数据位的中点，而不是数据边界；需要以起始沿为基准累加时间理解。
 
 原接收器到停止位时间就输出\code{valid}，没有确认\code{din==1}，无法拒绝坏停止位。规范化\code{uart_clean.v}先同步，并验证停止位，坏帧只复位接收过程、不拉高有效信号。只对帧有效的数据更新显示和计数。
+
+接收器和显示模块若在同一时钟沿使用非阻塞赋值，接收器在本沿更新的数据及 \code{valid} 会在沿后出现；显示模块通常在下一沿读取它们。数据必须覆盖这个有效窗口。连续两个字节即使数值相同，也须有两次接收事件；字节变化本身不能代替有效事件。
 \subsection{ASCII译码、六字符移位与空白编码}
 \code{display_logic.v}用\code{case(recv_data)}把\code{'0'}至\code{'9'}和\code{'A'}至\code{'F'}转换成十六进制数码，同时兼容小写a至f；其他字符令\code{valid_char=0}。处理条件为\code{valid && valid_char}，因此原代码仅统计可显示字符。指导书只测试0至F，但累计“接收到的字符个数”的范围仍需约定；本讲义采用所有帧有效字节计数、仅可显示字符进入六槽显示，以便区分物理接收与显示过滤。
 
 普通十六进制值占四位，却没有额外码表示空白。原代码每槽用五位，\code{5'h1F}表示全灭；\code{0_0000}至\code{0_1111}表示0至F。八槽拼接形成40位\code{display_data}，不同于Lab 4的32位。
+\par\noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
 if (valid && valid_char) begin
   slots[5] <= slots[4]; slots[4] <= slots[3];
@@ -2674,7 +2912,21 @@ if (valid && valid_char) begin
   slots[1] <= slots[0]; slots[0] <= {1'b0,hex_out};
 end
 \end{lstlisting}
+\end{minipage}\par
 非阻塞赋值保证每个槽取得旧的右邻字符，新字符进入\code{slots[0]}。复位时六槽全部为空白。连续接收\code{1,2,A}后，高位仍为空白，低端显示\code{12A}；不能把空白初始化为数字0。
+
+\par\medskip
+\noindent\begin{minipage}{\linewidth}\centering
+\begin{tikzpicture}[x=17mm,y=8mm]
+\foreach \i in {0,...,5}{
+ \draw[ThemeBorder,fill=ThemeBack] (\i,0) rectangle ++(1,1);
+ \pgfmathtruncatemacro{\idx}{5-\i}\node at (\i+.5,1.4){槽\idx};}
+\foreach \i/\v in {0/空白,1/空白,2/空白,3/1,4/2,5/A}\node at (\i+.5,.5){\v};
+\draw[->,ThemeMain] (6.8,.5) node[right]{新字符}--(6,.5);
+\draw[->,ThemeMain] (5.5,-.6)--(.5,-.6) node[midway,below]{每次有效接收，旧字符向高槽号移动一格};
+\end{tikzpicture}
+\diagramcaption{六槽历史按从左到右显示；空白不等于数字0。图示为依次收到1、2、A后的内容。}
+\end{minipage}\par\medskip
 
 原\code{recv_count}为八位，从255加一回0。即使显示时取\code{recv_count / 10}再模10，以及\code{recv_count}模10，第256个字符仍会显示00而非56。要只显示累计计数的末两位，应直接模100计数或用两位BCD，明确\code{99 -> 00}，这样任意长度输入都保留正确末两位。
 \subsection{字符串匹配：前缀状态与输入事件}
@@ -2713,12 +2965,14 @@ end
 \chapterpage{历史Lab补充：格雷计数、序列检测与记忆游戏}
 \subsection{格雷码计数器}
 2020年Lab 3第二题要求四位格雷码循环计数，仅仿真，观察内部二进制计数和格雷输出并覆盖复位、使能。设四位二进制状态为\code{binary}，格雷码为\code{binary ^ (binary >> 1)}。
+\par\noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
 always @(posedge clk_i or negedge rst_n_i)
   if (!rst_n_i) binary <= 4'h0;
   else if (en_i) binary <= binary + 1'b1;
 assign gray_o = binary ^ (binary >> 1);
 \end{lstlisting}
+\end{minipage}\par
 二进制\code{3 -> 4}对应\code{0011 -> 0100}，多个二进制位变化；格雷码为\code{0010 -> 0110}，仅一位变化。\code{15 -> 0}对应\code{1000 -> 0000}，循环边也只变一位。逐项测试相邻码异或是否为独热值，同时检查\code{en_i=0}保持。
 
 格雷码并不消除亚稳态。组合转换\code{binary ^ (binary >> 1)}可能因二进制触发器延迟不同而产生毛刺；跨时钟域使用时常把格雷结果寄存后同步，并满足相应路径约束。课程中的理想码表性质与真实物理波形需区分。
@@ -2740,11 +2994,14 @@ Mealy的瞬时命中为\code{(state==S4) && bit_valid && bit_in}；Moore命中�
 
 验证全部256个字并与软件规则“八位字符串含\code{01011}”比较，其中原指定\code{11011111}为不命中，\code{01010111}命中。串行附加题每个消抖\code{set_i}事件接收一位，命中计数只在接受事件上加一；显示一位数时必须明确超过9后的处理。
 \subsection{记忆游戏：需求拆解与数据格式}
+
+综合实验应分别记录“系统处于哪个阶段”和“当前处理第几项、已输入几位”。前者决定允许的操作，后者属于数据通路中的索引或计数。把每一种数据内容都设成独立状态会迅速扩大状态表，通常没有必要。
 2020年Lab 6要求复位显示八个0；\code{S0}启动生成五个互不相同的五位八进制数并存储，以1秒间隔播放；\code{S1}进入按地址查看；\code{S2}进入匹配输入；\code{S3}每次确认采样\code{SW[2:0]}；\code{S4}复位。五位八进制数用15位表示，每一位八进制数占3位。数码管十六进制译码仍可显示0至7。
 
 生成的五个数彼此不同，不要求一个数内部五个数码都不同。示例\code{44444}因此合法。可采用自由运行计数器采样或非零种子的LFSR产生候选，候选写入前与已经保存的0至$k-1$项逐项比较，重复则重新生成；不能只用不同地址便宣称数据互异。上电固定种子的固定取样时序可能每次给出相同五项，应按题意让启动时刻影响取样，并记录不属于密码学随机源。
 
 控制流程可设\code{WAIT_START -> GENERATE -> PLAY -> WAIT_VIEW -> VIEW -> MATCH}。\code{PLAY}保存播放索引和1秒计数，每满1秒推进一项；第5项显示满1秒后保持并等待\code{S1}。输入模块保存最近五个八进制数码，每次确认事件更新窗口：
+\par\noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
 wire [14:0] candidate_window = {window[11:0], sw[2:0]};
 if (confirm_pulse) begin
@@ -2752,6 +3009,7 @@ if (confirm_pulse) begin
   // Compare candidate_window, not the old window.
 end
 \end{lstlisting}
+\end{minipage}\par
 若在同一时钟过程更新\code{window}后用\code{window}比较，非阻塞语义会比较旧窗口，结果晚一位。还需记录已经输入的数量，未满五位之前不得以初始化的前导零误报匹配。
 \subsection{旧指导书中的地址与闪烁歧义}
 五项按示例分别编号0至4，输入\code{03}读取第四项\code{17531}；因此有效地址应为\code{0 <= address < 5}。指导书却写“地址大于5时显示F”，没有定义地址5，并与五项存储的范围不一致。本讲义按五项、零起始编号统一采用\code{address >= 5}为非法，显示八个F；若当年教师另有地址约定应按明确补充修改。
@@ -2826,7 +3084,9 @@ PLD、CPLD、FPGA & 可编程逻辑器件、复杂PLD、现场可编程门阵列
 
 UART一帧的八位数据最低位先传，ASCII字符与十六进制数值需区分。\code{valid}表示当前边沿有一份可接受的数据，不能当作持续请求。发送忙碌反馈、接收停止位验证、末两位计数以及字符串终结符，决定连续运行的边界行为。状态代表已接受输入的历史，输入无效时保持状态。
 
-\subsection{本次实验验证记录与边界}
+\subsection{既有实验验证记录与边界}
+以下保留2026年10月4日整理版的验证记录，测试对象是配套“整理示例”及当时读取的原参考代码。此次讲义表述与图示修订不改变这些实验代码，也不把既有结果解释为2026年新实验工程的验收。
+
 整理示例使用Icarus Verilog进行自动功能仿真：四位加减器1024组、译码器64组、两种寄存器文件八个地址及异步复位保持、Moore与Mealy检测器各256个字、格雷循环32次转移、四拍节拍、短毛刺拒绝与长按单次事件、模100计数256次；改写UART逐字节验证全部256种发送数据和全部256种接收数据，并验证短起始毛刺、坏停止位拒绝及随后恢复。
 
 原UART发送测试五组数据、接收测试十组数据均通过。原测试程序以\code{byte}命名任务参数，使用传统Verilog模式可运行，若按SystemVerilog编译则与关键字冲突；不能把这一语言模式错误当成UART逻辑错误。原Lab 4、5、6的顶层完成语法与展开检查。
@@ -2836,7 +3096,8 @@ UART一帧的八位数据最低位先传，ASCII字符与十六进制数值需�
 \subsection{课件范围与资料说明}
 新增例题参考《2024秋数逻期末回忆版》（资料标注更新日期2024年11月25日）与上述课件。电路图按可辨认接线重绘，逐项列出输入条件、位序、有效电平和初态；改编题注明补充条件。地址译码题的位序与通常74LS138约定冲突，正文分别给出两种解释；波形设计题重新规定明确的周期与初态。回忆资料未能确认的细节不据此补写为原题条件。
 
-本讲义以桌面“数字逻辑设计课件”文件夹内全部15份PDF为主要依据。重复版本合并为13个课件主题，保留较长版本中的补充内容，按知识联系整合为前述章节。课件中的教学安排、考核比例、建议和课堂投票不作为学科正文重复收录。
+本次修订于2026年11月17日对照桌面“数字逻辑设计课件”根目录的14份课件PDF，合并为13个主题，其中04-2有65页与68页两版。练习册子目录不计入课件数量。正文保留原版已核验的例题和纠正，并按知识联系组织。课件中的教学安排、考核比例、建议和课堂投票不作为学科正文重复收录。
+\begingroup\renewcommand{\arraystretch}{1.05}
 \begin{longtable}{>{\raggedright\arraybackslash}p{0.24\linewidth}p{0.44\linewidth}p{0.23\linewidth}}
 \toprule 课件标识 & 内容 & 对应正文\\\midrule\endhead
 01 引言 & 基本概念、数字系统、设计层次 & 第1章\\
@@ -2853,7 +3114,8 @@ UART一帧的八位数据最低位先传，ASCII字符与十六进制数值需�
 06-03 同步时序设计 & 状态图、状态化简、编码、序列检测 & 第12章\\
 06-04 中规模芯片应用 & 计数器、级联、寄存器、序列发生器 & 第13章\\\bottomrule
 \end{longtable}
-04-2的65页与68页版本合并，后者补充的优先编码、奇偶校验及分组比较Verilog应用均纳入对应主题。06-2的两个47页版本提取内容一致，仅保留一套讲解。讲义中的小规模算术、码制转换、反馈状态及序列例子按定义逐值核对；硬件延迟与非法控制条件未用理想真值表替代。
+\endgroup
+04-2的65页与68页版本合并，后者补充的优先编码、奇偶校验及分组比较Verilog应用均纳入对应主题。本次目录中06-2为一份47页课件；沿用原版相应讲解。讲义中的小规模算术、码制转换、反馈状态及序列例子按定义逐值核对；硬件延迟与非法控制条件未用理想真值表替代。
 
 必要纠正包括：标准ASCII为七位；十个数码从16个码字中任选一组共有 $\binom{16}{10}=8008$ 种选集，而给十个数码分别分配不同码字有 $16!/6!$ 种映射，二者不同；锁存器可带异步复位，完整赋值与过程类型决定是否推断锁存器；FSM不必有终态；状态位下界须使用向上取整；同步计数的组合译码仍可能有毛刺；74LS193清零高有效、74LS190/191级联端功能不同；若未给出适用统计模型，不将“单比特错误占96\%”当作通用概率。
 
@@ -2861,5 +3123,5 @@ UART一帧的八位数据最低位先传，ASCII字符与十六进制数值需�
 \subsection{实验资料与代码归档}
 实验资料读取时间为2026年10月4日。2025年六次实验的要求来自课程页面链接仓库中各次“实验指导书”PDF，设计来自“源代码”目录；报告只用于辅助核对，不用报告结论替代RTL与功能表。2020年指导书与2024年补充取自\href{https://github.com/HITSZ-OpenAuto/COMP2051/tree/main/labs}{HOA课程仓库labs}。配套目录记录原始下载路径及SHA-256摘要，可区分原文件与规范化示例。
 
-后续资料到来时，先确定实验版本、开发板、接口及任务变化，再在本讲义最新源文件中更新相应章节和验证记录，保留已有理论内容及统一样式。不能把另一学年的题目直接覆盖成同名实验的唯一要求。
+
 \end{document}
