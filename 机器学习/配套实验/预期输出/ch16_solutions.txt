@@ -1,0 +1,3 @@
+posterior examples: 8/15, 6/7, 5/9; duplicate: 16/17
+invalid cases rejected 4
+all checks passed

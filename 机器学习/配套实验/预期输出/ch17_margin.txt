@@ -1,0 +1,11 @@
+C / alpha 10.0 [0.  0.5 0.5 0. ]
+w / b [1. 0.] 0.0
+margins / xi [2. 1. 1. 2.] [0. 0. 0. 0.]
+primal-dual gap / KKT residual 2.3314683517128287e-15 1.2954047556856819e-15
+decision max error 1.3322676295501878e-15
+C / alpha 1.0 [0.  0.5 0.5 0.  1.  1. ]
+w / b [1. 0.] 0.0
+margins / xi [ 2.  1.  1.  2. -0.  0.] [0. 0. 0. 0. 1. 1.]
+primal-dual gap / KKT residual 0.0 3.3306690738754696e-16
+decision max error 8.881784197001252e-16
+all checks passed

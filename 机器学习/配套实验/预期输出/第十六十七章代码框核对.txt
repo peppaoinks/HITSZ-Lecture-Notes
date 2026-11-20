@@ -1,0 +1,4 @@
+block 1: parsed and executed in documented context
+block 2: parsed and executed in documented context
+block 3: parsed and executed in documented context
+block 4: parsed and executed in documented context

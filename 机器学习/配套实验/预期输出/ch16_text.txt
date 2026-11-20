@@ -1,0 +1,10 @@
+vocabulary size 16
+best alpha 0.1
+mean validation log loss 0.0016147557520519286
+test labels [0 0 0 0 1 1 1 1]
+test accuracy / log loss 1.0 0.0002813771193336174
+confusion matrix [[4, 0], [0, 4]]
+class 1 posterior [1.50000e-05 2.30000e-05 5.95000e-04 4.03000e-04 9.99994e-01 9.99992e-01
+ 9.99731e-01 9.99067e-01]
+unseen-only posterior [[0.5 0.5]]
+all checks passed

@@ -6,6 +6,22 @@ from ch08_uncertainty import ERROR_A, ERROR_B, paired_bootstrap
 
 
 def main():
+    # 例题8.11：用前三笔记录拟合，再在第四笔上核对已固定的直线。
+    x = np.array([0., 1., 2.])
+    target = np.array([1., 2., 2.])
+    design = np.column_stack((np.ones_like(x), x))
+    intercept, slope = np.linalg.lstsq(design, target, rcond=None)[0]
+    fitted = intercept + slope * x
+    residual = target - fitted
+    np.testing.assert_allclose([intercept, slope], [7 / 6, 1 / 2])
+    np.testing.assert_allclose(design.T @ residual, 0, atol=1e-12)
+    half_mse = np.mean(residual ** 2) / 2
+    gaussian_nll = -np.mean(np.log(np.exp(-residual ** 2 / 2) / np.sqrt(2 * np.pi)))
+    np.testing.assert_allclose([half_mse, gaussian_nll - np.log(2 * np.pi) / 2], 1 / 36)
+    holdout_prediction = intercept + slope * 3
+    np.testing.assert_allclose([holdout_prediction, abs(3 - holdout_prediction)], [8 / 3, 1 / 3])
+    print(f"example 8.11: half MSE={half_mse:.6f}, held-out prediction={holdout_prediction:.6f}")
+
     np.testing.assert_allclose(.54/.82, 27/41)
     np.testing.assert_allclose(bayes_positive(.01, .9, .01), 10/21)
     np.testing.assert_allclose(.138+.0096, .18*.82)

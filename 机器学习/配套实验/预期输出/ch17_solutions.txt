@@ -1,0 +1,4 @@
+alpha [0.  0.5 0.5 0. ] w [1. 0.] b 0.0
+hinge gradient max error 1.9203749701546258e-11
+polynomial map / PSD / copied-sample checks passed
+all checks passed

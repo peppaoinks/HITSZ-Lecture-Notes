@@ -1,0 +1,6 @@
+best params {'svc__C': 1, 'svc__gamma': 0.1, 'svc__kernel': 'rbf'}
+mean validation balanced accuracy 1.0
+test accuracy / balanced accuracy 1.0 1.0
+support vectors 71 of 180
+all checks passed
+Matplotlib is building the font cache; this may take a moment.

@@ -1,1 +1,2 @@
+example 8.11: half MSE=0.027778, held-out prediction=2.666667
 chapter 8: hand calculations, zero probabilities, Wilson, paired symmetry, and invalid inputs passed

@@ -1,0 +1,15 @@
+multinomial theta [[0.5   0.375 0.125]
+ [0.125 0.25  0.625]]
+multinomial posterior [[0.444444 0.555556]
+ [0.5      0.5     ]
+ [0.       1.      ]]
+bernoulli theta [[0.75 0.75 0.25]
+ [0.25 0.5  0.75]]
+bernoulli posterior [[0.333333 0.666667]
+ [0.333333 0.666667]
+ [0.333333 0.666667]]
+gaussian posterior [[0.99883  0.00117 ]
+ [0.00117  0.99883 ]
+ [0.679179 0.320821]]
+maximum log-probability errors 0.0 8.881784197001252e-16 8.881784197001252e-16
+all checks passed
